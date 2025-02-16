@@ -1,0 +1,6 @@
+
+This directory contains source code for ARPSPRT, a program for producing
+formatted table print out for variables in a ARPS history file. 
+ 
+Doing 'makearps arpsprt' in arps root directory compiles and links this package.
+

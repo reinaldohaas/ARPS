@@ -1,0 +1,201 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSTRAJC IN NAMELIST FORMAT    ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters  for program ARPSTRAJC
+!
+!  Steps to use this program:
+!
+!  Step 1: Compile and link using 'makearps arpstrajc'
+!  Step 2: Edit input file input/arpstrajc.input
+!  Step 3: Run job using 'bin/arpstrajc< input/arpstrajc.input'.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!
+!   Ming Xue (12/1/2003)
+!   Modification history:
+!
+!-----------------------------------------------------------------------
+!
+!  hinfmt   The format flag of the input history data.
+!          = 3, NCSA HDF4 format data dump - only this format is supported
+!
+!  hdmpinopt = Indicate the way history data files are specified.
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed.
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintv_dmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgn_dmpin   Time at which input history data begins (hdmpinopt=1).
+!  tend_dmpin   Time at which input history data ends (hdmpinopt=1).
+!
+!  grdbasfn Base-state and grid data file name (hdmpinopt=2).
+!  nhisfile The number of time-dependent history files to be processed
+!           (hdmpinopt=2).
+!  hisfile  Name of history data files (hdmpinopt=2).
+!
+!-----------------------------------------------------------------------
+!
+
+ &history_data
+
+   hinfmt = 3,
+
+   hdmpinopt    = 1,
+
+     hdmpfheader = '/home/ddawson/torcases/may0399/idealized/500m_new/500mMY1',
+
+     hdmpftrailer= '',
+     tintv_dmpin = 30.0,
+
+     tbgn_dmpin  = 900.0,
+     tend_dmpin  = 2700.0,
+
+     nhisfile = 1,
+     grdbasfn =   '/scratch7/xuem/may20_25x20m_cf.data/may20_50x20m_c.hdfgrdbas_25m',
+     hisfile(1) = '/scratch7/xuem/may20_25x20m_cf.data/may20_50x20m_c.hdf012600_25m',
+
+ /
+
+!----------------------------------------------------------------------------
+!
+!
+!  initrajc    Option for initializing the trajectroies.
+!           = 1, specified in this input file via arrays xtrajc0, ytrajc0 and ztrajc0.
+!           = 2, circle of radius of 'radius'
+!           = 3, square box
+!           = 4, Read in from trajectory file trajc_fn_in.
+!                Same format as trajectory output file.
+!           = 5, Initialize trajectories at surface scalar points where theta_e
+!                is below a certain threshold (see code for details).
+!           = 6, Initialize trajectories at the minimum surface theta_e point
+!                and surrounding grid box edges and corners (see code for details)
+!           = 7, As in 6 but for the minimum w at a given k-level (currently hard-coded
+!                to k=6 in the code).  See code for details
+!             In options 5,6,7, the search for the initial trajectory points are
+!             are constrained by a bounding box with width,height given by xwidth,ywidth
+!             and center given by xctr,yctr
+!
+!             Note that options 5,6,7 are a work in progress.
+!
+!  ntimes      Number of times for which trajectories are specified.  Note that options 5-7 above
+!              only work with a single initial time for now.
+!
+!  subinterval Number of subintervals between data intervals (given by tintv_dmpin above) for
+!              which to integrate trajectories.  Wind data at successive data times will
+!              be linearly interpolated to the subintervals.  More subintervals increases
+!              the accuracy of the integration but also takes longer to integrate.  Set to 1
+!              to make the trajectory time step equal the data time interval.
+!
+!  trajc_fn_in Name of trajectory file to be read to initialized the trajectories.
+!              Used when initrajc = 4.
+!
+!  ntrajcs     Number of trajectories to calculate. Used only when initrajc=1.
+!              In other cases, ntrajcs is set inside the program (need change
+!              program if wanting different numbers).
+!
+!  xtrajc0, ytrajc0, ztrajc0 : 1D arrays containning locations of trajectories at
+!              initialization time. Used only when initrajc=1.
+!
+!  reftime     The (reference) time of the INITIAL specification of trajectories
+!              If the trajectories are calculated in a single (non-restarting) job,
+!              set reftime = ttrajc0 or the time of ntrajc0-th history dump for
+!              hdmpinopt=2.
+!
+!  ttrajc0     When hdmpinopt=1, specify the time at which trajactores are initialized.
+!              For hdmpinopt=2, the trajectories are initialized at the time of
+!              the ntrajc0-th history dumps, hence ttrajc0 is determined inside the code,
+!              no here.
+!
+!  ntrajc0     When hdmpinopt=2, specify the file number within the list of history
+!              files whose time will be used to specify ttrajc0.
+!              For hdmpinopt=1, ttrajc0 is specified here and ntrajc0 is determined
+!              internally based on constant time interval.
+!
+!              The trajectories are integrated from the initialization time ttrajc0
+!              backward to the time of the first history dump (tbgn_dmpin for
+!              hdmpinopt=1) and forward to the time of the last history dump
+!              (tend_dmpin for hdmpinopt=1).
+!
+!  nzctr       Number of cirles of the same radius and horizontal center location
+!              but different heights (defined by array zctr) for initializing the
+!              trajectories.
+!  radius      Radius of circle or half-width of the squared box along which
+!              initial trajectory points are specified.
+!
+!  xwidth,ywidth Width of the bounding box for options 5,6,7 in x and y directions
+!
+!  xctr, yctr, zctr Center location of the circle or box.
+!  theta_inc   Increment in degrees between points among the circle.
+!
+!  trajcfn_header  String used to construct output trajectory file name header.
+!
+!  dirname Directory where file containing perturbation equivalent potential
+!          temperature resides.  Only used for initrajc = 5 and will likely
+!          be removed in later versions.
+!
+!----------------------------------------------------------------------------
+
+ &trajectories
+
+   initrajc = 2,
+
+   ntimes = 1,
+   subinterval = 1,
+   reftime  = 2700.0,
+
+   ttrajc0 = 2700.0,
+   ntrajc0 = 1,
+
+   trajc_fn_in(1) ='trajc_filename',
+
+   ntrajcs = 1,
+   xtrajc0(1,1) = 4250.0,xtrajc0(2,1) = 4750.0,xtrajc0(3,1) = 5500.0,
+   ytrajc0(1,1) = 6500.0,ytrajc0(2,1) = 6500.0,ytrajc0(3,1) = 6600.0,
+   ztrajc0(1,1) = 100.0,ztrajc0(2,1) = 100.0,ztrajc0(3,1) = 100.0,
+
+   radius = 50000.0,
+   xwidth = 7000.0,
+   ywidth = 9000.0,
+   xctr = 48500.0,
+   yctr = 60500.0,
+   nzctr = 1,
+     zctr(1) = 20.0,
+   theta_inc = 22.5,
+
+   dirname='./'
+   trajcfn_header = '500mMY1',
+ /
+
+
+!----------------------------------------------------------------------------
+!
+!  End of input file
+!
+!----------------------------------------------------------------------------

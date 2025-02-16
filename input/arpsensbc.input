@@ -1,0 +1,70 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSENSBC IN NAMELIST FORMAT    ######
+!     ######                 ( Version ARPS5.3 )                  ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+! Namelist for ARPSENBC.
+!
+!   AUTHOR:
+!
+!--------------------------------------------------------------------
+! iorder:    perturbation scaling index (-1, -2, 2), 0 for difference
+! irandom:   option to add random perturbation on BC (0 not; 1 yes)
+! iseed:     seed number for random number generator (meaningful only
+!            when irandom = 1)
+! iread:     read the 3rd file? 1 YES, 0 Not.
+! ngbrz:     number of grid zones in the boundary relaxation zone
+!            (should be the same as in &exbcpara of arps.input)
+! exbcdmp:   Flag to dump ARPS external boundary data files
+!            (should be the same as in &output of arps.input)
+! exbcfmt:   format of external boundary data files 
+!           = 1: Fortran unformatted - default; 
+!           = 3: HDF4
+!            (should be the same as in &exbcpara of arps.input)
+!--------------------------------------------------------------------
+
+ &ptbcpara
+   iorder=-1, 
+   irandom=0,
+   iseed=1,
+   iread=0,   
+   ngbrz=12,
+   exbcdmp = 3,
+   exbcfmt = 1,
+ /
+
+!--------------------------------------------------------------------
+!  isets:        Number of sets of data to be processed, maximum 20.
+!  filename1(1): 1st field  set 1
+!  filename2(1): 2nd field
+!  filename3(1): base field unused if iread=0
+!  filename1(2): 1st field !set 2
+!  filename2(2): 2nd field
+!  filename3(2): base field unused if iread=0
+!--------------------------------------------------------------------
+
+ &input_data 
+   isets=1,
+   filename1(1)='20020101/12Z/em2002010112.20020102.030000',
+   filename2(1)='20020102/00Z/em2002010200.20020102.030000',
+   filename3(1)=' ', 
+ /
+
+!--------------------------------------------------------------------
+! Output filed
+!--------------------------------------------------------------------
+
+ &outpt_data 
+   filnmout(1)='emb12002010200.20020102.030000',
+ /

@@ -1,0 +1,34 @@
+########################################################################
+####                                                                #### 
+#### Contain changes from CAPS                                      ####
+####                                                                ####
+####    Makefile                                                    ####
+####    README.int                                                  ####
+####                                                                #### 
+########################################################################
+
+This directory contains WRF internal binary format I/O subroutines.
+
+The only changes are:
+
+  makefile
+  README.int   (added)
+  pack_utils.c 
+        Note: ARPS usually use "UNDERSCORE" macro. However, this file 
+              use "NOUNDERSCORE". so we add three lines of directives
+              in the beginning to convert. 
+  
+Copy the following include file from WRF directory ../../inc to ../inc (ARPS directory)
+  intio_tags.h
+  wrf_io_flags.h 
+  wrf_status_codes.h
+
+03/01/2007 (Y. Wang)
+  Upgraded to WRFV2.2. Added the following note.
+
+  1. module_internal_header_util.F and pack_utils.c was copied in from 
+     WRF subdirectory "frame/".
+
+11/3/2008 (Y. Wang)
+  Upgraded to WRFV3.0.1.1. Note the changes within comment blocks.
+

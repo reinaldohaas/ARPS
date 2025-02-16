@@ -1,0 +1,338 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR ARPS2COAMPS IN NAMELIST FORMAT   ######
+!     ######                 ( Version ARPS5.3.2 )                ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!   AUTHOR:
+!
+!   Yunheng Wang, CAPS
+!   01/21/2011
+!
+!-----------------------------------------------------------------------
+!
+!   MODIFICATION HISTORY
+!
+*-----------------------------------------------------------------------
+!
+!  Message passing namelist
+!
+!  nproc_x     : processor number in X direction
+!  nproc_y     : processor number in Y direction
+!
+!  nprocx_in   : Valid only when readsplit = 0. processor number when
+!                the data to be read was dumped.
+!                It must be a multiple of nproc_x.
+!  nprocy_in   : Same as nprocx_in but in Y direction. It must be
+!                a multiple of nproc_y
+!
+!---------------------------------------------------------------------=*
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+   nprocx_in = 1,
+   nprocy_in = 1,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  history_data   specify files for COAMPS input data. It can be either ADAS
+!                 analysis, or ARPS history dumps or EXT2ARPS outputs.
+!
+!  hinfmt  input data format option. The available options are:
+!     = 1, unformatted binary data dump
+!     = 3, HDF format
+!     = 7, NetCDF format
+!
+!  adasbasfn  Base-state and grid data file name.
+!  adashisfn  History data files to be converted.
+!
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!---------------------------------------------------------------------=*
+!
+ &history_data
+   hinfmt     = 3,
+   adasbasfn  = 'adas25may1998.hdfgrdbas',
+   adashisfn  = 'adas25may1998.hdf000000',
+ /
+
+*--------------------------------------------------------------------
+!
+! Specify whether to create lateral boundary file for COAMPS
+!
+!   create_bdy = 0,  Do not create COAMPS boundary files
+!              = 1,  The program will create COAMPS boundary file.
+!                    The time interval in the COAMPS boundary file is
+!                    the same as those specified by tbgn_bdyin, tintv_bdyin,
+!                    & tend_bydin.
+!
+!   bdyfheader  External boundary file name header (not including '.'
+!                at the end), corresponding to runname plus directory name.
+!                e.g., bdyfheader='./eta25may1998'.
+!
+!   tbgn_bdyin  Time at which input boundary data begins (in seconds).
+!   tintv_bdyin Time interval between boundary data dumps.
+!   tend_bdyin  Time at which input boundary data ends.
+!
+!   NOTE: The above "time" represents forecast time in seconds from the
+!         initial ADAS analysis date and time (retrived from the file
+!         specified above "adashisfn"). "tbgn_bdyin" must be initial
+!         analysis time + tinv_bdyin.
+!
+!         The boundary file name is constructed as
+!              Perturbation file = bdyfheader//".XXXtttttt"
+!              Base file         = bdyfheader//".XXXgrdbas.??"
+!
+!          Where "XXX" represents the file format, like "bin" for binary
+!          which is specified by "hinfmt" above.
+!
+!          "tttttt" represents the forecast time from the initial time
+!          (ADAS analysis file specified above) which is computed
+!          from tbgn_bdyin + n*tintv_bdyin, n changes from 0 to
+!
+!               tend_bdyin - tbgn_bdyin
+!              -------------------------
+!                    tintv_bdyin
+!
+!          "??" is a serial number for the grid and base files.
+!
+!          Examples:
+!              ./eta25may1998.bin010800    ./eta25may1998.bingrdbas.01
+!              ./eta25may1998.bin021600    ./eta25may1998.bingrdbas.02
+!              etc.
+!
+!          Those files are created by EXT2ARPS and they must be at the
+!          same grid as that specified by "adashisfn" above and they
+!          have the same file format specified as "hinfmt".
+!
+!  mgrdbas      Grid base file option for the above files
+!              = 0 share the same grid base file as "adasbasfn" (default);
+!              = 1 All of the files share one grid base file but it
+!                  is not "adasbasfn", the file name will be
+!                  bdyfheader//".bingrdbas". Those files are usually
+!                  generated by ARPS;
+!              = 2 Each file has one corresponding grid base file.
+!                  Those files are generated by EXT2ARPS.
+!
+! nbdypt: number of points included in lateral boundary computation
+!
+!--------------------------------------------------------------------=*
+
+ &bdyspc
+   create_bdy = 1,
+     bdyfheader  = './eta25may1998',
+     tbgn_bdyin  = 10800,
+     tintv_bdyin = 10800,
+     tend_bdyin  = 21600,
+     mgrdbas     = 0,
+
+     nbdypt = 7,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  SFCSPC Option for surface fields
+!
+!  create_sfc Specify whether to create surface fields
+!           = 0, Do not generate surface fields
+!           = 1, Generate surface fields
+!
+!  dsclim:  directory path of climatology surface characteristics data (input).
+!  dsgiss:  directory path of GADDAR high-resolution albedo and z0 data (input)
+!  dsdted:  directory path of 1 km terrain data (input).
+!           masglob: USGS 1 km terrain database
+!  dsland:  directory path of 400-meter land-sea tables (input).
+!  dslanu:  directory path of 1 km land use data (input).
+
+!
+!---------------------------------------------------------------------=*
+
+ &sfcspc
+   create_sfc = 0,
+     dsclim  = '/data3/ywang/coamps/database/masclim/',
+     dsgiss  = '/data3/ywang/coamps/database/masgiss/',
+     dsdted  = '/data3/ywang/coamps/database/masglobe/',
+     dsland  = '/data3/ywang/coamps/database/landsea/',
+     dslanu  = '/data3/ywang/coamps/database/landuse/',
+ /
+
+*--------------------------------------------------------------------
+!
+!  COAMPS grid definitions  (similar to those for WRFSI)
+!
+!    use_arps_grid:    Specify whether ARPS grid and COAMPS grid are the same.
+!              = 1, horizontal interplation will not be needed
+!              = 0, need to do both horizontal and vertical interpolations.
+!
+!      NOTE: ARPS grid has two fake points at both end of each diretion
+!            X, Y and Z. So nx_coamps = nx_arps - 2, ny_coamps = ny_arps - 2.
+!
+!    kka    : Number of atm vertical levels
+!    dsigma : Arrays of intervals of sigma levels (in meter) of the vertical levels
+!
+!    The following speficicaitons are only used when use_arps_gird = 0, otherwise
+!    those information will be extracted from the ARPS data.
+!
+!      mx:       Number of x grid positions
+!      ny:       Number of y grid positions
+!
+!      nproj:    Map projection option (COAMPS definitions).
+!              = 1, Mercator;
+!              = 2, Lambert conformal;
+!              = 3, Polar stereographic;
+!              = 4, Cartesian coordinates;
+!              = 5, Spherical
+!      phnt1:  1st standard latitude of grid
+!      phnt2:  2nd standard latitude of grid
+!      alnnt:  Standard longitude of grid
+!      rlat:   Grid reference latitude
+!      rlon:   Grid reference longitude.
+!      iref:   Grid reference index
+!      jref:   Grid reference index
+!
+!      delx:       Grid spacing in x-direction (meter).
+!      dely:       Grid spacing in y-direction (meter).
+!
+!---------------------------------------------------------------------=*
+
+ &coamps_grid
+
+   use_arps_grid   =    1,
+     mx      =     65,
+     ny      =     65,
+     nproj   =      2,
+     phnt1   =   30.0,
+     phnt2   =   60.0,
+     alnnt   = -100.0,
+     rlat    =   38.0,
+     rlon    =  -98.0,
+     iref    =  33,
+     jref    =  33,
+     delx    = 30000.,
+     dely    = 30000.,
+
+   kka    = 50,
+   dsigma = 800.0, 786.0, 772.0, 758.0,  744.0,  729.0,  714.0,
+            700.0, 685.0, 670.0, 654.0,  639.0,  624.0,  608.0,
+            592.0, 576.0, 561.0, 545.0,  529.0,  513.0,  498.0,
+            481.0, 465.0, 449.0, 433.0,  417.0,  400.0,  384.0,
+            368.0, 353.0, 337.0, 321.0,  305.0,  289.0,  273.0,
+            258.0, 242.0, 226.0, 211.0,  196.0,  180.0,  165.0,
+            150.0, 136.0, 121.0, 106.0,   92.0,   78.0,   64.0,
+            50.0,
+
+   lm     = 16,
+   pr     =  50.0,  60.0,  70.0,  80.0, 100.0, 150.0, 200.0,  250.0,
+            300.0, 400.0, 500.0, 700.0, 800.0, 850.0, 925.0, 1000.0,
+/
+
+!   kka    = 30,
+!   dsigma = 7500.0, 5800.0, 4200.0, 2500.0, 1000.0,
+!            1000.0,  750.0,  750.0,  750.0,  750.0,
+!             750.0,  750.0, 1000.0, 1000.0, 1000.0,
+!            1000.0,  800.0,  800.0,  800.0,  600.0,
+!             400.0,  300.0,  200.0,  140.0,   90.0,
+!              60.0,   40.0,   30.0,   20.0,   20.0,
+!   lm = 16,
+!   pr = 10,  20,  30,  50,  70, 100, 150, 200, 250, 300,
+!        400, 500, 700, 850, 925, 1000,
+!
+
+*-----------------------------------------------------------------------
+!
+!  INTERP_OPT Option for interpolation
+!
+!  intrp_opt Interpolation option for most atmospheric field
+!            See constant definition in module module_constants.f90
+!           = 1 linear interpolation
+!           = 2 quadratic interpolation
+!
+!  ctrnopt   Option for terrain data
+!            = 0, Use that in ARPS(ADAS) data file,
+!            = 1, Use that in COAMPS static files.
+!  nfpass    Pass of smoothing for sea level pressure and wind components
+!
+!  hydmeteor Whether output hydrometeors (qc, qr, qi, qs, qg, qh etc.)
+!            =  -1, set all hydrometeorological fields to zero,
+!            =  1, yes (default, for q[crisg] only, coamps stock MP scheme),
+!            =  4, Thompson scheme
+!            =  5, Milbrandt-Yau one moment scheme (q[crisgh] from ARPS data).
+!            =  6, Milbrandt-Yau 2 moment scheme (q[crisgh], n[crisgh] from the ARPS data)
+!            =  7, Milbrandt-Yau 2 moment scheme (q[crisgh], n[crisgh] from the ARPS data)
+!            =  8, Milbrandt-Yau 3 moment scheme (q[crisgh], n[crisgh], z[risgh] from the ARPS data)
+!            =  9, Milbrandt-Yau 2 moment scheme used in the WRF system.
+!
+!            = 106, 107, 108, 109 same as 6, 7, 8, and 9 but n[crisgh], z[crisgh] etc are
+!              diagnosed from the first moment q[crisgh].
+!
+!  Use only when hydmeteor > 100.
+!
+!     N0risgh     Intercept parameter for rainwater (snow, graupel and hail) (1/m**4)
+!     Ntcloud     Constant number concentration for cloud (1/m**3)
+!     rhoisgh     Ice (snow, graupel and hail) density ( kg/m**3 )
+!     alpharisgh  shape parameter for gamma rain (ice, snow, graupel and hail)
+!
+!  varadj    Whether apply COAMPS variable adjustment process to initial
+!            fields. Note that COAMPS varadj is always applied for
+!            lateral boundary conditions.
+!            = 0, no,
+!            = 1, yes (default), adjust temperature more than adjusting pressure
+!            = 2, yes, asjust pressure more than adjusting temperature
+!
+!  icycle    Not significant, just make sure it has the same value as the
+!            same named paramter in the namelist file for coamps run.
+!
+!---------------------------------------------------------------------=*
+
+ &interp_opt
+   intrp_opt =  1,
+   ctrnopt   =  0,
+   hydmeteor =  1,
+     ntcloud    = 1.0e8,
+     n0rsgh     = 8.0e6, 3.0e6, 4.0e5, 4.0e4,
+     rhoisgh    = 500.0, 100.0, 400.0, 913.0,
+     alpharisgh =   0.0,   0.0,   0.0,   0.0, 0.0,
+
+   varadj    =  1,
+   nfpass    =  1,
+   icycle    =  1,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  Data output control parameters.
+!
+!  output_path   Name of directory into which output files are written.
+!  output_pres   Denote whether to write analysis fields on pressure levels
+!               = 1, Yes, full analysis fields
+!               = 2, zero increments,
+!               = 0, No
+!  lvldbg        Debug information
+!               > 0, more lager the number is, more messages are printed.
+!               = +- 11510, Magic switch to the author. Not intent for general use.
+!
+!---------------------------------------------------------------------=*
+
+ &output
+   output_path = './',
+   output_pres = 1,
+   lvldbg      = 0,
+/
+
+!---------------------------------------------------------------------
+!
+! END of Input file
+!
+!----------------------------------------------------------------------

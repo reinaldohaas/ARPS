@@ -1,0 +1,1402 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="file:///C%7C/./F90ARPS_files/filelist.xml">
+<title>Conversion and Testing of F90                               ARPS</title>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>DCTS</o:Author>
+  <o:LastAuthor>Ming Xue</o:LastAuthor>
+  <o:Revision>5</o:Revision>
+  <o:TotalTime>18</o:TotalTime>
+  <o:LastPrinted>1999-07-13T02:00:00Z</o:LastPrinted>
+  <o:Created>1999-07-13T06:00:00Z</o:Created>
+  <o:LastSaved>1999-07-13T06:02:00Z</o:LastSaved>
+  <o:Pages>7</o:Pages>
+  <o:Words>929</o:Words>
+  <o:Characters>5297</o:Characters>
+  <o:Lines>44</o:Lines>
+  <o:Paragraphs>10</o:Paragraphs>
+  <o:CharactersWithSpaces>6505</o:CharactersWithSpaces>
+  <o:Version>9.2720</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:DisplayHorizontalDrawingGridEvery>0</w:DisplayHorizontalDrawingGridEvery>
+  <w:DisplayVerticalDrawingGridEvery>0</w:DisplayVerticalDrawingGridEvery>
+  <w:UseMarginsForDrawingGridOrigin/>
+  <w:Compatibility>
+   <w:FootnoteLayoutLikeWW8/>
+   <w:ShapeLayoutLikeWW8/>
+   <w:AlignTablesRowByRow/>
+   <w:ForgetLastTabAlignment/>
+   <w:LayoutRawTableWidth/>
+   <w:LayoutTableRowsApart/>
+  </w:Compatibility>
+ </w:WordDocument>
+</xml><![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:Tahoma;
+	panose-1:2 11 6 4 3 5 4 4 2 4;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-pitch:variable;
+	mso-font-signature:553679495 -2147483648 8 0 66047 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+h1
+	{mso-style-next:Normal;
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:1;
+	font-size:24.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-font-kerning:0pt;
+	mso-bidi-font-weight:normal;}
+h2
+	{mso-style-next:Normal;
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:2;
+	font-size:16.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-bidi-font-weight:normal;}
+h3
+	{mso-style-next:Normal;
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:3;
+	font-size:22.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-bidi-font-weight:normal;}
+h4
+	{mso-style-next:Normal;
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:4;
+	font-size:18.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	font-weight:normal;}
+h5
+	{mso-style-next:Normal;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:5;
+	font-size:20.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	font-weight:normal;}
+h6
+	{mso-style-next:Normal;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:40.5pt;
+	margin-bottom:.0001pt;
+	text-indent:-4.5pt;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:6;
+	tab-stops:list .5in left 40.5pt;
+	font-size:16.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	font-weight:normal;}
+p.MsoHeading7, li.MsoHeading7, div.MsoHeading7
+	{mso-style-next:Normal;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:27.0pt;
+	margin-bottom:.0001pt;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:7;
+	font-size:16.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.MsoBodyText, li.MsoBodyText, div.MsoBodyText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:16.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.MsoBodyTextIndent, li.MsoBodyTextIndent, div.MsoBodyTextIndent
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:58.5pt;
+	margin-bottom:.0001pt;
+	text-indent:-58.5pt;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:16.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.MsoBodyTextIndent2, li.MsoBodyTextIndent2, div.MsoBodyTextIndent2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:27.0pt;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:16.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.MsoBodyTextIndent3, li.MsoBodyTextIndent3, div.MsoBodyTextIndent3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.75in;
+	margin-bottom:.0001pt;
+	text-indent:-.5in;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	tab-stops:list .75in;
+	font-size:16.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+p.MsoDocumentMap, li.MsoDocumentMap, div.MsoDocumentMap
+	{margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	background:navy;
+	font-size:10.0pt;
+	font-family:Tahoma;
+	mso-fareast-font-family:"Times New Roman";}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+@list l0
+	{mso-list-id:25953249;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1
+	{mso-list-id:148450034;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l1:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l2
+	{mso-list-id:222063642;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l2:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l3
+	{mso-list-id:243269795;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l3:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l4
+	{mso-list-id:273444112;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l4:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l5
+	{mso-list-id:313340135;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l5:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l6
+	{mso-list-id:369187181;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l6:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l7
+	{mso-list-id:447163306;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l7:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l8
+	{mso-list-id:537085126;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l8:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l9
+	{mso-list-id:680857280;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l9:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l10
+	{mso-list-id:687945940;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l10:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l11
+	{mso-list-id:725494017;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l11:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l12
+	{mso-list-id:768544939;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l12:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l13
+	{mso-list-id:770320915;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l13:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l14
+	{mso-list-id:784814232;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l14:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l15
+	{mso-list-id:831146253;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l15:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l16
+	{mso-list-id:846291096;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l16:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l17
+	{mso-list-id:959070673;
+	mso-list-type:simple;
+	mso-list-template-ids:67698703;}
+@list l17:level1
+	{mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l18
+	{mso-list-id:1004864243;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l18:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l19
+	{mso-list-id:1008404041;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l19:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l20
+	{mso-list-id:1076053576;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l20:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l21
+	{mso-list-id:1078552775;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l21:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l22
+	{mso-list-id:1127894485;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l22:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l23
+	{mso-list-id:1160656098;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l23:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l24
+	{mso-list-id:1208495769;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l24:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l25
+	{mso-list-id:1232470838;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l25:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l26
+	{mso-list-id:1292981412;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l26:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l27
+	{mso-list-id:1294561060;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l27:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l28
+	{mso-list-id:1300261086;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l28:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l29
+	{mso-list-id:1352024507;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l29:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l30
+	{mso-list-id:1355572929;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l30:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l31
+	{mso-list-id:1392732652;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l31:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l32
+	{mso-list-id:1458987108;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l32:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l33
+	{mso-list-id:1481729849;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l33:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l34
+	{mso-list-id:1495225431;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l34:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l35
+	{mso-list-id:1557400972;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l35:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l36
+	{mso-list-id:1589267268;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l36:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l37
+	{mso-list-id:1640693790;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l37:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l38
+	{mso-list-id:1651212111;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l38:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l39
+	{mso-list-id:1651984372;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l39:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l40
+	{mso-list-id:1692220843;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l40:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l41
+	{mso-list-id:1721441458;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l41:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l42
+	{mso-list-id:1838811343;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l42:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l43
+	{mso-list-id:1995062191;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l43:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l44
+	{mso-list-id:2006929910;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l44:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l45
+	{mso-list-id:2013219602;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l45:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l46
+	{mso-list-id:2096395504;
+	mso-list-type:simple;
+	mso-list-template-ids:67698689;}
+@list l46:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+</head>
+
+<body lang=EN-US style='tab-interval:.5in' background="cloud.jpg">
+<div class=Section1> 
+  <h1 align=center style='margin-left:.5in;text-align:center;line-height:150%'>Conversion 
+    of ARPS 4.5.0 to ARPS Fortran 90 Standard</h1>
+  <h1 align=center style='margin-left:.5in;text-align:center;line-height:150%'>and 
+    Testing of the F90 Version</h1>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+  <p class=MsoNormal align=center style='text-align:center'><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt'>Presentation by Yanming Li<o:p></o:p></span></p>
+  <p class=MsoNormal align=center style='text-align:center'><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt'>July 9, 1999<o:p></o:p></span></p>
+  <p class=MsoNormal align=center style='text-align:center'><span
+style='font-size:14.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+  <p class=MsoNormal style='margin-left:1.75in;text-indent:-.25in;line-height:
+150%;mso-list:l43 level1 lfo8;tab-stops:list 1.75in'><![if !supportLists]><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><b
+style='mso-bidi-font-weight:normal'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>ARPS coding standard in F90 and sample code<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.75in;text-indent:-.25in;line-height:
+150%;mso-list:l41 level1 lfo9;tab-stops:list 1.75in'><![if !supportLists]><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><b
+style='mso-bidi-font-weight:normal'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>An Overview of F77toF90 Converter<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.75in;text-indent:-.25in;line-height:
+150%;mso-list:l4 level1 lfo10;tab-stops:list 1.75in'><![if !supportLists]><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><b
+style='mso-bidi-font-weight:normal'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>Modification of Makefiles<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.75in;text-indent:-.25in;line-height:
+150%;mso-list:l18 level1 lfo11;tab-stops:list 1.75in'><![if !supportLists]><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><b
+style='mso-bidi-font-weight:normal'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>Testing of ARPS<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.75in;text-indent:-.25in;line-height:
+150%;mso-list:l30 level1 lfo12;tab-stops:list .5in 1.75in'><![if !supportLists]><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><b
+style='mso-bidi-font-weight:normal'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>Dynamic Memory Allocation (ARPS4.4.0)<o:p></o:p></span></b></p>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></h1>
+  <p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt'>ARPS coding standard in F90 
+    and sample code<o:p></o:p></span></h1>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-weight:normal'>See ARPS 
+    homepage—future plan<o:p></o:p></span></h1>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></h1>
+  <h3 align=left style='margin-left:1.25in;text-align:left;text-indent:-.25in;
+line-height:150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+font-weight:normal'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><span style='font-size:14.0pt;mso-bidi-font-size:10.0pt'>F77 
+    to F90 Convertor Overview</span><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'><o:p></o:p></span></h3>
+  <h3 align=left style='margin-left:1.25in;text-align:left;text-indent:-.25in;
+line-height:150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+font-weight:normal'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><span style='font-size:14.0pt;mso-bidi-font-size:10.0pt'>A 
+    Flowchart</span><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt;
+font-weight:normal'><o:p></o:p></span></h3>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-outline-level:1;mso-list:l30 level1 lfo12'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'>Input(*. f)<o:p></o:p></span></b></p>
+  <h2 align=left style='margin-left:1.25in;text-align:left;text-indent:-.25in;
+line-height:150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span
+style='font-family:Symbol;font-weight:normal'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]>Read the code line by line and</h2>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><b style='mso-bidi-font-weight:normal'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Build a linked list.<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-outline-level:1;mso-list:l30 level1 lfo12'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'>Replace tabs anywhere with space<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-outline-level:1;mso-list:l30 level1 lfo12'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'>Convert lowcase keywords into uppercase<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><b style='mso-bidi-font-weight:normal'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Adjust all lines to column 
+    1<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><b style='mso-bidi-font-weight:normal'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Modify variable declaration<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><b style='mso-bidi-font-weight:normal'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>REMOVE INCLUDE<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><b style='mso-bidi-font-weight:normal'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>INSERT USE before implicit 
+    NONE<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><b style='mso-bidi-font-weight:normal'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Writing out and Indention<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l30 level1 lfo12'><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><b style='mso-bidi-font-weight:normal'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Output (*. f90)<o:p></o:p></span></b></p>
+  <h1 align=center style='text-align:center;line-height:150%;tab-stops:9.0pt'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></h1>
+  <h1 align=center style='text-align:center;line-height:150%;tab-stops:9.0pt'><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt'>F77toF90 Converter Overview<o:p></o:p></span></h1>
+  <p class=MsoNormal align=center style='text-align:center;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>How to use<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span
+style="mso-spacerun: yes">       </span>Two versions:<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l23 level1 lfo41'><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>One 
+    for conversion of<span style="mso-spacerun: yes">  </span>*.f<span
+style="mso-spacerun: yes">  </span>to *.f90<o:p></o:p></span></p>
+</div>
+<blockquote> 
+  <blockquote> 
+    <blockquote> 
+      <blockquote> 
+        <blockquote> 
+          <div class=Section1><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>/work/yli/arps4.5.0.release.f90/src/to_f90.f90<o:p></o:p></span></div>
+        </blockquote>
+      </blockquote>
+      <div class=Section1><![if !supportLists]><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+        </span></span><![endif]><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>One 
+        for conversion of<span style="mso-spacerun: yes">  </span>*.inc<span
+style="mso-spacerun: yes">  </span>to *.f90<o:p></o:p></span> </div>
+      <blockquote> 
+        <blockquote>
+          <div class=Section1><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>/work/yli/arps4.5.0.release.f90/include/to_f90.f90</span></div>
+        </blockquote>
+      </blockquote>
+      <div class=Section1><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><o:p></o:p></span></div>
+    </blockquote>
+  </blockquote>
+</blockquote>
+<div class=Section1>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">                           </span>(We add the following functions in this 
+    version<o:p></o:p></span></p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">                                           </span>Remove COMMON statements<o:p></o:p></span></p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun: yes">  </span><span
+style="mso-spacerun:
+yes">                                         </span>Insert IMPLICIT NONE<o:p></o:p></span></p>
+  <h4 style='line-height:150%'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><span style="mso-spacerun:
+yes">                                           </span>Insert SAVE)<o:p></o:p></span></h4>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoNormal align=center style='text-align:center;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'>Converting ARPS<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:81.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l32 level1 lfo13;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'> </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">  </span>Compile the converter: f90 to_f90.f90<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:81.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l8 level1 lfo14;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'> </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">  </span>Create a file of name list<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:63.0pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">         </span>‘ ls –1 */*.f<span style="mso-spacerun: yes">  </span>&gt; 
+    enlist ’<span style="mso-spacerun: yes">  </span>in src directory<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:63.0pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">          </span>(or ‘ ls –1 *.inc &gt; enlist ’ in the include dir.)<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:81.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l21 level1 lfo15;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'> </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">  </span>Insert a empty line at the end of enlist (in order for the last 
+    file to be converted and interruption of the convertor)<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:81.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l42 level1 lfo16;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'> </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">  </span>a.out &lt; enlist<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:81.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l11 level1 lfo17;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'> </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">  </span>Remove all *.f<span style="mso-spacerun: yes">  </span>(preparation 
+    for makearps)<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:81.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l26 level1 lfo18;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'> </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">  </span>makearps –90 --- and start hand modification<b style='mso-bidi-font-weight:
+normal'><o:p></o:p></b></span></p>
+  <h1 style='line-height:150%'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></h1>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt'>F77toF90 Converter Overview<o:p></o:p></span></h1>
+  <h2 style='line-height:150%'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>Common Problems/hand modifications<o:p></o:p></span></h2>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span
+style="mso-spacerun: yes">    </span>Continuation lines/Quotation marks (80%)<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l14 level1 lfo43;tab-stops:list 1.25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>write(*, ‘very long format’), 
+    the quotaton marks were broken by continuation marks<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:1.25in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:50.25pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">           </span>solution 1: Rewritten with “ write(*, 1111) + <o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:50.25pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">           </span>1111 format ( very long format)”<span
+style="mso-spacerun: yes">  </span>in the present<span style="mso-spacerun:
+yes">                                    </span><o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:50.25pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">           </span>ARPS f90 version<b style='mso-bidi-font-weight:normal'>.<o:p></o:p></b></span></p>
+  <p class=MsoNormal style='margin-left:50.25pt;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <h5 style='line-height:150%'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><span style="mso-spacerun: yes">                </span>Solution 2:<span
+style="mso-spacerun: yes">  </span>Use two quotation marks: one at the<o:p></o:p></span></h5>
+  <h5 style='line-height:150%'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><span style="mso-spacerun: yes">                </span>end of previous 
+    line and the other at the beginning<span style="mso-spacerun: yes">   </span><o:p></o:p></span></h5>
+  <h5 style='line-height:150%'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><span style="mso-spacerun: yes">                </span>of the continued 
+    line ?<o:p></o:p></span></h5>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:1.25in;text-indent:-.25in;line-height:
+150%;mso-list:l6 level1 lfo45;tab-stops:list 1.25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Very long strings have been 
+    broken into separate small strings in all ARPS code except arps_mpi.<o:p></o:p></span></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span
+style="mso-spacerun: yes">    </span><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span
+style="mso-spacerun: yes">     </span>Character declarations (1-5%)<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span
+style="mso-spacerun: yes">   </span><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:49.5pt;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><span style="mso-spacerun: yes">       </span></span></b><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Check with the F77 code when 
+    compiler Complains<span style="mso-spacerun: yes">      </span>(When character 
+    variables with different lengths were declared in one single line, the converter 
+    will rewrite them into separate lines such that all the character variables 
+    on the same line have same length, like CHARCTER(LEN=*) :: filename.<span style="mso-spacerun: yes">  
+    </span>However, during extraction, the converter may introduce some bugs, 
+    but only several files for the whole ARPS)<span style="mso-spacerun: yes">   
+    </span><o:p></o:p></span></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span
+style="mso-spacerun: yes">    </span>Others<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:49.5pt;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><span style="mso-spacerun: yes">           </span></span></b><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>The converter may have problems 
+    to convert Dummy subroutines. In this case, you may need to insert an comment 
+    line between ‘SUBROUTINE …’ and ‘END SUBROUTINE …’.<span
+style="mso-spacerun: yes">  </span>We need at least three-line long subroutine 
+    to make the converter run properly. (This is a problem of linked list in this 
+    converter.)<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:49.5pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:49.5pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">          </span>Spaces between dot and ‘AND’/’OR’ are not allowed in F90.<span
+style="mso-spacerun: yes">  </span>If there is a space between dot and ‘EQ’ / 
+    ‘LT’ …, the converter will not convert it into ‘==’ / ‘&lt;=’. We may fix 
+    this in the later version of the converter.<b style='mso-bidi-font-weight:normal'><o:p></o:p></b></span></p>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></h1>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt'>Modification of Makefiles<o:p></o:p></span></h1>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman";
+mso-char-type:symbol;mso-symbol-font-family:Symbol'><span style='mso-char-type:
+symbol;mso-symbol-font-family:Symbol'>·</span></span><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt'> Added a new Makefile in the include dir.<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">    </span>See /work/yli/arps4.5.0.release.f90/include<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman";
+mso-char-type:symbol;mso-symbol-font-family:Symbol'><span style='mso-char-type:
+symbol;mso-symbol-font-family:Symbol'>·</span></span><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt'> Modify the Makefile in the root of ARPS in 
+    order to compile data Modules first<o:p></o:p></span></p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun: yes">          </span>see 
+    /work/yli/arps4.5.0.release.f90/Makefile<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman";
+mso-char-type:symbol;mso-symbol-font-family:Symbol'><span style='mso-char-type:
+symbol;mso-symbol-font-family:Symbol'>·</span></span><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt'> Update dependencies for all Makefiles in src 
+    dirs<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman";
+mso-char-type:symbol;mso-symbol-font-family:Symbol'><span style='mso-char-type:
+symbol;mso-symbol-font-family:Symbol'>·</span></span><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt'> Add<span style="mso-spacerun: yes">  </span>SUFFIXES<span style="mso-spacerun: yes">  
+    </span>to all Makefiles in order to compile f90 code: <o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">     </span>.SUFFIXES: $(SUFFIXES) .f90<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">     </span>.f90.o:<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">               </span>$(F90) $(FFLAGS) -c $&lt;<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman";
+mso-char-type:symbol;mso-symbol-font-family:Symbol'><span style='mso-char-type:
+symbol;mso-symbol-font-family:Symbol'>·</span></span><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt'> Need to REMOVE<span style="mso-spacerun:
+yes">  </span>all “*.f” file before compile “*.f90” code<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.5in;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman";
+mso-char-type:symbol;mso-symbol-font-family:Symbol'><span style='mso-char-type:
+symbol;mso-symbol-font-family:Symbol'>·</span></span><span style='font-size:
+16.0pt;mso-bidi-font-size:10.0pt'> Working version on origin<o:p></o:p></span></p>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></h1>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:18.0pt;mso-bidi-font-size:10.0pt'>TESTING<o:p></o:p></span></h1>
+  <p class=MsoNormal align=center style='text-align:center;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>Issues in arps testing<o:p></o:p></span></b></p>
+  <p class=MsoNormal align=center style='text-align:center;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span
+style="mso-spacerun: yes">   </span>Initialization <o:p></o:p></span></b></p>
+  <p class=MsoBodyTextIndent2 style='line-height:150%'>Initialization in f90 data 
+    module, such as soilcst.f90, is not allowed:</p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun: yes">              </span>Break 
+    soilcst.f90 into two parts:<o:p></o:p></span></p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">                          </span>Soilcst.f90 for pure variable declaration<o:p></o:p></span></p>
+  <h2 style='line-height:150%'><span style="mso-spacerun: yes">              </span><span style='font-weight:normal'>Soilcst.init 
+    for initialization using F90 array<o:p></o:p></span></h2>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun: yes">                 </span><span style="mso-spacerun: yes">         </span>initializer 
+    <o:p></o:p></span></p>
+  <p class=MsoBodyTextIndent><span style="mso-spacerun: yes">               </span>insert 
+    “ INCLUDE ‘soilcst.init’ ” right before the<span
+style="mso-spacerun: yes">   </span>excutable in the subroutine which has a ‘USE 
+    soilcst’ statement.</p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun: yes">  </span><b
+style='mso-bidi-font-weight:normal'>USE statements cause difference<o:p></o:p></b></span></p>
+  <p class=MsoNormal style='margin-left:69.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l0 level1 lfo33;tab-stops:list 69.0pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Variables in soilcst.inc in 
+    f77 version are local to the subroutines which have a “INCLUDE ‘soilcst.inc’ 
+    ” statement.<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:69.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l0 level1 lfo33;tab-stops:list 69.0pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Variables in soilcst.f90 in 
+    f90 version are shared(like COMMON, partially global) between the subroutines 
+    which have a ‘USE soilcst’ statement.<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:69.0pt;text-indent:-.25in;line-height:
+150%;mso-list:l0 level1 lfo33;tab-stops:list 69.0pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>REALCASE tests show a minute 
+    difference between these two version. See /scratch/origin/yli/std_test_90/realcase.<o:p></o:p></span></p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><span style="mso-spacerun: yes">           </span><o:p></o:p></span></p>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>TESTING<o:p></o:p></span></h1>
+  <h2 style='line-height:150%'>Issues in ext2arps/adas testing</h2>
+  <p class=MsoNormal align=center style='text-align:center;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Ext2arps:<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:.25in;text-indent:4.5pt;line-height:150%;
+mso-list:l46 level1 lfo46;tab-stops:list .75in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Break 
+    gribcst.inc into two parts:<o:p></o:p></span></p>
+  <h2 align=left style='text-align:left;line-height:150%;tab-stops:list .75in'><span
+style="mso-spacerun: yes">             </span><span style='font-weight:normal'>Gribcst.f90 
+    data module for pure variable declarations<o:p></o:p></span></h2>
+  <p class=MsoNormal style='text-indent:4.5pt;line-height:150%;tab-stops:list .75in'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">            </span>Gribcst.init for variable initialization<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:.25in;text-indent:4.5pt;line-height:150%;
+mso-list:l40 level1 lfo47;tab-stops:list .75in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    </span></span><![endif]><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>2D-array 
+    initialization has problems in F90?<o:p></o:p></span></p>
+  <p class=MsoBodyTextIndent3><span style="mso-spacerun: yes">         </span>See 
+    /work/yli/arps4.5.0.release.f90/include/soilcst.init for 2D array initialization 
+    in F90.</p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>adas<o:p></o:p></span></b></p>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoHeading7>Initadas.f90<span style="mso-spacerun: yes">  </span></p>
+  <p class=MsoNormal style='margin-left:27.0pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">                   </span>READ(5, adas_backerf, END=300)<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:27.0pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">                   </span>300 CONTINUE<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:27.0pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>These two lines are correct, 
+    but it may come with a little problem when adas is executed. REWRITE them 
+    or MOVE them up. Problem disappears.<o:p></o:p></span></p>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></h1>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>TESTING<o:p></o:p></span></h1>
+  <h1 align=center style='text-align:center;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>In Summary<o:p></o:p></span></h1>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:31.5pt;text-indent:-13.5pt;line-height:
+150%;mso-list:l1 level1 lfo35;tab-stops:list .5in left 40.5pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Testing standard: for same 
+    f90 compiler and some options, we should obtain exactly same results from 
+    the f77 code and the f90 code (realcase is the only exception so far and we 
+    have identified the reason)<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:31.5pt;text-indent:-13.5pt;line-height:
+150%;mso-list:l29 level1 lfo19;tab-stops:list .5in left 40.5pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>No bugs in F90 version found 
+    so far after<o:p></o:p></span></p>
+  <h6>Makearps </h6>
+  <p class=MsoNormal style='margin-left:31.5pt;text-indent:-13.5pt;line-height:
+150%;mso-list:l33 level1 lfo20;tab-stops:list .5in left 40.5pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>A minor difference in ‘realcase’ 
+    testing due to <o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:31.5pt;text-indent:-13.5pt;line-height:
+150%;tab-stops:list .5in left 40.5pt'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><span style="mso-spacerun: yes">    </span>USE module<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:31.5pt;text-indent:-13.5pt;line-height:
+150%;mso-list:l20 level1 lfo21;tab-stops:list .5in left 40.5pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Passed all the standard tests 
+    except arps_mpi<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:31.5pt;text-indent:-13.5pt;line-height:
+150%;mso-list:l2 level1 lfo22;tab-stops:list .5in left 40.5pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Still working on arps_mpi <o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:31.5pt;text-indent:-13.5pt;line-height:
+150%;mso-list:l2 level1 lfo22;tab-stops:list .5in left 40.5pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Conversion based on arps4.5.0.release<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:31.5pt;text-indent:-13.5pt;line-height:
+150%;mso-list:l2 level1 lfo22;tab-stops:list .5in left 40.5pt'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Testing results available on 
+    /scratch/origin/yli/std_test_90<o:p></o:p></span></p>
+  <p class=MsoNormal align=center style='text-align:center;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal align=center style='text-align:center;line-height:150%'><b
+style='mso-bidi-font-weight:normal'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'>Dynamic Memory Allocation<o:p></o:p></span></b></p>
+  <h1 style='line-height:150%'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt'>ARPS4.4.0-arps<o:p></o:p></span></h1>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <h2 style='line-height:150%'>Hand modification</h2>
+  <p class=MsoNormal style='line-height:150%'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+  <p class=MsoNormal style='margin-left:49.5pt;text-indent:-.25in;line-height:
+150%;mso-list:l15 level1 lfo24;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Remove dims.f90<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:49.5pt;text-indent:-.25in;line-height:
+150%;mso-list:l39 level1 lfo23;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Declare all the arrays in arps.f90 
+    using<span style="mso-spacerun: yes">      </span>ALLOCATABLE attribute<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:49.5pt;text-indent:-.25in;line-height:
+150%;mso-list:l39 level1 lfo23;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>CALL initpara(nx,ny,nz) and 
+    obtain nx, ny, nz (nx, ny, nz are passed to initpara3d.f90 by a NAMELIST called 
+    (&amp;)dimensions)<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:49.5pt;text-indent:-.25in;line-height:
+150%;mso-list:l12 level1 lfo25;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Use ALLOCATE / allocfail(istatus, 
+    ‘—‘)<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:31.5pt;line-height:150%'><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'><span style="mso-spacerun:
+yes">     </span>See /work/yli/arps4.4.0.f90/src/arps/arps44.f90<o:p></o:p></span></p>
+  <p class=MsoNormal style='margin-left:49.5pt;text-indent:-.25in;line-height:
+150%;mso-list:l5 level1 lfo26;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><![endif]><span
+style='font-size:16.0pt;mso-bidi-font-size:10.0pt'>Modify nx, ny, nz without recompiling 
+    (dynamic allocation)<o:p></o:p></span></p>
+  <h3 style='line-height:150%'><span style='font-size:16.0pt;mso-bidi-font-size:
+10.0pt;font-weight:normal'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></h3>
+  <h3 style='line-height:150%'><span style='font-size:18.0pt;mso-bidi-font-size:
+10.0pt'>Timing fixed/dynamic allocation<o:p></o:p></span></h3>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+  <p class=MsoBodyText style='margin-left:13.5pt'>Dynamic allocation improve the 
+    speed of arps by 15%-20%<span style="mso-spacerun: yes">  </span>on Origin200 
+    (may20 test, compare results from arps.output.f90.alloc.7200 and arps.output.f90.7200 
+    in /work/yli/arps4.4.0.f90 )</p>
+  <p class=MsoNormal style='line-height:150%'><span style='font-size:16.0pt;
+mso-bidi-font-size:10.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+</div>
+
+</body>
+
+</html>

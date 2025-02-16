@@ -1,0 +1,140 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR PLTRADCOL IN NAMELIST FORMAT    ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  for PLTRADCOL version 5.2 or later and a few utility programs.
+!
+!  For ARPS official release, this file is configured for a 
+!  supercell storm simulation.
+!
+!  Note that only lines between &NAMELIST_NAME and / are read as the
+!  input data, and there must be a blank space in front of the '&' sign.
+!  Comments can be written between these data blocks. We are using '!'
+!  in the first column of comment line only to distinguish them from the
+!  data statement. Certain compilers, include Cray F90, does not 
+!  allow non-blank statements/comments between namelist blocks.
+!  They need to be stripped out first.   
+!
+!-----------------------------------------------------------------------
+!
+! Author: Yunheng Wang (02/22/2001)
+!
+! Modification history:
+!
+!   02/22/2001 (Yunheng Wang)
+!   Converted to namelist format.
+!
+!   11/02/2010 (Youngsun Jung)
+!   Added gridtilt_opt.
+!  
+!-----------------------------------------------------------------------
+!
+!   Filename to be plotted:
+!
+!   fname:   String of file name to plot, at most 80 characters
+!
+!   gridtilt_opt  Option for the vertical data column
+!                 0 = observations on model grid
+!                 1 = observations on radar elevation angle
+!
+!   numvar	  Number of radar parameters the input file contains
+!                 2 = Reflectivity, radial velocity
+!                 7 = Vr, Zhh, reserved, Zdr, reserved, Kdp, rho_hv
+!-----------------------------------------------------------------------
+
+ &file_name
+   fname='KTLX.990503.2154',
+
+   gridtilt_opt = 0,
+
+   numvar = 2,
+ /
+!
+!-----------------------------------------------------------------------
+!
+!   Variables to be plotted
+!
+!  pltref:  Plot reflectivity       (0:no, 1:black/white, 2:color)
+!  pltvel:  Plot radial velocity    (0:no, 1:black/white, 2:color)
+!  pltnyq:  Plot Nyquist velocity   (0:no, 1:yes)
+!  plttim:  Plot data time (offset) (0:no, 1:yes)
+!  pltzdr:  Plot Zdr                (0:no, 1:black/white, 2:color)
+!  pltKdp:  Plot Kdp                (0:no, 1:black/white, 2:color)
+!  pltrhv:  Plot rho_hv             (0:no, 1:black/white, 2:color)
+!
+!-----------------------------------------------------------------------
+!
+
+ &var_plot
+  pltref=1,
+  pltvel=2,
+  pltnyq=0,
+  plttim=0,
+  pltzdr=0,
+  pltkdp=0,
+  pltrhv=0,
+ /
+
+!
+!-----------------------------------------------------------------------
+!
+!   Levels to plot
+!
+!  npltlvl:  Number of levels of remapped data to plot
+!  pltlvl:   Array of level indices
+!
+!-----------------------------------------------------------------------
+!
+
+ &level_plot
+   npltlvl=2,
+   pltlvl=16,20,24,28,32,
+ /
+
+!
+!-----------------------------------------------------------------------
+!
+!  ovrmap     Option to overlay political map on horizontal plane plots
+!                = 0, no map overlay.
+!                = 1, overlay map on all of the ploted fields.
+!
+!  mapgrid       Grid for latitude and longitude
+!                = 0, no grid draw
+!                = 1, draw grid (default set latgrid=2 and longrid=2)
+!                = 2, draw grid (user specify latgrid and longrid)
+!
+!  latgrid,      longrid (degree)
+!                the grid for latitude and longitude (mapgrid=2)
+!  nmapfile      number of mapfiles ( maximum=2)
+!
+!  mapfile       Mapdata file name.
+!
+!-----------------------------------------------------------------------
+!
+
+ &map_plot
+   ovrmap = 1,
+   mapgrid = 0,
+      latgrid = -5., longrid = -5.,
+   nmapfile = 2,
+     mapfile(1) = '../data/arpsplt/us_state.mapdata',
+     mapfile(2) = '../data/arpsplt/us_spcounty.mapdata',
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of input file
+!
+!-----------------------------------------------------------------------

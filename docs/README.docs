@@ -1,0 +1,83 @@
+
+This directory contains the latest documentation of ARPS 
+and those documents are listed as following:
+
+Document name   Description                     Author            Last updated
+==============  ==============================  ================  ============
+
+---------------------------- 88D2ARPS ----------------------------------------
+
+88d2arps50.pdf  88D2ARPS Users' Guide           Keith Brewster    Aug  9, 2004
+                (ARPS WSR-88D Data Remapper)
+
+a2io.txt        A2 I/O Documentation                              Mar 13, 2003
+                (Used only by 88D2ARPS)
+
+----------------------------   ADAS   ----------------------------------------
+
+ADAS500.pdf     ADAS Users' Guide               Keith Brewster
+
+ADASDataFormats.pdf
+                ADAS accessory document 1       Keith Brewster    Feb 27, 2001
+                (ASCII Input Data Formats)
+
+ADASErrorFormats.pdf
+                ADAS accessory document 2       Keith Brewster    Feb 27, 2001
+                (Error and Blacklist Files Formats and Guidance)
+
+ADASNudging.pdf ADAS accessory document 3       Keith Brewster    May 22, 2003
+                (Incremental Analysis Updating)
+
+ADASPhaseAdjust.pdf
+                ADAS accessory document 4       Keith Brewster    Nov 19, 2004
+                (Phase Correcting Data Assimillation)
+
+---------------------------   ARPS   -----------------------------------------
+
+arps50.ch3.pdf  ARPS5.0 Getting Started                           Jun  2, 2005
+
+arps50.ch4.pdf  ARPS5.0 Runtime/Configuration                     Jan 29, 2004
+                Reference Guide
+
+arps50.ch8.pdf  Model Initialization and                          Jan 29, 2004
+                Preprocessing
+
+ARPSShading.pdf Topographic Shading for         Augustin Colette/ Jun   , 2002
+                Radation Computation in ARPS    Robert L. Street
+
+--------------------------- ARPS2WRF -----------------------------------------
+
+arps2wrf.pdf    ARPS2WRF Users' Guide           Yunheng Wang      Feb 18, 2005
+
+--------------------------- ARPSSHIFT ----------------------------------------
+
+arpsshift.pdf   ARPS Shift Phase/Position       Keith Brewster    Nov 18, 2004
+                Error Program
+
+--------------------------- MCI2ARPS -----------------------------------------
+
+mci2arps.pdf    MCI2ARPS Users' Guide           Keith Brewster    Jul 30, 2000
+                (ARPS satellite data remapper)
+
+--------------------------- NIDS2ARPS ----------------------------------------
+
+nids2arps.pdf   NIDS2ARPS Users' Guide          Keith Brewster    Jan  9, 2002
+
+---------------------------  Others  -----------------------------------------
+
+ARPSNetCDF.pdf  ARPS NetCDF file convention     Yunheng Wang      Sep 22, 2004
+
+ARPSQuickGuide.pdf
+                ARPS Program Quick Guide        Ming Xue/Y. Wang  Jun 30, 2005
+
+newprogs.txt    Several new programs added in   Keith Brewster    Oct 16, 2003
+                src/adas or src/88d2arps 
+                radmosaic, arps2rad, difobs
+
+TerrainTerm.pdf CAPS Research Note              Keith Brewster    Oct  3, 2002
+                (Update to ADAS to account for variations in terrain for 
+                 surface and near-surface data)
+
+----------------
+Yunheng Wang
+07/05/2005

@@ -1,0 +1,158 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######   INPUT FILE FOR RADARDTAINTRP IN NAMELIST FORMAT    ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters  for program ARPSSUBDOMAIN.
+!
+!  RADARDTAINTRP writes out a portion of the grid in arps history format,
+!  at the original resolution or at a new resolution specified horizontal
+!  resolution specified as dx1 and dy1. No vertical change of resolution
+!  is supposed. Only linear interpolation is available.
+!  
+!  Steps to use this program:
+!  
+!  Step 1: Compile and link using 'makearps radardtaintrp'
+!  Step 2: Edit input file input/radardtaintrp.input
+!  Step 3: Run job using 'bin/radardtaintrp < input/radardtaintrp.input'.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!
+!   Mingjing Tong (02/09/2007)
+!   Modification history:
+!
+!-----------------------------------------------------------------------
+!
+!  hinfmt   The format flag of the input history data.
+!          = 3, NCSA HDF4 format data dump - only this format is supported
+!
+!  grdbasfn Base-state and grid data file name of input grid.
+!
+!  grdbasfn1 Base-state and grid data file name of output grid. 
+!-----------------------------------------------------------------------
+!
+
+ &history_data
+
+   hinfmt = 3,
+
+     grdbasfn  =   '/scratcha/mhu/OKC/1km/MdlIP5_OKC1k5m_VrZ_2140.hdfgrdbas',
+     grdbasfn1 =   '/scratcha/mhu/OKC/1km/MdlIP5_OKC1k5m_VrZ_2140.hdfgrdbas',
+ /
+
+!-----------------------------------------------------------------------
+!
+!  datanamopt Option of data name
+!           =1, prefix plus model time, prefix is specified by
+!               radarnam, vanam or varnam
+!           =2, specified by rdrdtanam, vadtanam or vardtanam
+!  rdrdtadir  Radar data directory
+!  vadtadir   Cross-beam wind data directory
+!
+!  vareadopt Option to read and interpolate cross-beam wind component
+!            data
+!            = 0, no
+!            = 1, yes
+!
+!  (when datanamopt == 2)
+!  nfile      Number of data file
+!  rdrdtanam  Name of radar data
+!  vadtanam   Name of cross-beam component data
+!
+!  (when datanamopt == 1)
+!  radarnam  Radar name
+!  vanam   Prefix of cross-beam component data name
+!  t0
+!  tn
+!  dt
+!
+!  datatype Spatial distribution of radar data
+!            = 1, data on model scalar grid                       
+!            = 2, data on elevation angle level
+!-----------------------------------------------------------------------
+
+ &radar_data
+ 
+  datanamopt = 1,
+
+  rdrdtadir = '/home/mtong/radardata/',
+  vadtadir = '/home/mtong/radardata/',
+
+  vareadopt = 0,
+
+  nfile = 1,
+  rdrdtanam(1) = 'KTLX.20040530.000000',
+  vadtanam(1) = 'KTLXcrsbmv006000',
+  
+  radarnam = 'KTLX_may20f_1km_Va_',
+  vanam = 'KTLXcrsbmv',
+  t0 = 4800,
+  tn = 4800,
+  dt = 300,
+
+  datatype = 2,
+/
+
+!-----------------------------------------------------------------------
+!  intrp_opt Option for horizontal interpolation.
+!         = 1, linear interpolation;
+!         = 2, quadratic interpolation.
+!
+!  The new grid is specified by nx1,ny1, xctr1, yctr1, dx1 and dy1.
+!  nx1,ny1 Horizontal and veritcal dimesions of the output grid.
+!
+!-----------------------------------------------------------------------
+
+ &output_dims
+
+    intrp_opt = 1,
+
+    nx1 = 723,
+    ny1 = 723,
+    xctr1 = 105000.0,
+    yctr1 = 95000.0,
+    dx1 = 100.00,
+    dy1 = 100.00,
+ /
+
+!-----------------------------------------------------------------------
+!
+! run name of input grid  
+!
+!-----------------------------------------------------------------------
+
+ &jobname
+   runname = 'may20f_100m',
+ /
+!-----------------------------------------------------------------------
+!
+!  Data output control parameters.
+!
+!  dirname   Name of directory into which output files are written.
+!  outname   Name of output 
+!  out_input ARPS input file for new grid    
+!-----------------------------------------------------------------------
+
+ &output
+   dirname  = '/scratcha/mhu/OKC/fnScl/subdomain/',
+   outname = 'may20f_1km', 
+ /
+
+!----------------------------------------------------------------------------
+!
+!  End of input file
+!
+!----------------------------------------------------------------------------

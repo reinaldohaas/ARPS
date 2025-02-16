@@ -1,0 +1,5 @@
+
+This directory contains source code for arpsassim, a thermodynamic retrieval
+package.  It is not a part of the official arps distribution, but is included
+as-is.  It is packaged with the official distribution for maintainability.
+

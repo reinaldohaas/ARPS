@@ -1,0 +1,104 @@
+!-----------------------------------------------------------------------
+!
+!  Input file for program mergetrn
+!
+!  nx,ny grid dimensions for the high-resolution domain
+!  dx,dy grid spacing (m) for the high-resolution domain
+!  nx_ext, ny_ext  grid dimensions for the low-resolution domain
+!  dx_ext, dy_ext  grid spacing for the low-resolution domain
+!
+!  Note: These grid distances serve as a check against the read-in
+!  values to ensure the proper grids are accessed.  All grid
+!  navigation is obtained from the terrain files.
+!
+!  terndta     = the name of the input terrain file. 
+!                the output grid will be on this domain
+!  terndta_ext = the name of a second input terrain file. 
+!
+!  terndta and terndta_ext are combined to produce an output terrain
+!  file, which retains the values of the former in the interior and 
+!  the values of the latter at the boundaries.  Also the final terrain
+!  data are smoothed along the edge to reduce the gradient normal to 
+!  the boundary.
+!
+!  The output file name is formed by appending ".new" to the name
+!  of the first input terrain file name.
+!
+!
+!  Map overlay plotting variables
+!
+!  
+!   
+!-----------------------------------------------------------------------
+
+ &terrain
+   nx = 67,
+   ny = 67,
+   dx = 3000.,
+   dy = 3000.,
+   nx_ext = 51,
+   ny_ext = 51,
+   dx_ext = 15000.,
+   dy_ext = 15000.,
+   terndta  = 'arpstern.dat',
+   terndta_ext = 'arps15kmtern.dat'
+ /
+!
+!-----------------------------------------------------------------------
+!
+!  Merging control variables:
+!
+!  rlen    length scale for merging zone, typically 4 grid lengths
+!          of the high-resolution grid.
+!
+!  rmvbias switch to control matching of mean of larger domain terrain
+!          to that of the high resolution terrain.  This prevents
+!          "hills" due to any bias in the large-scale terrain.
+!                 rmvbias=1   remove bias
+!                 rmvbias=0   do not remove bias
+!
+!  nsmth    number of smoothing passes near the grid edge after merging,
+!           this serves to smooth any discontinuities from the merging
+!           as well as to reduce the terrain gradient in the direction
+!           toward the nearest boundary.  Points within nsmth/4 points
+!           from each boundary are affected.  Set to zero for no smoothing.
+!
+!-----------------------------------------------------------------------
+!
+ &ternmrg
+   rlen = 12000.,
+   rmvbias = 1,
+   nsmth = 48,
+ /
+!
+!-----------------------------------------------------------------------
+!
+!  ovrmap  Option to overlay political map on horizontal plane plots
+!        = 0, do not overlay map
+!        = 1, overlay map
+!
+!  mapcol Map color
+!        = 1 default (black),
+!        > 1, color number from the color table.
+!
+!  mapgrid  Grid for latitude and longitude  
+!        = 0, no grid draw 
+!        = 1, draw grid (default set latgrid=2 and longrid=2) 
+!        = 2, draw grid (user specify latgrid and longrid) 
+!
+!  latgrid, longrid (degree)
+!        the grid for latitude and longitude (mapgrid=2) 
+!
+!  mapfile File name of map data.
+!  'usstate.mapdata'
+!   /laps/vortex/static/spcounty.dat
+!-----------------------------------------------------------------------
+!
+
+ &map_plot
+   ovrmap = 1, 
+   mapcol = 10,
+   mapgrid = 0, latgrid = 4., longrid = 4.,
+   mapfile = './sp_county.mapdat'
+ /
+!

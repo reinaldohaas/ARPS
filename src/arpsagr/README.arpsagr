@@ -1,0 +1,20 @@
+This directory contains source code for using Adapative Grid Refinement
+(AGR) with ARPS, for two-way interactive grid nesting.
+Some explanation on using ARPSAGR can be found in arps.input.
+To compile and link with ARPSAGR, do in the ARPS root directory
+
+makearps arpsagr
+
+If you add new variable arrays in the regular ARPS main driver
+arps##.f, you may have to make changes to the following files:
+
+agrigrid.inc		Change the number of 1-, 2-, or 3-D arrays
+arpsinit.f
+arpsolve.f
+arpsout.f
+arpstgrid.f
+
+If you added a scalar variable or input constant, you may have to make
+changes to the following files:
+
+arpscnst.f	

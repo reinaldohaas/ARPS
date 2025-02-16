@@ -1,0 +1,333 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR ARPSVERIF IN NAMELIST FORMAT     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format
+!  for ARPSVERIF.
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+!
+! Jason J. Levit (04/03/2002)
+!
+! Modification history:
+!
+! Jason Levit (05/01/2002)
+! Added documentation, and completed the surface data component
+! of the verification system.
+!
+! Kevin Thomas (08/04/2005)
+! Add MPI capability.
+!
+*-----------------------------------------------------------------------
+!
+!  Message passing namelist
+!
+!  nproc_x     : processor number in X direction
+!  nproc_y     : processor number in Y direction
+!  max_fopen   : Maximum number of files allowed open when reading or
+!                writing, a number smaller than the number of processors
+!                can be used if dictated by the computing platform.
+!                When readsplit = 1, max_fopen will be reset to
+!                nproc_x*nproc_y in the code.
+!  nproc_node  : Specify processes number allocated in one node. This option
+!                will ensure only one process doing I/O per node. If you
+!                do not know how the processes will be allocated, let it be 0.
+!
+!    NOTE:   case 1: nprocx_in >= nproc_x OR nprocy_in >= nproc_y
+!               case 1.a  nproc_node = 0 or 1,  max_fopen will be used.
+!               case 1.b  nproc_node > 1, max_fopen will be ignored.
+!                  The program will set max_fopen = nproc_x*nproc_y
+!
+!            case 2: nprocx_in = 1 AND nprocy_in =1, both max_fopen &
+!                    nproc_node are ignored. The program will set
+!                    max_fopen = nproc_x*nproc_y and nproc_node = 1.
+!
+!  NOTE: Parameter nprocx_in and nprocy_in play an role even in no-mpi mode.
+!
+!  nprocx_in : Number patches of the data files to be read.
+!              It can be 1 or equals to nproc_x or is a multiple of nproc_x.
+!
+!  nprocy_in : Same as nprocx_in but in Y direction. It must be either 1 or
+!              a multiple of nproc_y
+!
+!  NOTE:  Ploting of stream line with multiple processors is still not ready
+!         Please check HISTORY for any new updates.
+!
+!----------------------------------------------------------------------=*
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+   max_fopen  = 8,
+   nproc_node = 0,
+
+   nprocx_in = 1,
+   nprocy_in = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  verifopt  Option for the particular type of verification to execute.
+!            = 1, single-point verification (surface obs, etc.)
+!            = 2, gridded data verification
+!            = 3, run options 1 and 2
+!
+!-----------------------------------------------------------------------
+
+ &verif_opt
+   verifopt = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  SINGLE-POINT VERIFICATION OPTIONS - WORKS ONLY WITH VERIFOPT = 1 or 3
+!
+!  This namelist block sets the input history data format, history
+!  dump files, and the single-point verification options.
+!
+!  hinfmt  History data dump format option. The available options are:
+!          = 0, no data dump is produced;
+!          = 1, unformatted binary data dump;
+!          = 2, formatted ascii data dump;
+!          = 3, NCSA HDF4 format data dump;
+!          = 4, Packed binary data dump;
+!          = 5, dump for Savi3D visualization package;
+!          = 6, binary allowing data point skip;
+!          = 7, NetCDF format (no longer supported starting from 4.1.5);
+!          = 8, Packed NetCDF format (no longer supported since from 4.1.5);
+!          = 9, GrADS data dump;
+!          = 10, GRIB data dump.
+!          = 11, Vis5D data dump.
+!
+!  hdmpinopt = Indicate the way history data files are specified.
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed.
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!
+!  grdbasfn    Name of base-state and grid data file (hdmpinopt=2).
+!  nhisfile    Number of history files to be processed (hdmpinopt=2).
+!  hisfile(i)  History data files to be processed (hdmpinopt=2).
+!
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!-----------------------------------------------------------------------
+
+ &history_data
+   hinfmt = 3,
+   hdmpinopt    = 1,
+
+     hdmpfheader = './arpsrunname',
+     hdmpftrailer= '',
+     tintv_dmpin = 3600.0,
+     tbgn_dmpin  = 0.0,
+     tend_dmpin  = 129600.0,
+
+     grdbasfn = 'arps.grbgrdbas',
+     nhisfile = 1,
+     hisfile(1) = 'arps.grb003600',
+ /
+
+
+!-----------------------------------------------------------------------
+!
+!  sndopt      Option for sounding data verification.
+!  THIS OPTION IS CURRENTLY UNAVAILABLE.
+!
+!  proopt      Option for profiler data verification.
+!  THIS OPTION IS CURRENTLY UNAVAILABLE.
+!
+!  sfcopt      Option for surface data verification.
+!             = 0 Do not perform surface data verification.
+!             = 1 Perform surface data verification.
+!
+!  sfclist     File containing a list of surface stations available for
+!              the verification system.  This file can be found in
+!              the data/arpsverif directory within the ARPS source code
+!              distribution, as "sfcstns.tbl".  Included in the data is
+!	       latitude, longitude, and station elevation.
+!
+!  sfcrunname  A string used to identify the surface verification
+!              component.  The surface verification data will be written to
+!              a file named "sfcrunname.hdf".
+!
+!  sfcobsdir   The location of the surface observations.  The verification
+!              system will look for files named "saoyyyymmddhhhh.lso",
+!              and the files MUST be in the same format as the ADAS
+!              surface files, but see next set of options for changes.
+!
+!  sfcpre      This is the string that shows as "sao" in the filename above.
+!              This removes the restriction that it be "sao".
+!
+!  sfcpost     This is the string that shows as "lso" in the filename above.
+!              This removes the restriction that it be "lso".
+!
+!  mesoobsdir  A second surface data file is supported.  The naming scheme is
+!              the same as "sfcobsdir".  Use "NULL" if you do not have a second
+!              file.  It is not a fatal error if "NULL" isn't used and there
+!              isn't a second set of files.  A sample name would be
+!              "mesoyyyymmddhhhh.lso"
+!
+!  mesopre     Same as "sfcpre" except for the "mesoobsdir" files.
+!
+!  mesopost    Same as "sfcpost" except for the "mesoobsdir" files.
+!
+!  blackfile   A file containing blacklisted surface stations.  It is
+!              used to keep a particular station's observations from
+!              being used in the system, due to systematic observation
+!              errors and bad reported values.  A sample file is
+!              contained in data/adas/blacklist.sfc within the ARPS
+!              source code distribution.
+!
+!  nsfcuse     Number stations the user wants processed.  The list of stations
+!	       is in the next variable.  When zero, or missing, all stations
+!	       in SFCLIST are processed.
+!
+!  sfcuse      A list of stations to be processed.  The number of stations
+!	       must be in NSFCUSE.
+!
+!  precveropt Option for precipication data verification.
+!  THIS OPTION IS CURRENTLY UNAVAILABLE.
+!
+!  mosopt Option for MOS calcuations.
+!  THIS OPTION IS CURRENTLY UNAVAILABLE.
+!
+!  arpsnn_opt Option for running the ARPS Neural Network system.
+!  THIS OPTION IS CURRENTLY UNAVAILABLE.
+!
+!-----------------------------------------------------------------------
+
+ &single
+   sndopt = 0,
+     sndlist = 'NULL',
+     sndrunname = 'NULL',
+     snddomlist = 'NULL',
+
+   proopt = 0,
+     prolist = 'NULL',
+     prorunname = 'NULL',
+     prodomlist = 'NULL',
+
+   sfcopt = 1,
+     sfclist = '../data/arpsverif/sfcstns.tbl',
+     sfcobsdir = './',
+     sfcpre = 'sao',
+     sfcpost = 'lso',
+     mesoobsdir = 'NULL',
+     mesopre = 'meso',
+     mesopost = 'lso',
+     sfcrunname = 'runname_sfcverif',
+     blackfile = '../data/adas/blacklist.sfc',
+
+     nsfcuse = 3,
+     sfcuse = 'OKC', 'DFW', 'AMA',
+
+   precveropt = 0,
+     preclist = 'NULL',
+     precrunname = 'NULL',
+     precdomlist = 'NULL',
+
+   mosopt = 0,
+     moslist = 'NULL',
+     mosrunname = 'NULL',
+     mosdomlist = 'NULL',
+
+   arpsnn_opt = 0,
+     nnrunname = 'NULL',
+     wtsdir = 'NULL',
+     nnoutputfn = 'NULL',
+ /
+
+
+!-----------------------------------------------------------------------
+!
+!  GRIDDED DATA VERIFICATION OPTIONS - WORKS ONLY WITH VERIFOPT = 2 or 3
+!
+!   mRefopt = 1,   DO ETS calculation for reflectivity
+!           = 2,   DO ETS calculation for precipitation ! zhaokun add
+!
+!     mReflist   file contain reflectivity observations from mosaic2arps,
+!                from mosaic2arps and rad2mosaic( NCEP STAGE IV precipitation),
+!     mRefdir    directory contain files listed in mReflist
+!
+!    reffmt    - Option for observational reflectivity format
+!             = 1 mosaci2arps (NSSL)
+!             = 2 radmosaic   (CAPS)
+!             = 3 mosaic2arps Composite Reflectivity (NSSL)
+!    refopt    - Option for calculating reflectivity field
+!               < 100 ( =mphyopt  Microphysics option. [Refer mphyopt in "arps.input"] )
+!               > 100 WRF schemes (For HWT spring experiments)
+!               = 101 mp_physics=1 (Kessler)
+!               = 102 mp_physics=2 (Lin)
+!               = 103 mp_physics=3 (WSM 3-class)
+!               = 104 mp_physics=4 (WSM 5-classes)
+!               = 105 mp_physics=5 (Ferrier)
+!               = 106 mp_physics=6 (WSM 6-classes)
+!               = 108 mp_physics=8 (Thompson)
+!
+!    refcomp   - composite Radar reflectivity (dBZ)
+!                  1 = composite reflectivity
+!                  0 = single level used to statistic
+!                  2 = precipitation
+!       nreflvl=2, which level will be used
+!       mxscorelvl   number of threshold for ETS of reflectivity
+!        threshold   value of threshold for ETS of reflectivity
+!-----------------------------------------------------------------------
+
+ &gridded
+   mRefopt = 1,
+   mReflist = './mosaic/mosaic_2009051402.list',
+   mRefdir = '/scratch/kbrews/2009/mosaic/',
+   mRefrunname = 'ar2009051402',
+   reffmt = 3,
+   refopt = 1,
+   refcomp = 1,
+   nreflvl=2,
+   ibgn=0,
+   iend=0,
+   jbgn=0,
+   jend=0,
+   mxscorelvl = 8,
+     threshold(1)=15.0,
+     threshold(2)=20.0,
+     threshold(3)=25.0,
+     threshold(4)=30.0,
+     threshold(5)=35.0,
+     threshold(6)=40.0,
+     threshold(7)=45.0,
+     threshold(8)=50.0,
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of input file
+!
+!-----------------------------------------------------------------------

@@ -1,0 +1,519 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR COAMPS2ARPS IN NAMELIST FORMAT   ######
+!     ######               ( Version ARPS5.3.2)                   ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!   AUTHOR:
+!
+!   Yunheng Wang, CAPS
+!   05/03/2011
+!
+!-----------------------------------------------------------------------
+!
+!   MODIFICATION HISTORY:
+!
+!-----------------------------------------------------------------------
+!
+!  Message passing namelist
+!
+!  nproc_x     : processor number in X direction
+!  nproc_y     : processor number in Y direction
+!  max_fopen   : Maximum number of files allowed open when reading or
+!                writing, a number smaller than the number of processors
+!                can be used if dictated by the computing platform.
+!
+!---------------------------------------------------------------------
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+   max_fopen = 8,
+ /
+
+!-----------------------------------------------------------------------
+!
+! COAMPS input information
+!
+!   dir_extd             The directory that contains the COAMPS data
+!                        files that are to be converted/processed.
+!                = '<dir>' is handled specially.
+!
+!  init_cdtg             Initial COAMPS date time group as:
+!                           'YYYYMMDDHH'
+!  start_time_str:       COAMPS forecast started time string as:
+!                           'HHHHMMSS'
+!  history_interval:     COAMPS history dump interval string as:
+!                           'HHHHMMSS'
+!  end_time_str:         COAMPS history ended time string as:
+!                           'HHHHMMSS'
+!
+!  mphysics              Microphysics option of the COAMPS run
+!                      = 1, original COAMPS microphysical scheme
+!                      = 4, Thompson scheme
+!                      = 5, MY one moment scheme
+!                      = 6, MY two moment scheme with fixed alpha
+!                      = 7, MY two moment scheme with diagnostic alpha
+!                      = 8, MY three moment scheme
+!                      = 9, MY two moment scheme used in the WRF system
+!                      = -1, original COAMPS scheme, but use
+!                            Ferrier reflectivity formula in the ARPS system.
+!
+!----------------------------------------------------------------------
+
+ &coampsfile
+   dir_extd          = './',
+   init_cdtg         = '1998052500',
+
+   start_time_str         = '00000000',
+   history_interval       = '00030000',
+   end_time_str           = '00120000',
+   mphysics          = 0,
+ /
+
+!-----------------------------------------------------------------------
+!
+! ARPS grid definition
+!
+!  strhopt  Grid stretching option.
+!         = 0, no vertical stretching;
+!         = 1, vertical stretching with f=z**3 function for dz;
+!         = 2, vertical stretching with hyperbolic tangent (see User's Guide).
+!
+!  dzmin    Minimum vertical grid spacing in physical space (m). Used
+!           if strhopt = 1 or 2.
+!  zrefsfc  Reference height of the surface (ground level) (m).
+!
+!  dlayer1  Height (m) of the layer beneath which stretching is not applied.
+!           0.0 =< dlayer1 < (nz-3)*dz
+!
+!  dlayer2  Depth of the mid-layer with stretched vertical spacing (m)
+!           0.0 =< dlayer2 < (nz-3)*dz and 0.0 =< dlayer1+dlayer2 < (nz-3)*dz
+!           For consistency, dlayer2 is reset to: min(dlayer2,ztop-dlayer1).
+!
+!  strhtune Tuning parameter used when strhopt = 2.
+!           A value between 0.2 and 5.0 is recommended. Stretching
+!           becomes more linear as strhtune increases. Default value is 1.0.
+!
+!  nz       Veritcal dimension of computational grid.
+!
+!  dz       Averaged vertical grid spacing in transformed
+!           computational space (m).
+!
+!  zflat    Height at which the grid becomes flat in the
+!           terrain-following coordinate transformation (m).
+!
+!-----------------------------------------------------------------------
+
+ &arpsgrid
+   use_coamps_grid = 1,
+
+   strhopt  = 2,
+     dzmin    =   20.0,
+     zrefsfc  =    0.0,
+     dlayer1  =    0.0,
+     dlayer2  =    1.0e5,
+     strhtune =    1.0,
+
+   zflat  = 1.0e5,
+
+   nz     = 43,
+   dz     = 500.00,
+ /
+
+!-----------------------------------------------------------------------
+!
+! intrp_opts    Interpolation options
+!
+!    intrp_method Interpolation option for vertical fields
+!           = 1 bilinear interpolation
+!           = 2 quadratic interpolation
+!
+!    intropt    Option indicating to interpolate perturbation or total
+!               variables:
+!               = 1  Interpolate perturbation variables and add to base
+!                    sounding (default);
+!               = 2  Interploate total variables
+!
+!    nsmooth    Number of smoothing passes after interpolation
+!               1 (default) or 2 recommended.
+!
+!    ext_lbc    Option to apply lateral boundary conditions to the winds.
+!               = 0  no boundary contitions applied;
+!               = 1  apply zero-gradient boundary contitions (default).
+!
+!    ext_vbc    Option to apply vertical boundary conditions to w.
+!               = 0  no boundary contitions applied;
+!               = 1  apply boudary contitions specified by tbc & bbc to
+!                    w (default).
+!
+!    tbc        Top boundary condition option.
+!               = 1 Rigid wall;
+!               = 2 Periodic;
+!               = 3 Zero gradient:
+!               = 4 Linear hydrostatic radiation top boundary:
+!
+!    fftopt     Fast Fourier Transform method for use with the upper
+!               boundary tbc=4.
+!               = 1, periodic transform used, edges are assumed to be
+!                    equal in value.
+!
+!                    Requires special dimensions for (nx,ny), see arps.input
+!
+!               = 2, even Cosine transform used, edges are NOT assumed to be
+!                    equal in value.  see, arps.input.
+!
+!     bbc       Bottom boundary condition option.
+!               = 1 Rigid wall;
+!               = 2 Periodic;
+!               = 3 Zero gradient;
+!
+!    coampsexttrnopt  Terrain option for output grid:
+!               = 0, no terrain, flat ground;
+!               = 1, interpolate terrain from original grid.
+!               = 2, terrain data read in from file terndta (defined later)
+!               = 3, use terrain read in from file but merged to original
+!                    grid at the boundaries (see also extntmrg).
+!    terndta    Name of the terrain data file for wrfexttrnopt=2 or 3.
+!    ternfmt    Format of terrain data file.
+!               = 1, Fortran unformatted (default);
+!
+!    extntmrg   Number of zones over which to merge original and new terrain
+!               at the bondaries (used when wrfexttrnopt=3).
+!
+!-----------------------------------------------------------------------
+
+ &intrp_opts
+   intrp_method   = 2,
+   intropt  = 1,
+   nsmooth  = 1,
+   ext_lbc  = 1,
+   ext_vbc  = 1,
+     bbc = 1,
+     tbc = 1,
+       fftopt = 1,
+
+   coampsexttrnopt = 1,
+     terndta   = 'arpstern.data',
+     ternfmt   = 1,
+     extntmrg  = 7,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Variables associated with hydrostatic and wind adjustments.
+!
+!    csopt     Sound wave speed option used in the pressure equation.
+!             = 1, csound = cp/cv * rd * T;
+!             = 2, csound = cp/cv * rd * T * csfactr;
+!             = 3, csound = specfied constant.
+!               Option 1 should be used whenever possible. Reduced sound
+!               wave speed may result in inaccurate solution.
+!
+!    csfactr   Multiplication factor for the sound speed if csopt=2.
+!    csound    User specified constant sound speed if csopt=3.
+!
+!    hydradj    Option for adjusting pressure to balance gravity
+!               and buoyancy to force dw/dt=0 for output field.
+!               = 0    no correction
+!               = 1    correction applied beginning at surface
+!               = 2    correction applied beginning at top
+!               = 3    hydrostatic equation integrated from
+!                      surface for total-p, pbar subtracted.
+!               hydradj=0 suggested
+!
+!     wndadj   Option for adjusting interpolated winds.
+!               = 0  no adjustment from read-in values
+!                    if w is not read-in, it is set to zero
+!               = 1  w set so that wcont = 0, no adjustment to u or v
+!               = 2  w set using integrated divergence with OBrien
+!                    correction to satisfy top and bottom bc
+!               = 3  as in 2, but u and v adjusted for
+!                    to remove 3-D divergence.
+!
+!    obropt     O'Brien adjustment option.  Determines
+!               distribution of mean divergence error used to
+!               enforce upper boundary condition of w=0
+!               = 1  Linearly in computational z. (default)
+!               = 2  Linearly in physical z.
+!               = 3  Linearly in potential temperature.
+!
+!               Adding 10 to the previously listed options makes
+!               w=0 at the bottom of the Rayleigh damping layer
+!               (zbrdmp) rather that at the physcial top of
+!               the domain.
+!
+!               obropt=11 is recommended for most
+!               ext2arps applications to large-scale models
+!
+!     obrzero   Height to set w=0 in O'Brien correction routines.
+!
+!-----------------------------------------------------------------------
+
+ &adjust
+   csopt    = 1,
+     csfactr  = 0.5,
+     csound   = 150.0,
+
+   hydradj = 0,
+   wndadj  = 2,
+     obropt  = 12,
+     obrzero = 12000.,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  COMMENT_LINES Comments
+!
+!  nocmnt     Number of comment lines
+!  cmnt       Comments
+!
+!  runname   Name of this run, this will be used to construct the
+!            output file name
+!
+!-----------------------------------------------------------------------
+ &comment_lines
+   runname = 'COAMPS2ARPS, version 5.2',
+   nocmnt  = 2,
+   cmnt(1) = 'ARPS 5.2',
+   cmnt(2) = 'Del City Storm Simulation',
+   lvldbg  = 0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Data output control parameters.
+!
+!  dirname   Name of directory into which output files are written.
+!
+!  dmp_out_joined = 0/1   Flag indicating if, when the model is run in
+!         distributed-memory-parallel mode (e.g., using MPI), the output
+!         fields from different processors will be gathered and joined
+!         first before being written out (into single files).
+!         = 0, each processor writes out its own portion of data,
+!              the output will be joined together using joinfiles program.
+!         = 1, the output fields from different processors will be gathered
+!              and joined first before being written out. The joinfiles
+!              step is not needed any longer.
+!
+!  exbcdmp   Flag to dump ARPS external boundary data files.
+!          = 0, no EXBC dumping;
+!          = 1, EXBC dumping (Fortran unformatted);
+!          = 3, EXBC dumping (HDF4 format);
+!          = 7, EXBC dumping (NetCDF format);
+!
+!  soildmp   Flag to dump ARPS soil data files
+!          = 0, no soil data files;
+!          = 1, Fortran unformatted dumps;
+!          = 3, HDF4 format dumps.
+!          = 7, NetCDF format dumps.
+!
+!  terndmp   Flag to dump ARPS terrain data file
+!          = 0, no terrain data file;
+!          = 1, Fortran unformatted dumps;
+!          = 3, HDF4 format dumps.
+!          = 7, NetCDF format dumps.
+!
+!  hdmpfmt   History data dump format option.
+!          = 0, no data dump is produced;
+!          = 1, unformatted binary data dump;
+!          = 3, HDF4 format dumps.
+!          = 7, NetCDF format dumps.
+!
+!  filcmprs  Option to compress the history dumping files.
+!          = 0, history files not compressed.
+!          = 1, history files compressed;
+!
+!  readyfl   Option to create a marker file (same name is the history dump
+!            but with "_ready" appended to the end) to indicate that
+!            writing of the history dump has completed.
+!          = 0, do not create a ready file.
+!          = 1, create a ready file;
+!
+!  grdout    Grid output option.
+!          = 0, no grid array output in time-dependent history files;
+!          = 1, grid arrays written in time-dependent history files.
+!  basout    Base state field output option.
+!          = 0, no base state arrays time-dependent history files;
+!          = 1, base state arrays written in time-dependent history files.
+!  varout    Perturbation fields output option in history dump.
+!          = 0, no perturbation wind, pressure or pot. temperature output;
+!          = 1, perturbation wind, pressure and pot. temperature output.
+!  mstout    Moist variable output option in history dump.
+!          = 0, no moisture variables output;
+!          = 1, qv, qc, qr, qi, qs and qh output.
+!  iceout    Ice variable outout option in history dump.
+!          = 0, no ice variables output;
+!          = 1, qi, qs and qh output.
+!  tkeout    TKE output option in history dump.
+!          = 0, no
+!          = 1, yes
+!  trbout    Turbulence field (km) output option in history dump.
+!          = 0, no km output;
+!          = 1, km output.
+!  rainout   Option for surface accumulated rainfall array output.
+!          = 0, no,
+!          = 1, yes.
+!  sfcout    Soil model variable output option in history dump.
+!          = 0, no,
+!          = 1, yes.
+!  landout   Option for soil and vegetation property array output in
+!            history dump.
+!          = 0, no,
+!          = 1, yes.
+!  prcout    Precipitation rates output option in history dump.
+!          = 0, no,
+!          = 1, yes.
+!  radout    Radiation arrays output option in history dump.
+!          = 0, no,
+!          = 1, yes.
+!  flxout    Surface fluxes output option in history dump.
+!          = 0, no,
+!          = 1, yes.
+!
+!  qcexout   Option for qc array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no,
+!          = 1, yes.
+!  qrexout   Option for qr array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no,
+!          = 1, yes.
+!  qiexout   Option for qi array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no,
+!          = 1, yes.
+!  qsexout   Option for qs array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no,
+!          = 1, yes.
+!  qhexout   Option for qh array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no,
+!          = 1, yes.
+!
+!----------------------------------------------------------------------
+
+ &output
+   dirname  = './',
+   dmp_out_joined = 1,
+
+   exbcdmp  = 0,
+     qcexout  = 0,
+     qrexout  = 0,
+     qiexout  = 0,
+     qsexout  = 0,
+     qhexout  = 0,
+
+   soildmp  = 1,
+   terndmp  = 1,
+
+   hdmpfmt  = 7,
+   hdfcompr = 5,
+     basout   = 0,
+     grdout   = 1,
+     varout   = 1,
+     mstout   = 1,
+     iceout   = 1,
+     tkeout   = 1,
+     trbout   = 0,
+     rainout  = 1,
+     sfcout   = 1,
+     landout  = 1,
+     prcout   = 0,
+     radout   = 0,
+     flxout   = 0,
+
+   filcmprs = 0,
+   readyfl  = 0,
+/
+
+!------------------------------------------------------------------------
+!
+!  outheader:      Header of output file name (for ascii and binary)
+!  gemoutheader:   Header of output GEMPAK file name
+!  icape:          choice of CAPE schem, 1 CAPS, 2,NCEP (add 9 - skip arps_be)
+!  iaccu:         = 0 for entire accppt (accul. rain) (0h->current value);
+!                 = 1 for piecewise accppt (previous->current value) when nhisfile
+!                     (>1) hisfiles (in time series) are involved
+!  icrtm:         = 0 turn off CRTM call (default)
+!                 = 1 for calling CRTM ABI VI channels (6)
+!                 = 2 for calling CRTM ABI IR channels (10)
+!                 = 3 for both VI & IR channels (16)
+!  isatid:        = 1 GOES-R
+!                 = 2 GOES-13
+!  chbgn:          Begining channel (default 0: full channels)
+!  chend:          Ending channel   (default 0: full channels)
+!                 !!! currently only support both zero or both non-zero
+!  arpssfcfn       An ARPS time-independent grid and base file that
+!                  contains variable soiltyp and vegtyp.
+!                  This file is required due to the COAMPS model does not
+!                  provide those static data set required by CRTM. The file
+!                  must at the same horizontal grid as the COAMPS system.
+!                  The file must be in joined HDF 4 format.
+!  arpsfmt        = 3,   HDF 4 format
+!                 = 103, HDF 4 split file
+!  user_emis:     = 0 look-up table for a rough surface in CRTM is used.
+!                     Currently, N. Nalli Quasi-specular emissivity LUT (2008, appl. Opt.)
+!                     NOTE> NOT TESTED FOR CIRA_RTM!!!
+!                 = 1 Surface emissivity file is provided by user
+!
+!  icitm:         = 0 turn off CIRA call (under icrtm control)
+!
+!  iascii:         Write out ASCII format output (in a single big file)
+!                  [not functional  currently!!!]
+!  i2dfmt:         Write out 2D output (one file each field each time)
+!                    i2dfmt=0 no 2D output
+!                    i2dfmt=1 native binary 2D output
+!                    i2dfmt=3 HDF4 2D output
+!                    i2dfmt=7 NetCDF 2D output
+!  igempak:        Write out GEMPAK format output (for SPC)
+!
+!                  NOTE: code should be recompiled with "-io gempak" option.
+!
+!  The following parameters are used if igempak=1
+!  ilite:          A lite set of GEMPAK fields (if ilite=1; default: 0)
+!  iltgci:         switch on LTG & CI output  (if iltgci=1; default: 0)
+!  ibeg_offset:    Offset for writing out sub-domain GEMPAK file (default: 0)
+!  iend_offset:
+!  jbeg_offset:
+!  jend_offset:
+!
+!------------------------------------------------------------------------
+
+ &output_2d
+
+   outheader    = 'bin_2d_out',
+   gemoutheader = 'gem_2d_out',
+   icape = 1,
+   iaccu = 1,
+
+   icrtm = 0,
+    isatid = 2,
+    chbgn = 3,
+    chend = 3,
+    arpssfcfn = './arps25may1998.hdfgrdbas',
+    user_emis = 0,
+   icitm = 0,
+
+   iascii  = 0,
+   i2dfmt  = 0,
+   igempak = 0,
+    ilite       = 0,
+    iltgci      = 0,
+    ibeg_offset = 0,
+    iend_offset = 0,
+    jbeg_offset = 0,
+    jend_offset = 0,
+ /
+
+!---------------------------------------------------------------------
+!
+! END of Input file
+!
+!----------------------------------------------------------------------

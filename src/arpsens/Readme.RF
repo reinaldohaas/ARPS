@@ -1,0 +1,71 @@
+Brief Rremarks on Recirsive Filter used  in arpsenkfic package
+(Gang  Zhao  03/16/2009 : Add 2D horizontal recursive filter)
+(Gang  Zhao  05/08/2009 : add 1D vertical Explicit Filter)
+
+Modification:
+
+$(ARPSHOME)/src/arpsens:
+    arpsenkfic.f90                modified
+    lib_RecursiveFilter.f90       new file
+    Makefile                      modified
+    Readme.RF                     readme file
+        
+
+$(ARPSHOME)/input:
+    Arpsenkfic.input
+    
+Details:
+1. Program arpsenkfic.f90:  modified to accommodate 2D Recusive Filter + 1D Explicit Filter as an option to generate the Gaussian random perturbations with spatial correlation structure; RF algorithm is merged into subroutines RANGARY3D and RANGARY3D2. When iniprtopt = 3 or 6, RF is used.
+
+2. Subroutine lib_RecursiveFilter.f90: Subroutines of Filters.
+
+3. Modification of Makefile:
+   ......
+   ......
+ENKFICOBJ = arpsenkfic.o initenkfic.o lib_RecursiveFilter.o
+   ......
+   ......
+  $(ARPS_LD) $(LDFLAGS) -o $@ $(ENKFICOBJ)            \
+                               $(LIBDIR)/$(LIBARPS).a       \
+                               $(LIBDIR)/$(LIBENKF).a       \
+                               $(LIBDIR)/$(LIBADAS).a $(LIBS) \
+                               -L/home/gzhao/local/lib -llapack -lblas
+  ! Note: Need external libraries of LAPACK and BLAS. 
+  !       On Sooner: link to mine -L/home/gzhao/local/lib -llapack -lblas
+  !       On the other machine:
+  !               Usually these 2 libs are common and pre-installed,
+  !               you could ask the system admin or support where they are 
+  !               and how to link them to your code.
+  .......
+  .......
+lib_RecursiveFilter.o : lib_RecursiveFilter.f90     # this is at the bottom of Makefile
+
+4. The 2*N-passing of RF is 4. It is fixed as the default number of passing in subroutine RANGARY3D and RANGARY3D2.
+    np = 2;
+    np2 = np * 2;  ! i.e., np2=4
+
+5. No new parameter, variable is introduced in program arpsenkfic.f90.
+
+6. To use Recursive Filter in arpsenkfic, user only needs to modify several options in arpsenkfic.input to choose RF and control the correlation length scale:
+
+arpsenkfic.input:
+   ...
+   ...
+   iniprtopt = 3,
+     iniprt_ptprt = 3,
+     iniprt_qv = 3,
+
+   ...
+   lhor = 5000.0,
+   lver = 5000.0,
+
+   Note:
+      a.  lhor & lver depend on charactericstic scale in your case. At beginning, you could try to use same value as the localisation influence radius used in arpsenkf.input.
+      b.  set lhor = 0.0 ---> no 2D horizontal Recursive Filter applied
+          set lver = 0.0 ---> no 1D vertical Explicit Filter applied
+
+
+7.  Compared to general gaussian random perturbations, RF could improve filter convergence significantly.
+    Compared to smoothed Gaussian random perturbations, Smoother function is a little bit better than RF, but not too much.
+
+8.  In RF method, the field variance is adjusted to the specified stdev by multiplying the stdev factor to whold field for all members, without removal of the field mean. Its purpose is to restrain the negative correlation beyond the correlation length scale.

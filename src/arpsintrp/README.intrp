@@ -1,0 +1,32 @@
+
+ARPSINTRP
+ 
+  This directory contains source code for ARPSINTRP, a program for interpolating 
+  ARPS fields read in from history data file(s) to a smaller domain. The output 
+  are written into another ARPS history file(s). 
+
+  This program is often used to produce boundary forcing files for a one-way
+  nested grid run.
+ 
+  Doing 'makearps arpsintrp' in arps root directory compiles and links this package.
+
+  For big problem and simple interpolation, the user can try ARPSSUBDOMAIN to minimize
+  the usage of memory.
+
+ARPSSUBDOMAIN          (09/12/2006)
+
+  Purpose:  Sub-samples or horizontally interpolates data from one ARPS grid to another.
+
+  Function: Read in ARPS gridded data files one by one in history format, and sub-sample 
+            the file in the 3 dimensions or interpolate the field in the horizontal to 
+            another (output) ARPS grid, and write them out in one of the history dump 
+            formats for this output grid.
+
+  Applications:
+            Similar to ARPSINTRP but mainly used for generating initial and boundary 
+            conditions for very high resolution ARPS grid application. This program 
+            can minimize memory usage by processing one field at a time.
+
+  NOTE:     Only linear horizontal interpolation can be conducted and vertical grid 
+            must be kept the same in input and output data fields.
+

@@ -1,0 +1,451 @@
+!
+!-----------------------------------------------------------------------
+!
+!  This is an input file for ARPSSOIL
+!
+!  Modified 1 June 2002 by Eric Kemp
+!  Soil variable updates
+!
+!-----------------------------------------------------------------------
+!
+!  hinfmt     History data dump format of input file
+!           = 0, do not read in history dump;
+!           = 1, unformatted binary data;
+!           = 2, formatted ascii data;
+!           = 3, NCSA HDF format data;
+!           = 4, Packed binary data;
+!           = 5, dump for Savi3D visualization package;
+!           = 6, binary allowing data point skip;
+!           = 7, NetCDF format (no longer support starting from 4.1.5);
+!           = 8, Packed NetCDF format (no longer support since from 4.1.5);
+!           = 9, GrADS data;
+!           = 10, GRIB data
+!
+!  nx,ny      Dimensions of output soil data (values used only for hinfmt=0,
+!             otherwise over-ridden by history dump dimensions).
+!
+!  grdbasfn   Name of base-state and grid data file name
+!  hisfile    History data file to be processed.
+!
+!  soilinit2  Option flag for soil model initialization. 
+!
+!           For options 1 through 4, soil temperature is initialized using
+!             soil-air temperature offset ttprt and tbprt.
+!
+!           = 1, use wgrat and w2rat to init. soil moisture
+!           = 2, use API to initialize soil moisture
+!           = 3, use API to calculate soil moisture, then scale
+!                wsfc and wdp by wgrat and w2rat, respectively
+!           = 4, use soil moisture data in soilinfl
+!           = 5, update soil temperature data with that found in
+!                soilinfl for vegtyp of water only, otherwise use that in 
+!                history file, update with snow depth data in soilinfl for
+!                all grid points
+!
+!  soilfmt  Format of data file containing initial values of soil model
+!           variables.
+!         = 1, Fortran unformatted (default);
+!         = 3, HDF4 (uncompressed).
+!
+!  prdata     API precipitation data option
+!           = 1, use precip data from reformatted NCDC data files
+!           = 2, use precip data from NCEP "real-time" files
+!             prdata is only meaningful when soilinit2=2 or 3.
+!
+!  apiinit  = (Optional) Name of the file containing the initial
+!             (on inidate) equivalent water depth (cm) in the top d2 meters
+!             (defined to be 1 meter by d2 in soilcst.inc) and the
+!             corresponding lat and lon (e.g. '29.5  33.75  -98.24').
+!
+!             Data is for background field purposes and can be
+!             obtained from e.g. the ARM sites.  The values specified
+!             should be from within a couple week span around inidate.
+!
+!             For sufficiently long assimilation periods (at least on
+!             the order of 90 days) the final API should be RELATIVELY
+!             insensitive to the initial API.  However, an initial
+!             guess is still recommended.  (See dependence on initial
+!             API in the output file.)  If no background is supplied,
+!             initial moisture contents are set to 1/2 of saturation.
+!
+!             apiinit is only meaningful when soilinit2=2 or 3
+!
+!  apifile    File listing the names of the files which contain the
+!             precipitation station location (lat,lon - 1st line) and
+!             the precipitation data (in inches, first entry is on 
+!             inidate -- below).  Used when soilinit2=2 and datapr=1.
+!
+!             apifile is only meaningful when soilinit2=2 or 3
+!
+!  mxdays     Maximum number of days to run API.
+!  mxstns     Maximum number of stations used in API.
+!  
+!  precpdir = Name of directory containing the NCEP precip file.
+!             Used when soilinit2=2 or 3, and datapr=2.
+!
+!  sfcdat     Flag for soil type input
+!
+!         = 1, Surface property data are initialized using input parameters.
+!         = 2, Surface property data are initialized using file sfcdtfl;
+!         = 3, Same as sfcdat =2, except when
+!              the soil variables are present in the grid/base state
+!              file grdbasfn values in grdbasfn will be used instead.
+!
+!  styp       Soil type used only when sfcdat=1
+!             See arps.input file for list of soil types.
+!
+!  wetcanp0   Water amount on canopy
+!
+!  Snowcvr0   Snow cover
+!
+!  ttprt      Difference of top layer soil temperature from the ground level
+!             air temperature. Ground air temperature is extrapolated from 
+!             that at k=2 and 3. Degree Kelvin.
+!
+!  tbprt      Difference of bottom layer soil temperature from the ground level
+!             air temperature  Degrees Kelvin.
+!
+!  wgrat      percent ( >= 0.0, <= 1.0 ) to determine the surface soil
+!             moisture between the saturated and wilting point values
+!             Used when soilinit2 = 1 or 3.
+!
+!  w2rat      percent ( >= 0.0, <= 1.0 ) to determine the deep soil
+!             moisture between the saturated and wilting point values
+!             Used when soilinit2 = 1 or 3.
+!
+!  nstyp      The number of soil types per grid point.
+!
+!
+!  sfcdtfl    Input surface soil type file
+!             Used when sfcdat = 2.
+!
+!  sfcfmt   Format of data file containing surface characteristics.
+!         = 1, Fortran unformatted (default);
+!         = 3, HDF4 (uncompressed).
+!
+!  soilinfl   Input soil moisture file, used only when
+!             soilinit2 = 4 or 5.  Temperature info in this file is not used
+!             for soilinit2=4.
+!
+!  soiloutfl  Output soil temperature/moisture file
+!
+!  soildmp   Flag to dump ARPS soil data files.
+!          = 0, no soil data files;
+!          = 1, Fortran unformatted dumps;
+!          = 3, HDF4 (uncompressed) dumps.
+!
+!  zpsoilout  Soil depth option.
+!          = 0, no zpsoil output
+!          = 1, zpsoil output.
+!
+!  tsoilout  Soil temperature option.
+!          = 0, no tsoil output
+!          = 1, tsoil output.
+!
+!  qsoilout  Soil moisture option.
+!          = 0, no qsoil output
+!          = 1, qsoil output.
+!
+!  wsfcout   Surface soil moisture output option
+!          = 0, no wetsfc output
+!          = 1, wetsfc output
+!
+!  wdpout    Deep soil moist output option
+!          = 0, no wetdp output
+!          = 1, wetdp output.
+!
+!  wcanpout  Water amount on canopy
+!          = 0, no wetcanp output
+!          = 1, wcanpout output.
+!
+!  snowdout  Snow depth
+!          = 0, no snowdpth output
+!          = 1, snowdpth output.
+!
+!  twater     Water temperature in degrees C (used for soiltyp=13)
+!
+!  inidate   Character string, format: '1977-05-20'
+!            Date of the initial date in the precip files.
+!            This day should be at least 90 days prior to fnldate.
+!
+!  fnldate   Character string, format: '1977-05-20'
+!            Date of the final date in the precip files.
+!
+!  respapi   Response of initial API analysis to wavelengths equal
+!            to 2 x (mean initial API station separation).  Since
+!            initial API observations are usually sparse, a value at
+!            or near 1.0 is usually desirable.
+!
+!  k1        API depletion coefficient minimum value for ground
+!            surface layer (sinusoidal variation, min@July 15: k=k1
+!            max@January 15: k=1.0).  Applies only to the top few
+!            millimeters of the soil.  Should be small (< .25) since
+!            this layer has VERY short memory of rainfall.  The min-
+!            imum value of wetsfc at any given point is determined
+!            by wgeq, or the amount of soil moisture in this layer
+!            that would be in equilibrium with the root layer moist-
+!            ure content.  If k1=0.0, wetsfc is set to wgeq at all
+!            grid points (appropriate for morning starts with no
+!            recent rainfall).  If k1<0.0, wetsfc is set to ~80% of
+!            wgeq (most appropriate for mid- to late-day starts with
+!            no recent rainfall).  If it hasn't rained within the last
+!            at any of the precip stations, it is RECOMMENDED that k1
+!            be set to <= 0.0, depending on the model's initial time.
+!            
+!  k2        API depletion coefficient minimum value for root zone
+!            layer (of depth d2).
+!
+!  range     Range parameter (km) in the denominator of the Barnes'
+!            weight function used to analyze the daily precip to the
+!            ARPS grid.  If set to 0.0, arpsh2s will determine
+!            a range parameter based on the mean station separation
+!            where the final response at wavelengths of 2*(mean
+!            station separation) will be respprec.
+!
+! respprec   Response in the daily precipitation analyses to wavelengths
+!            equal to 2 x (mean precip station separation).  If observ-
+!            ations are dense, respprec should be quite small (~0.1).  If
+!            observations are sparse, set closer to 1.0.  NOTE: respprec
+!            is used only if the range parameter is set to 0.0.
+!
+!  gamma()   Range parameter multiplier for passes 1 and 2 where
+!            0.20 < gamma <= 1.0 (smaller gamma, more detail).
+!            NOTE:  gamma(1) is usually set to 1.0 while gamma(2)
+!                   is usually set near the lower bound of 0.20
+!
+!-----------------------------------------------------------------------
+!
+
+ &arpssoilvars
+   hinfmt = 10,
+     nx = 4,
+     ny = 4,
+   grdbasfn = 'may20.grbgrdbas',
+   hisfile  = 'may20.grb000000',
+
+   soilinit2 = 2,
+     soilfmt = 1,
+   prdata   = 2,
+
+   apiinit  = 'dummy',
+   apifile  = 'precfile.lst',
+   mxdays   = 180,
+   mxstns   = 4000,
+   prcpdir  = '/vortex/precip',
+   prcplst  = '/vortex/precip/splains.stns',
+
+   sfcdat   = 2,
+     sfcfmt = 1,
+   styp     = 10,
+   wetcanp0 = 0.0,
+   snowdpth0 = 0,
+   twater   = 21.,
+   ttprt    = 0.0,
+   tbprt    = 0.0,
+   wgrat    = 0.40,
+   w2rat    = 0.40,
+   nstyp    = 1,
+   sfcdtfl  = 'ad97041017.sfcdata',
+   soilinfl = 'test1.soildata',
+   soiloutfl= 'ad97042317.soildata',
+
+   soildmp  = 1,
+   zpsoilout = 1,
+   tsoilout = 1,
+   qsoilout = 1,
+   wcanpout = 1,
+   snowdout = 1,
+
+   inidate  = '1997-01-10-00',
+   fnldate  = '1997-01-10-00',
+
+   respapi  = 0.20,
+   k1       = 0.0,
+   k2       = 0.965,
+   range    = 0.0,
+   respprec = 0.05,
+   gamma(1) = 1.00,
+   gamma(2) = 0.40,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  temperatures for bodies of water.
+!
+!  nbwater   Number of boxes over which the water temperature will be
+!            set to specified values.
+!
+!            The example below is for the following:
+!              1 - Lake Superior 
+!              2 - Lake Michigan
+!              3 - Lake Huron
+!              4 - Lake St. Clair (between Huron & Erie)
+!              5 - Lake Erie
+!              6 - Lake Ontario
+!              7 - Gulf of Mexico
+!
+!  tbwater   Array containing the surface water temperature for each
+!            specified box (in degrees C).
+!  blat1     Array containing the southern latitude of each box.
+!  blat2     Array containing the northern latitude of each box.
+!  blon1     Array containing the western longitude of each box.
+!  blon2     Array containing the eastern longitude of each box.
+!
+!-----------------------------------------------------------------------
+
+ &box_water
+   nbwater = 0,
+   tbwater(1) = 12.,
+   tbwater(2) = 20.,
+   tbwater(3) = 19.,
+   tbwater(4) = 22.,
+   tbwater(5) = 23.,
+   tbwater(6) = 21.,
+   tbwater(7) = 29.,
+   blat1(1) =  46.4, blat2(1) =  49.0, blon1(1) = -92.5, blon2(1) = -84.1,
+   blat1(2) =  41.0, blat2(2) =  46.3, blon1(2) = -88.1, blon2(2) = -84.7,
+   blat1(3) =  43.0, blat2(3) =  46.4, blon1(3) = -84.7, blon2(3) = -79.5,
+   blat1(4) =  42.2, blat2(4) =  42.8, blon1(4) = -83.5, blon2(4) = -82.2,
+   blat1(5) =  41.1, blat2(5) =  43.0, blon1(5) = -83.7, blon2(5) = -78.6,
+   blat1(6) =  43.0, blat2(6) =  45.6, blon1(6) = -80.0, blon2(6) = -76.0,
+   blat1(7) =  20.0, blat2(7) =  31.0, blon1(7) = -98.0, blon2(7) = -90.0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  history_dump parameters.
+!
+!  hdmpfmt   History data dump format option.
+!          = 0, no data dump is produced;
+!          = 1, unformatted binary data dump;
+!          = 2, formatted ascii data dump;
+!          = 3, NCSA HDF4 format data dump;
+!          = 4, Packed binary data dump;
+!          = 5, dump for Savi3D visualization package;
+!          = 6, binary allowing data point skip;
+!          = 7, NetCDF format (no longer support starting from 4.1.5);
+!          = 8, Packed NetCDF format (no longer support since from 4.1.5);
+!          = 9, GrADS data dump;
+!          = 10, GRIB data dump;
+!          = 11, Vis5D data dump.
+!
+!  grbpkbit  Number of bits in packing GRIB data
+!          = 16 (default)
+!
+!  hdfcompr  HDF4 compression option (for hdmpfmt=3).
+!          = 0 (default), no compression;
+!          = 1, fast gzip compression;
+!          = 2, high gzip compression;
+!          = 3, adaptive or skipping Huffman compression;
+!          = 4-7, as above plus mapping reals to 16 bit integers.
+!            Note that only options 0-2 work on Cray platforms.
+!
+!-----------------------------------------------------------------------
+
+ &history_dump
+   hdmpfmt    = 1,
+     grbpkbit   = 16,
+     hdfcompr   = 0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  output control parameters.
+!
+!  runname   Header to use for outputing history file.
+!
+!  dirname   Name of directory into which output files are written.
+!
+!  filcmprs  Option to compress the history dumping files.
+!          = 0, history files not compressed.
+!          = 1, history files compressed;
+!  grdout    Grid output option.
+!          = 0, no grid array output in time-dependent history files;
+!          = 1, grid arrays written in time-dependent history files.
+!  basout    Base state field output option.
+!          = 0, no base state arrays time-dependent history files;
+!          = 1, base state arrays written in time-dependent history files.
+!  varout    Perturbation fields output option in history dump.
+!          = 0, no perturbation wind, pressure or pot. temperature output;
+!          = 1, perturbation wind, pressure and pot. temperature output.
+!  mstout    Moist variable output option in history dump.
+!          = 0, no moisture variables output;
+!          = 1, qv, qc, qr, qi, qs and qh output.
+!  iceout    Ice variable outout option in history dump.
+!          = 0, no ice variables output;
+!          = 1, qi, qs and qh output.
+!  tkeout    TKE output option in history dump.
+!          = 0, no
+!          = 1, yes 
+!  trbout    Turbulence field (km) output option in history dump.
+!          = 0, no km output;
+!          = 1, km output.
+!  rainout   Option for surface accumulated rainfall array output.
+!          = 0, no,
+!          = 1, yes.
+!  sfcout    Soil model variable output option in history dump.
+!          = 0, no,
+!          = 1, yes. 
+!  landout   Option for soil and vegetation property array output in 
+!            history dump.
+!          = 0, no,
+!          = 1, yes.
+!
+!-----------------------------------------------------------------------
+
+ &output
+   runname  = 'arpssoilout',
+   dirname  = './',
+   filcmprs = 0,
+   basout   = 0,
+   grdout   = 0,
+   varout   = 1,
+   mstout   = 1,
+   iceout   = 0,
+   tkeout   = 0,
+   trbout   = 0,
+   rainout  = 0,
+   sfcout   = 1,
+   landout  = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Grid information if no history is provided as input.
+!
+!  dx       Grid spacing in x-direction in computational
+!           and physical space (m).
+!  dy       Grid spacing in y-direction in computational
+!           and physical space (m).
+!  dz       Averaged vertical grid spacing in transformed
+!           computational space (m).
+!
+!  ctrlat   Latitude of the model physical domain center (deg. N).
+!  ctrlon   Longitude of the model physical domain center (deg. E).
+!
+!  mapproj   Map projection option.
+!          = 0, no map projection;
+!          = 1, polar projection;
+!          = 2, Lambert projection;
+!          = 3, Mercator projection.
+!  trulat1   1st true latitude of map projection.
+!  trulat2   2nd true latitude of map projection (used only by mapproj = 2).
+!  trulon    True longitude of map projection.
+!  sclfct    Map scale factor (default is 1.0).
+!
+!-----------------------------------------------------------------------
+
+ &grid_info
+   dx = 9000.,
+   dy = 9000.,
+   dz = 500.,
+
+   ctrlat   =  36.,
+   ctrlon   =  -100.,
+
+   mapproj  =  0,
+     trulat1  =  30.,
+     trulat2  =  60.,
+     trulon   =  -100.,
+     sclfct   =  1.0,
+ /

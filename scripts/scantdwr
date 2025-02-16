@@ -1,0 +1,373 @@
+#!/usr/bin/perl -w
+#
+#  Script to identify volume scans among the Level-2 TDWR sweep files.
+#  Output of script is a file, named RADAR_YYYYMMDDHHMM_V
+#  containing a volume scan of TDWR data.
+#
+#  Keith Brewster, CAPS  April 2012
+#
+#  Modifications:
+#  
+#
+use Time::Local;
+use File::Copy;
+use Cwd;
+
+$tmpdir = "/home/kbrews/tmp";
+$voldir = "/home/kbrews/perl";
+#$tdwrdir = "/data6/kbrews/20120403/tdwr";
+$tdwrdir = "/arpsdata2/tdwr/20120403";
+
+$tmpdir = cwd();
+$voldir = cwd();
+
+#my $ldm = $ENV{ARPSCNTL_LDM};
+#if ( $ldm =~ /ldm1/ ) {
+#	$tdwrdir = "/arpsdata/ldm1/datafiles/tdwr";
+#} elsif ( $ldm =~ /ldm2/ ) {
+#	$tdwrdir = "/arpsdata2/ldm2/datafiles/tdwr";
+#} else {
+#	$tdwrdir = "$ldm/datafiles/tdwr";
+#	my $tstr = $ARGV[0];
+#	my @splits = split /-/, $ARGV[0];
+#	$tdwrdir .= "/$splits[0]";
+#}
+
+mkdir("tmp") if ( ! -d "tmp" );
+
+$tmpfile = $tmpdir . "/scan_tmp.nc";
+#print "Temporary file $tmpfile used for zcat uncompress\n";
+if ( -e $tmpfile ) {
+  unlink $tmpfile;
+}
+#
+$gotradar = 0;
+$gottime = 0;
+$lowthr = 1.9;
+$minsec = 190;
+$fullsec = 320;
+$scorethr = 1800;
+$dminn = 3;
+$dminp = 2;
+
+$narg = $#ARGV;
+if($narg == 0) {
+   $timestr = $ARGV[0];
+   $gottime = 1;
+   print " timestr $timestr\n";
+} elsif ($narg > 0) {
+   $iarg = 0;
+   while ($iarg < $narg) {
+      if ($ARGV[$iarg] eq "-d") {
+         $tdwrdir = $ARGV[$iarg+1];
+         print " tdwrdir $tdwrdir\n";
+         $iarg = $iarg+2;
+      } elsif ($ARGV[$iarg] eq "-r") {
+         $radar_list[0] = $ARGV[$iarg+1];
+         print " Radar $radar_list[0]\n";
+         $gotradar = 1;
+         $iarg = $iarg+2;
+      } elsif ($ARGV[$iarg] eq "-s") {
+         $scorethr = $ARGV[$iarg+1];
+         print " scorethr $scorethr\n";
+         $iarg = $iarg+2;
+      } elsif ($ARGV[$iarg] eq "-t") {
+         $timestr = $ARGV[$iarg+1];
+         print " timestr $timestr\n";
+         $gottime = 1;
+         $iarg = $iarg+2;
+      } elsif ($ARGV[$iarg] eq "-tw") {
+         $dminn = abs($ARGV[$iarg+1]);
+         print " dminn $dminn\n";
+         $iarg = $iarg+2;
+      } elsif ($ARGV[$iarg] eq "+tw") {
+         $dminp = abs($ARGV[$iarg+1]);
+         print " dminp $dminp\n";
+         $iarg = $iarg+2;
+      } else  {
+         print "Usage scantdwr -t YYYYMMDDHHMM [-d] tdwr_directory [-r] radar\n";
+         print "      [-tw] time_window_minutes_before\n";
+         print "      [+tw] time_window_minutes_after\n";
+         print "      Notes: -t is mandatory\n";
+         print "             default is process all tdwr radars\n";
+         print "             default is same as -tw 3 +tw 2\n";
+         exit;
+      }
+   }
+} else {
+   print "Usage scantdwr -t YYYYMMDDHHMM [-d] tdwr_directory [-r] radar\n";
+   print "      [-tw] time_window_minutes_before\n";
+   print "      [+tw] time_window_minutes_after\n";
+   print "      Notes: -t is mandatory\n";
+   print "             default is process all four tdwr radars\n";
+   print "             default is same as -tw 3 +tw 2\n";
+   exit;
+}
+
+if ($gottime == 0) {
+   print "Usage scantdwr -t YYYYMMDDHHMM [-d] tdwr_directory [-r] radar\n";
+         print "      [-tw] time_window_minutes_before\n";
+         print "      [+tw] time_window_minutes_after\n";
+         print "      Notes: -t is mandatory\n";
+         print "             default is process all TDWR radars\n";
+         print "             default is same as -tw 3 +tw 2\n";
+         exit;
+   exit;
+}
+
+if ($gotradar == 0) {
+   chdir $tdwrdir;
+   @radar_list = <*>;
+}
+
+print "Directory: $tdwrdir\n";
+
+#
+#  Allow specification of time without the -t flag.
+#
+
+my $timehyphen = $timestr;
+$timestr =~ s/-//;
+
+$year_req = substr($timestr,0,4);
+$month_req = substr($timestr,4,2);
+$day_req = substr($timestr,6,2);
+$hour_req = substr($timestr,8,2);
+$min_req = substr($timestr,10,2);
+$sec_req = 0;
+printf "Request %04i/%02i/%02i %02i:%02i\n",$year_req,$month_req,$day_req,$hour_req,$min_req;
+#  Convert to C convention.
+$month_req--;
+$time_req = timegm($sec_req,$min_req,$hour_req,$day_req,$month_req,$year_req);
+print "Integer time value: $time_req \n";
+$dminn=-$dminn;
+$k=-1;
+foreach $i ( $dminn .. $dminp) {
+   $k++;
+   $time = $time_req + $i*60;
+   ($sec,$min,$hour,$day,$month,$year,$wday,$yday,$isdst) = gmtime($time);
+   $year = $year + 1900;
+#  Convert from C convention.
+   $month++;
+#   printf "Next %04i/%02i/%02i %02i:%02i:%02i %03i %03i %03i\n",$year,$month,$day,$hour,$min,$sec,$wday,$yday,$isdst;
+   $globtim[$k] = sprintf("*%04i%02i%02i%02i%02i*",$year,$month,$day,$hour,$min);
+   print "Glob time String $globtim[$k] \n";
+}
+
+foreach $radar (@radar_list) {
+  $raddir = $tdwrdir . "/" . $radar;
+  print "Radar Directory: $raddir\n";
+  if ( -d $raddir ) {
+    $elevlast = -99.0;
+    $ifile = 0;
+    $fsec=0;
+    chdir $raddir;
+    foreach $glob1str (@globtim) {
+      @filelist = glob($glob1str);
+      foreach $filename (@filelist) {
+        $catalog[$ifile]=$filename;
+        $slash=rindex($filename,"/");
+        if ($slash > -1) {
+           $filen[$ifile]=substr($filename,$slash+1);
+        } else {
+           $filen[$ifile]=$filename;
+        }
+        my @items = split('-',$filen[$ifile]);
+#       printf " items: %s %s %s %s\n",$items[0],$items[1],$items[2],$items[3];
+        $ftimestr=substr($items[0],4,12);
+#       printf "filen,ftimestr: %s %s \n",$filen[$ifile],$ftimestr;
+        $fyr=substr($ftimestr,0,4);
+        $fmon=substr($ftimestr,4,2);
+        $fday=substr($ftimestr,6,2);
+        $fhr=substr($ftimestr,8,2);
+        $fmin=substr($ftimestr,10,2);
+        $seqnum[$ifile]=$items[1];
+        $elev[$ifile]=$items[2];
+        $secsiz[$ifile]=$items[3];
+        printf "File %04i/%02i/%02i %02i:%02i:%02i\n",$fyr,$fmon,$fday,$fhr,$fmin,$fsec;
+#	Convert to C convention.
+	$fmon--;
+        $ftime = timegm($fsec,$fmin,$fhr,$fday,$fmon,$fyr);
+#       print "Integer time value: $ftime \n";
+        $delt[$ifile] = $ftime - $time_req;
+        print "Time difference: $delt[$ifile] \n";
+        $nfile = $ifile;
+        $ifile++;
+      }
+    }
+    $nfile = $ifile;
+    printf "Read %7d Files\n",$nfile;
+#
+#   Sort the files into discrete volumes
+#   Note here if the elevation steps down once, but resumes upward
+#   the step down elevation is flagged and the volume count is not
+#   incremented.
+#
+    $ivol = 0;
+    $nvol = 0;
+    $stepdown = 0;
+    $gotfull[0] = 0;
+    $got1ow[0] = 0;
+    $score[0] = 0;
+    $bgndt[0] = $delt[0];
+    $enddt[0] = $delt[0];
+    $elevlast = $elev[0];
+    for ($ifile = 0; $ifile < $nfile; ++$ifile) {
+      if ($stepdown == 0) {
+        $fvol[$ifile] = $ivol;
+        if ($elev[$ifile] < $elevlast) {
+          $stepdown = 1;
+        } else {
+          $elevlast = $elev[$ifile];
+          $enddt[$ivol]=$delt[$ifile];
+        }
+#
+#   Last elev was step down.  Permanent?
+#
+      } else {    
+        if ($elev[$ifile] <= $elevlast) {
+          $ivol++;
+          $fvol[$ifile-1] = $ivol;
+          $fvol[$ifile] = $ivol;
+          $nvol=$ivol;
+          $gotfull[$ivol]=0;
+          $gotlow[$ivol]=0;
+          $score[$ivol]=0;
+          $bgndt[$ivol]=$delt[$ifile-1];
+          $enddt[$ivol]=$delt[$ifile];
+          $elevlast = $elev[$ifile];
+          $stepdown = 0;
+        } else {
+          $fvol[$ifile-1] = -1;
+          $fvol[$ifile] = $ivol;
+          $enddt[$ivol]=$delt[$ifile];
+          $stepdown = 0;
+        }
+      }
+    }
+#
+#     Compute the score for each volume
+#     Print some info at this point
+#
+    print "  File Name                      Vol   Elev  SecSize\n";
+    for ($ifile = 0; $ifile < $nfile; ++$ifile) {
+      if ($fvol[$ifile] >= 0) {
+        $ivol = $fvol[$ifile];
+        if ($secsiz[$ifile] > $minsec) {
+           $score[$ivol] += $secsiz[$ifile];
+        }
+        if ( $elev[$ifile] < $lowthr ) {
+           $gotlow[$ivol]=1;
+        }
+        if ( $secsiz[$ifile] > $fullsec) {
+           $gotfull[$ivol]=1;
+           printf "%-30s %5d %6.1f %5d  F\n",$filen[$ifile],$ivol,$elev[$ifile],$secsiz[$ifile];
+        } else {
+           printf "%-30s %5d %6.1f %5d  S\n",$filen[$ifile],$ivol,$elev[$ifile],$secsiz[$ifile];
+        }
+      }  else {
+        printf "%-30s %5d %6.1f %5d  Scandown\n",$filen[$ifile],$fvol[$ifile],$elev[$ifile],$secsiz[$ifile];
+      }
+    }
+#
+#   Print-out volume info
+#
+    printf "All Volumes for this radar\n";
+    printf "   ivol   begin   end    gotfull   gotlow   score\n";
+    for ($ivol = 0; $ivol <= $nvol; ++$ivol) {
+       printf "%6d %6d %6d %6d %6d %9d\n",$ivol,$bgndt[$ivol],$enddt[$ivol],$gotfull[$ivol],$gotlow[$ivol],$score[$ivol];
+    }
+# 
+#   Now select the "best" volume.
+#   This should be near the requested time and work backwards until
+#   a volume is found that has at least one full scan.
+#   Start from the first volume of 0 or positive time offset.
+#
+    $selvol=-1;
+    $midvol=0;
+    for ($ivol = 0; $ivol <= $nvol; ++$ivol) {
+       if($enddt[$ivol] > 0) {
+          $midvol=$ivol;
+          last;
+       }
+    }
+    printf "Found mid vol= %d\n",$midvol;
+#
+    for ($ivol = $midvol; $ivol > -1; --$ivol) {
+       if(($gotfull[$ivol] > 0) && ($gotlow[$ivol] > 0) && ($score[$ivol] > $scorethr)) {
+          $selvol=$ivol;
+          printf "Rev search selvol= %d\n",$selvol;
+          last;
+       }
+    }
+    if($selvol < 0) {
+       for ($ivol = $midvol; $ivol <= $nvol; ++$ivol) {
+          if(($gotfull[$ivol] > 0) && ($gotlow[$ivol] > 0) && ($score[$ivol] > $scorethr)) {
+             $selvol=$ivol;
+             printf "Fwd search selvol= %d\n",$selvol;
+             last;
+          }
+       }
+    }
+#
+#   If no volumes met the minimum criteria, take the best score
+#   midvol score gets 2200 bonus points and gotlows get 1200 bonus points.
+#   to favor their selection all scores are nearly the same. 
+#
+    if($selvol < 0) {
+       $scoremax = -1;
+       $volmax = -1;
+       for ($ivol = 0; $ivol <= $nvol; ++$ivol) {
+          if($score[$ivol] > 0 && $gotlow[$ivol] > 0) {
+               $score[$ivol]=$score[$ivol] + 1200;
+          }
+       }
+       if($score[$midvol] > 0 ) {
+          $volmax = $midvol;
+          $scoremax = $score[$midvol] + 2200;
+       }
+       for ($ivol = 0; $ivol <= $nvol; ++$ivol) {
+          if($score[$ivol] > 0 && $score[$ivol] > $scoremax) {
+             $volmax = $ivol;
+             $scoremax = $score[$ivol];
+          }
+       }
+       $selvol = $volmax;
+       printf "high score selvol= %d\n",$selvol;
+    }
+#
+#   Now write the files in the selected volume to the list file
+#
+    $unopened=1;
+    unless ($selvol < 0) {
+       printf "Files in selected volume %d\n",$selvol;
+       for ($ifile = 0; $ifile < $nfile; ++$ifile) {
+          if($fvol[$ifile] == $selvol) {
+             if( $unopened ) {
+#               $slash=rindex($catalog[$ifile],"/");
+#               $volname=$voldir . substr($catalog[$ifile],($slash+1),18) . ".list";
+#               $timename=$radar . "_" . $timestr;
+                $timename=$radar . "_" . $timehyphen;
+                printf "Time name %s\n",$timename;
+                $volname=$voldir . "/" . $timename . "_V";
+                printf "Concatenating files to file %s\n",$volname;
+                printf "copy %s\n",$catalog[$ifile];
+                copy($catalog[$ifile], $volname) or die "File cannot be copied.";
+                open(VOL,">>$volname");
+                $unopened=0;
+             } else {
+               printf "cat %s\n",$catalog[$ifile];
+               open(TILT,$catalog[$ifile]) or die "File cannot be opened for reading.";
+               while(<TILT>) { print VOL; }
+               close(TILT);
+             }
+          }
+       }
+       close(VOL);
+    }
+    chdir $tdwrdir;
+  } else {
+    print "\n$raddir Not Found \n";
+    print "No directory for radar: $radar\n\n";
+  }  # raddir
+}  # radars

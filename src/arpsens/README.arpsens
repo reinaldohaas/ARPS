@@ -1,0 +1,8 @@
+
+This directory contains source code for programs that produce perturbations
+for ensemble forecasts based on scaled lagged average method.
+
+The programs are restricted for internal research use, or
+by collaborators with permission from CAPS. Please do not
+re-distribute the package. Contact CAPS Director
+Dr. Ming Xue (mxue@ou.edu) for further information. 

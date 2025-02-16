@@ -1,0 +1,18 @@
+This the WRF netCDF IO API from WRFV3.0.1.1
+
+Changed files are the following
+
+  Makefile     Replace makefile to incorporated into the ARPS package
+  README       This file
+
+  wrf_io.F90                 No changes from here
+  field_routines.F90
+  module_wrfsi_static.F90
+  bitwise_operators.c
+  ext_ncd_get_dom_ti.code
+  ext_ncd_get_var_td.code
+  ext_ncd_get_var_ti.code
+  ext_ncd_put_dom_ti.code
+  ext_ncd_put_var_td.code
+  ext_ncd_put_var_ti.code
+  transpose.code

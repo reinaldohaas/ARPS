@@ -1,0 +1,64 @@
+The following are known bugs or problems:
+
+Version 5.1.4
+ 
+  - On "tungsten.ncsa.uiuc.edu" or other Linux platform (such as 
+    boomer.ou.edu), jobs may abort with a segmentation violation 
+    when the user is writing restart files.  If so, add the line:
+
+        limit stacksize unlimited
+
+    to the ".cshrc" file.  This applies to csh/tcsh users.  Users 
+    of other shells (such as bash) should consult the shell man 
+    page for the proper technique.
+
+Version 5.1.0  (Do NOT need since Version 5.1.4)
+
+  - On some 64bit machine, such as Compaq AlphaServer ES40 at TASC,
+    The following changes are required for EXT2ARPS and MCI2ARPS 
+    to work.
+    
+    1. uncomment the following line in include/mc_area.h
+       /*#define long int              /* On some 64bit platform */ */
+    2. Change the declaration of grbunit in src/ext2arps/rdnmcgrb.f90
+       to "INTEGER*8 :: grbunit".
+     
+
+Version 5.0.0
+
+-  "Arps_mpi" goes unstable quickly when compile with "ifc"
+   version 6.0.  Use 6.0.1 or version 7.0.
+
+-  When brcopt = 4 the symmetry test result is not exactly symmetric.
+
+-  On SGI Origin machine, when compiled using "-Ofast" (default)
+   and "prcout = 1" in arps.input, the program will abort with
+   a bus error.
+
+-  Possible WARNINGs/comments when compiled on Linux using ifc
+   1. "!DIR$" directives
+   2. constant truncated --- precision too great
+   3. "GO TO" statement
+   4. some statement functions
+   5. some character string truncations
+   6. "EQUIVALENCE" statement
+   7. some declarations like, "REAL*8 ...", "INTEGER*2 ...", etc.
+
+-  When compiles using ifc on Intel processors, option "-opt 3" does
+   not work for ext2arps and adas. So makearps reset the option to 
+   "-O2" whenever the option specified is higer than "2".
+
+-  Inconsistent results exist between MPI run and no MPI run for Open 
+   (radiation) boundary condition and periodic boundary condition. 
+   The tests were done on CAPS Origin 2000. However, the difference 
+   will disappear when using "-opt 3" or lower level optimization 
+   option.
+
+
+Version 4.5.1
+
+- ARPS GRIB history data are not transferable beteen little and big
+  endian machines.
+- ARPS MP version: there is a boundary condition bug in the ARPS model
+  which is causing the message passing version of the arps to produce
+  incorrect results.

@@ -1,0 +1,9 @@
+
+ 
+This directory contains source code for ARPSDIFF, a program that reads
+in 2 sets of ARPS history format files (can have different resolution and/or 
+size) and write out the difference fields also in ARPS history format. 
+Interpolation will be done when the two grid configurations differ.
+ 
+Doing 'makearps arpsdiff' in arps root directory compiles and links this package.
+

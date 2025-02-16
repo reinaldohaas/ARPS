@@ -1,0 +1,93 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR TMATRIX IN NAMELIST FORMAT      ######
+!     ######                 ( Version arps5.3 )                  ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format
+!  used by tmatrix program.
+!  The original tmatrix program is written by J. Vivekanandan
+!     Reference: Vivekanandan et al. (J. Appl. Meteor., 1991)
+!  The program is reformatted and extended by Youngsun Jung.
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+! Youngsun Jung (11/24/07)
+!
+!-----------------------------------------------------------------------
+!
+!  ml      Number of size interval (bin).
+!          Bin size = Dcut (cm) / ml
+!  Dcut    Maximum size of drop for (1) rain, (2) snow, (3) hail
+!          (4) graupel (cm)
+!
+!  iopt    Species option. 
+!          = 1 for raindrops
+!          = 2 for snpw (dry to wet)
+!          = 3 for hail (dry to wet)
+!          = 4 for graupel (dry to wet)
+!          = 5 for all 1 - 4
+!   iaxisopt  Axis ratio option for rain
+!             = 1 Zhang's experimental fit
+!             = 2 Green exact
+!             = 3 Experimental fit
+!             = 4 Experimental Fit excluding Bread
+!             = 5 Bear and Chuang's formula
+!   absnow   Constant axis ratio for snow (0.75)
+!   abhail   Axis ratio for hail 
+!            iaxisopt = 1   Fixed axis ratio 0.75
+!                     = 2   Fit to Knight's Oklahoma hailstorms (1986)
+!   abgrpl   Constant axis ratio for graupel (0.75)
+!
+!  nm      Number of directions (2 for forward and backward).
+!  nrank   Number of T-matrices (Matrix order).
+!  alamd   Wave length of radar (cm).
+!          WSR-88D (10.7), CASA (3.19), OU Prime (5.445)
+!  anginc  Angle of incidence of the incident wave.
+!
+!  rhos    Density of snow (g/cm^3)
+!  rhog    Density of graupel (g/cm^3)
+!
+!  irayleiopt  Option for Rayleigh scattering calculation.
+!              This option also produce phase data.
+!              (Mostly for verification purposes)
+!---------------------------------------------------------------------
+
+&tmatrix_paras
+
+  ml = 100,
+  Dcut(1) = 0.8,
+  Dcut(2) = 3.0,
+  Dcut(3) = 7.0,
+  Dcut(4) = 5.0,
+
+  iopt = 5,
+    iaxisopt = 1,
+    absnow = 0.75,
+    abhail = 0.75,
+    abgrpl = 0.75,
+
+  nm =2,
+  nrank = 16,
+
+  alamd = 10.7,
+  anginc = 90.0,
+
+  rhos = 0.1,
+  rhog = 0.4,
+
+  irayleiopt = 0,
+
+/
+

@@ -1,0 +1,251 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######     INPUT FILE FOR arpstern.f IN NAMELIST FORMAT     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!
+! This file contains the input parameters for arpstern for use in ARPS 
+! version 5.2 in the NAMELIST format.
+!
+! NAMELIST is not a standard FORTRAN 77 feature but is supported by
+! almost all computer system vendors. 
+!
+! The format for  NAMELIST data is:
+!
+! Note that only lines between &NAMELIST_NAME and / are read as the 
+! input data, and there must be a blank space in front of the '&' sign.
+!
+! Comments can be written between these data blocks. We are using '!'
+! in the first column of comment line only to distinquish them from the 
+! data statement.
+!
+!-----------------------------------------------------------------------
+!
+! created by:  Dan Weber 
+!              12/7/93
+!
+! Modification history:
+!
+! Dan Weber,  6/17/94
+!
+! comtype variable included.
+!
+! Dan Weber,   1/5/95
+!
+! Updated variable names (consistant with arpstern12.f and ARPS).
+!
+! Dan Weber,   11/29/2000
+!
+! Added F90 array allocation capability to ARPSTERN.  NX AND NY are now
+! set in the input file and there is no need to set ndx,ndy,nptx and
+! npty.  ndx ndy ntx and nty are now computed at runtime.
+!
+!
+!-----------------------------------------------------------------------
+!
+! Set the nx and ny for the job.
+! These are the number of grid points used for the output terrain field
+! for the arps model simulation.   They must match the arps simulation
+! nx and ny.  (global nx and ny for a mpi run)
+!
+!-----------------------------------------------------------------------
+!
+
+ &grid
+   nx =67,
+   ny =67,
+ /
+
+!-----------------------------------------------------------------------
+!
+! The arpstern.f program can produce a number of differnt types of 
+! analyses of terrain data base. 
+!
+!   analtype      = 1 for Barnes analysis scheme;
+!                   2 for bi-linear interpolation (includes 2-d smoother); 
+!                     (NOT available yet)
+!
+!   The arpstern.f program can apply three different type of map 
+!   projections.
+!
+!   mapproj       = 0 for longitude-latituge grid, i.e., no projection,
+!                  1 for Polar stereographic projection;
+!                  2 for Lambert projection;
+!                  3 for Mercator projection;
+!
+!   itertype     = 1 for 30 second terrain data
+!                = 2 for 5 minute terrain data
+!                = 3 for 1 degree terrain data
+!
+!   rmsopt       = 0 no calculation of the background and rms difference 
+!                  fields for a 1 pass scheme only
+!                = 1 calculates background and rms difference fields 
+!
+!           NOTE: calculation of background field is required for any 
+!                 multipass barnes anslysis.......
+!
+!   comtype      Index used to set the type of computer chosen to run
+!                this program.  This variable is related to the minimum
+!                integer size declared.  For the CRAY machines, the minimum
+!                integer declaration is integer *8 and for the IBM and other
+!                machines it is integer *2   
+!                  comtype = 1  for IBM and other machines which can define
+!                               integer *2
+!
+!                          = 4  For CRAY and other machines with a minimum
+!                               integer declaration of *8
+!
+!   tdatadir     The name of the directory containing the three direct
+!                access terrain data - dir1km.dat, dir1deg.dat and 
+!                dir5min.dat.
+!
+!   terndir      The name of the directory containing the original ASCII
+!                terrain data files dma_elev.dat and elev.dat from NCAR.
+!                This string is used by pre-processor programs dir1deg.f,
+!                dir5min.f and dir30sec.f only.
+!
+!-----------------------------------------------------------------------
+!
+
+ &terraind
+   analtype =1,
+   mapproj  =1,
+   itertype =1,
+   rmsopt   =1,
+   comtype  =1,
+   tdatadir = 'arpstern.data',
+   terndir  = '/work/official/arpstern.data/',
+ /
+  
+!
+!-----------------------------------------------------------------------
+!
+! Options and parameters related to barnes technique
+!      
+!     knot is the shape factor and is the denominator in the exponential
+!     barnes weight function.  It can be user set (in this file) or 
+!     it can be calculated by the program given a set of parameters.
+!     The larger knot the more data required to acheive a convergent
+!     solution.  The knot calculated by the setgrid subroutine is a 
+!     function of a number of variables.  The equation is as follows:
+!       
+!     knot = ((wdn * max grid-data spacing/sclfct)/pi)**2 * ln(rdnot) 
+!
+!     knot  =  0.0   the program will determine this quantity.
+!            >,<0.0   this specific value will be used in weight function.
+!  
+!     The variables which are used to calculate knot are described
+!     in a following section.
+!
+!     gamma is a parameter which is used for multiple pass scenarios.
+!     It will multiply the knot in the denominator of the barnes weight
+!     function.  It's value can range from 0<x<1.  For multiple pass schemes
+!     in which the user is concerned with preserving the longest 
+!     wavelength features, choose gamma=1.0.  A lower gamma will bring 
+!     more of the shorter wvelength features back into the analysis.     
+!
+!     ipass is the number of passes the user desires to apply to the
+!     data set.  It can be any positive integer.  But note that large
+!     values (>5) will potentially require significant computer resources.
+!     Depending on the user specified variables used to determine knot,
+!     an optimum number of passes with gamma=1 for retaining the larger
+!     wavelength features is approximately 3.
+! 
+!-----------------------------------------------------------------------
+!
+
+ &barnesd
+   knot    =   0.0,  
+   gamma   =   1.00,
+   ipass   =   4,
+ /
+
+!  
+!-----------------------------------------------------------------------
+!
+! Options and parameters related to the map projection
+!
+!     trulat1 and trulat2 are the latitudes (north) used in the user
+!     specified map projections.  For example, if you choose to use a polar 
+!     stereographic projection, you need only specify trulat1.  
+!
+!     trulon is the longitude (east) to which the longitude is true.
+!
+!     sclfct is the map scale factor used to adjust the scale of the grid
+!     units and grid and data scapings.  If sclfct=1, the units will be 
+!     meters and the grid units will be on the order of 10**6 meters.  
+!     If sclfct= 1500000, then the grid increments and data spacings will be
+!     divided by or scaled by sclfct.  
+! 
+!-----------------------------------------------------------------------
+!
+ 
+ &mapprojd
+   trulat1 =    40.70,
+   trulat2 =     0.0,
+   trulon  =    248.000,
+   sclfct  =    1.0,
+ /
+  
+!
+!-----------------------------------------------------------------------
+!
+! Options and parameters related to the model and analysis grid setup
+!    
+!     dx and dy are the user specified analysis grid spacings in meters.
+!     Note: if the analysis grid spacing are much larger than the data
+!     spacings, the program will require significant computational time
+!      to complete..  
+!
+!     ctrlat and ctrlon are the latitude (north) and longitude (east) of
+!     center point of the analysis grid  
+!
+!     tol is the lower limit of the barnes weight function thought to be
+!     significant in the analysis.  tol is used primarily to determine
+!     the cut-off radius for which within in this radius the distances
+!     from the analysis point to the data point is computationally 
+!     significant.  Beyond this radius data points have weights less than
+!     1x10**-7.  tol is used to find the number of points in the east
+!     and west directions required for the barnes scheme to achieve 
+!     convergence.  Given a cut-off radius (rc) using the smallest data 
+!     spacing in the east and west dierctions, the number of data points
+!     required for each analysis point is calculated by rc/minimum data
+!     spacing.  
+!
+!     wdn is the wave number of the smallest wave resolvable by either the
+!     data set or the analysis grid spacing whichever is larger.  
+!     Thus, wdn uses the largest data/analysis grid spacing in determing
+!     the desired initial response.  wdn is used in the setgrid subroutine
+!     (if knot is not user specified) to determine knot.  
+!
+!
+!     where rdnot is the desired response of the wdn max grid-data spacing
+!     wave for the first pass of the barnes analysis.  This method allows
+!     the user to specify the desired response of a particular wavelength
+!     and thus the shape of the response curve. 
+!
+!
+!-----------------------------------------------------------------------
+!
+
+ &gridd
+   dx=  1000.0,
+   dy=  1000.0,
+   ctrlat   =    40.70,
+   ctrlon   =   248.00,
+   tol     =    1.0e-7, 
+   wdn     =    2.00,
+   rdnot   =    0.006
+ /
+

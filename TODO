@@ -1,0 +1,94 @@
+
+Version arps5.1.0 (10/30/2003)
+  
+  10/30/2003  Note: ARPS I/O now supports only binary and HDF 4 format.
+                    GrADS format was supported as a dump format only.
+
+Version ARPS5.0.0IHOP_3
+
+  * splithdf and joinhdf do not work well when hdfcompr >= 4.
+                                 -- Fixed in version 5.0.0IHOP_5
+
+Version ARPS5.0.0IHOP_2
+
+  1. liba2io is not installed on paige, so 88d2arps_a2/88d2arps_rt may not
+     be compilied on paige.  
+     ---- Library a2io now delivered with ARPS since version 5.0.0IHOP_5.
+
+Version ARPS5.0.0WDT
+
+  1. mpi code for FCT scheme is still not complete.
+
+Version ARPS5.0.0Beta7
+
+  1. Error when run 25May1998 real case. 
+     >> Maximum velocity component exceeded 150.0 m/s,
+     More test needed.                      ----- Done.
+  2. Same inconsistent results as (4) in Beta6 exist for periodic boundary
+     condition.                             ---- Fixed in Beta8
+  3. Beta6 version has a bug which was fixed temporary by change:
+      <   CHARACTER (LEN=*  ) :: soiloutfl ! Surface data file name
+      ---
+      >   CHARACTER (LEN=80  ) :: soiloutfl ! Surface data file name
+      at about 2226 line in iolib3d.f90.
+                                          ---- Bug fixed permanently
+
+Version ARPS5.0.0Beta6
+
+  1. The current sfcphysics in Beta6 is untested. The work is in progress.
+                                                           ----  Done in Beta7
+  2. MPI run has problems for Periodic boundary condtion.  ----  Done in Beta7
+  3. ADAS updates are in progress.                         ----  Done in Beta7
+  4. Inconsistent results exist between MPI run and no MPI run for Open 
+     (radiation) boundary condition. The tests were done on CAPS Origin 2000
+     and on Origin machine at NCSA. However, the difference will disappear 
+     when using "-opt 3" or lower level optimization option.
+ 
+
+Ming's TODO list (Commented on 10/27/2003 by Yunheng)
+
+  Update ARPGAGR. Working with single grid and May 20 storm test.
+  Not with nested grid.
+
+  snowcvr0 changed to snowdpth0                               -- Done
+
+  incrfmt, ternfmt,sfcfmt,soilfmt,hdmpfmt,extdfmt are new.    -- Done
+
+  Find MPI bug when using open LBC (see with may 20 storm test).
+                                                              -- Done
+
+  Complete testing, including at least one real data case
+
+  Just want to let you know, when I tried to convert NCEP Reanalysis to
+  ARPS, somehow there is a problem in 4.5.2. I got some kind of NAN.
+  So I changed back to 4.5.0.2 which I've used it before. and It's no
+  problem to convert. You may want to check it.
+  Sam Chiao [schiao@unity.ncsu.edu]
+
+  Need to distinquish between Tur64 Unix alpha and Alpha-Linux in makearps.
+
+  Streamline arpssfc                                         -- Partially done
+
+  Merge with Gene's latest version.                          -- Done
+
+  Debug MPI for sadvopt=3,4.                                 -- Partially done
+
+  Add restart test script                                    -- Done
+
+  increase maximum length of filenames for plotting
+
+
+  smooth9p_nobc does not include MPI call?
+    IF ( smthflx == 1 ) THEN
+      DO nsmth=1,numsmth
+        CALL smooth9p_nobc( usflx, nx,ny,1,nx,  1,ny-1,tem9 )
+        CALL smooth9p_nobc( vsflx, nx,ny,1,nx-1,1,ny,  tem9 )
+        CALL smooth9p_nobc( ptsflx,nx,ny,1,nx-1,1,ny-1,tem9 )
+        CALL smooth9p_nobc( qvsflx,nx,ny,1,nx-1,1,ny-1,tem9 )
+
+
+TODO list (ARPS5.3.0 src/adas):
+
+-continue updating to handle scalar array version of ARPS
+-update cloud analysis to handle multiple categories/moments
+-merge with MPI version of ADAS

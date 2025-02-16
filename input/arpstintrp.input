@@ -1,0 +1,285 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSTINTRP IN NAMELIST FORMAT   ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in namelist format for ARPS
+!  gridded data time-interpolation program ARPSTINTRP.
+!
+!  The program interpolates two ARPS history data on grid of the same
+!  size to a time inbetween them. The output will be written into a new
+!  history dump file.
+!
+!  Steps to use this program:
+!
+!  Step 1: Compile and link using 'makearps arpstintrp'
+!  Step 2: Edit input file arpstintrp.input
+!  Step 3: Run job using 'arpstintrp < arpstintrp.input'.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!
+!   Ming Xue (02/26/1999)
+!   Written based on ARPSINTRP.
+!
+!   Modification history:
+!
+!   1999/09/28 (Gene Bassett)
+!   Made output characteristics the same as arpsintrp.
+!
+!-----------------------------------------------------------------------
+!
+! Message passing parameters
+!
+!  MESSAGE_PASSING  Namelist for message passing version of the ARPS.
+!                   These values are ignored for the non-MP version.
+!
+!  nproc_x      Number of processors in the x-direction.
+!  nproc_y      Number of processors in the y-direction.
+!               Note that if (nx-3)/nproc_x or (ny-3)/nproc_y are not
+!               integers, ny & ny will be increased so that they are.
+!
+! nproc_x_in    Number of input patches in x-direction
+! nproc_y_in    Number of input patches in y-direction
+!
+!         NOTE: Must be either 1 or nproc_x/nproc_y at present
+!
+! nproc_x_out   Number of patches in x-direction for output
+! nproc_y_out   Number of patches in y-direction for output
+!               If those parameters are specified, they must be multiples of
+!               nproc_x/nproc_y respectively. Furthermore, the grid sizes of
+!               each output patch must also be an integer, i.e.
+!               MOD((nx-3),nproc_x_out) = 0 and MOD((ny-3),nproc_y_out) = 0.
+!               Currently, it is only supported with HDF4 and netCDF format.
+!
+!-----------------------------------------------------------------------
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+
+   nproc_x_in = 1,
+   nproc_y_in = 1,
+
+   nproc_x_out = 1,
+   nproc_y_out = 1,
+ /
+!
+!-----------------------------------------------------------------------
+!
+!  hinfmt   The format flag of the input history data.
+!          = 1, unformatted binary data dump
+!          = 2, formatted ascii data dump
+!          = 3, NCSA HDF format data dump
+!          = 4, Packed binary data dump
+!          = 5, dump for Savi3D visualization package
+!               (Not supported as an INPUT file format)
+!          = 6, binary allowing data point skip
+!          = 7, NetCDF format
+!          = 8, Packed NetCDF format
+!          = 9, GrADS data dump
+!          = 10, GRIB data dump.
+!
+!  grdbasfn    Base-state and grid data file name
+!  hisfile(1)  Name of the 1st history data file. The 1st data should
+!                 be earlier than 2nd one in time.
+!  hisfile(2)  Name of the 2nd history data file.
+!
+!-----------------------------------------------------------------------
+!
+ &input
+   hinfmt = 3,
+   grdbasfn =   'may20.hdfgrdbas',
+   hisfile(1) = 'may20.hdf000000',
+   hisfile(2) = 'may20.hdf001800',
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Output control parameters.
+!
+!  runname,  a string of up to 80 characters long, is used to identify
+!            this job and construct the output file names.
+!            The characters before either a blank space or comma will
+!            be used as the prefix of the output file names.
+!
+!  use_data_t Use the reference initial time string in the first data
+!            set (hisfile(1)) instead of initime specified in the following.
+!
+!  initime = 'yyyy-mm-dd.hr:mn:se', UTC(GMT) date/time. yyyy is a
+!                                   4-digit integer for year, and mm, dd,
+!                                   hr, mn, and se are 2-digit integers
+!                                   for month, day, hour, minute, and
+!                                   second, respectively. For example,
+!                                   20:30Z, Dec. 19, 1994 would be
+!                                   represented as: 1994-12-19.20:30:00
+!
+!  outtime   The time of the interpolated output data, either relative
+!            to initime or that of hisfile(1) depending on option
+!            use_data_t.
+!
+!  dirname   Name of directory into which output files are written.
+!
+!  hdmpfmt   History data dump format option.
+!          = 0, no data dump is produced;
+!          = 1, unformatted binary data dump;
+!          = 2, formatted ascii data dump;
+!          = 3, NCSA HDF4 format data dump;
+!          = 4, Packed binary data dump;
+!          = 5, dump for Savi3D visualization package;
+!          = 6, binary allowing data point skip;
+!          = 7, NetCDF format (no longer support starting from 4.1.5);
+!          = 8, Packed NetCDF format (no longer support since from 4.1.5);
+!          = 9, GrADS data dump;
+!          = 10, GRIB data dump;
+!          = 11, Vis5D data dump.
+!
+!  grbpkbit  Number of bits in packing GRIB data
+!          = 16 (default)
+!
+!  hdfcompr  HDF4 compression option (for hdmpfmt=3).
+!          = 0 (default), no compression;
+!          = 1, fast gzip compression;
+!          = 2, high gzip compression;
+!          = 3, adaptive or skipping Huffman compression;
+!          = 4-7, as above plus mapping reals to 16 bit integers.
+!
+!  filcmprs  Option to compress the history dumping files.
+!          = 0, history files not compressed.
+!          = 1, history files compressed;
+!
+!  grdout    Grid output option.
+!          = 0, no grid array output in time-dependent history files;
+!          = 1, grid arrays written in time-dependent history files.
+!  basout    Base state field output option.
+!          = 0, no base state arrays time-dependent history files;
+!          = 1, base state arrays written in time-dependent history files.
+!  varout    Perturbation fields output option in history dump.
+!          = 0, no perturbation wind, pressure or pot. temperature output;
+!          = 1, perturbation wind, pressure and pot. temperature output.
+!  mstout    Moist variable output option in history dump.
+!          = 0, no moisture variables output;
+!          = 1, qv, qc, qr, qi, qs and qh output.
+!  iceout    Ice variable outout option in history dump.
+!          = 0, no ice variables output;
+!          = 1, qi, qs and qh output.
+!  tkeout    TKE output option in history dump.
+!          = 0, no
+!          = 1, yes
+!  trbout    Turbulence field (km) output option in history dump.
+!          = 0, no km output;
+!          = 1, km output.
+!  rainout   Option for surface accumulated rainfall array output.
+!          = 0, no,
+!          = 1, yes.
+!  sfcout    Soil model variable output option in history dump.
+!          = 0, no,
+!          = 1, yes.
+!  landout   Option for soil and vegetation property array output in
+!            history dump.
+!          = 0, no,
+!          = 1, yes.
+!
+!  exbcdmp   Flag to dump ARPS external boundary data files.
+!          = 0, no EXBC dumping;
+!          = 1, EXBC dumping (Fortran unformatted);
+!          = 3, HDF4 dumping format;
+!
+!  exbchdfcompr  HDF4 compression option (for exbcdmp=3).
+!          = 0 (default), no compression;
+!          = 1, fast gzip compression;
+!          = 2, high gzip compression;
+!          = 3, adaptive or skipping Huffman compression;
+!          = 4-7, as above plus mapping reals to 16 bit integers.
+!            Note that only options 0-2 work on Cray platforms.
+!
+!            When exbchdfcompr > 4, inside of domain (unused portion,
+!            determined by ngbrz & zbrdmp) set to a constant value.
+!
+!  ngbrz     Number of boundary grid points (used only with exbcdmp=4).
+!
+!  zbrdmp    Height of the bottom of Rayleigh damping layer (used only with
+!            exbcdmp=4).
+!
+!  qcexout   Option for qc array output in EXBC file dump when exbcdmp=1
+!          = 0, no,
+!          = 1, yes.
+!
+!  qrexout   Option for qr array output in EXBC file dump when exbcdmp=1
+!          = 0, no,
+!          = 1, yes.
+!
+!  qiexout   Option for qi array output in EXBC file dump when exbcdmp=1
+!          = 0, no,
+!          = 1, yes.
+!
+!  qsexout   Option for qs array output in EXBC file dump when exbcdmp=1
+!          = 0, no,
+!          = 1, yes.
+!
+!  qhexout   Option for qh array output in EXBC file dump when exbcdmp=1
+!          = 0, no,
+!          = 1, yes.
+!
+!  sfcdmp    Flag to dump ARPS surface data files.
+!          = 0, no surface data files;
+!          = 1, Fortran unformatted dumps;
+!          = 3, HDF4 (uncompressed) dumps.
+!
+!  soildmp   Flag to dump ARPS soil data files.
+!          = 0, no soil data files;
+!          = 1, Fortran unformatted dumps;
+!          = 3, HDF4 (uncompressed) dumps.
+!
+!-----------------------------------------------------------------------
+
+ &output
+   runname = 'may20I',
+   use_data_t = 1,
+     initime = '1977-05-20.21:00:00',
+   outtime  = 900.0,
+   dirname  = './',
+
+   hdmpfmt    = 3,
+     grbpkbit   = 16,
+     hdfcompr   = 5,
+
+   filcmprs = 0,
+
+   basout   = 0,
+   grdout   = 0,
+   varout   = 1,
+   mstout   = 1,
+   iceout   = 1,
+   tkeout   = 1,
+   trbout   = 1,
+   rainout  = 0,
+   sfcout   = 1,
+   landout  = 1,
+
+   exbcdmp  = 0,
+   exbchdfcompr = 5,
+     qcexout  = 1,
+     qrexout  = 1,
+     qiexout  = 1,
+     qsexout  = 1,
+     qhexout  = 1,
+
+     ngbrz = 5,
+     zbrdmp = 12000.0,
+
+   sfcdmp  = 1,
+   soildmp = 1,
+ /

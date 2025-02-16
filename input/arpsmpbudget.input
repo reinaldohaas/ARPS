@@ -1,0 +1,145 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSMPBUDGET IN NAMELIST FORMAT ######
+!     ######               (ARPS VERSION 5.3)                     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+! This file contains the input parameters in namelist format for 
+! program ARPSMPBUDGET.
+!
+! A explanation on the NAMELIST format can be found in ARPS input file
+! arps.input. 
+!
+! Note that only lines between &NAMELIST_NAME and / are read as the
+! input data, and there must be a blank space in front of the '&' sign.
+!
+! Comments can be written between these data blocks. We are using 'c'
+! in the first column of comment line only to distinquish them from the
+! data statement.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!   Dan Dawson
+!
+!   Modification history:
+!
+!-----------------------------------------------------------------------
+!
+!  hinfmt   The format flag of the input history data.
+!          = 0, Do not convert history data;
+!          = 1, unformatted binary data dump
+!          = 2, formatted ascii data dump
+!          = 3, NCSA HDF4 format data dump
+!          = 4, Packed binary data dump
+!          = 5, dump for Savi3D visualization package
+!          = 6, binary allowing data point skip
+!          = 7, NetCDF format
+!          = 8, NetCDF in one file
+!          = 9, GrADS data dump
+!          = 10, GRIB data dump.
+!
+!  hdmpinopt = Indicate the way history data files are specified. 
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed. 
+!
+!  hdmpfheader  History data file name header (not including '.' at the end), 
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!  
+!  grdbasfn Base-state and grid data file name (hdmpinopt=2).
+!  nhisfile The number of time-dependent history files to be converted
+!           (hdmpinopt=2).
+!  hisfile  History data files to be converted (hdmpinopt=2).
+!
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!-----------------------------------------------------------------------
+!
+ &history_data
+   hinfmt = 3,
+   hdmpinopt    = 1,
+
+     hdmpfheader = '/data1/users/ddawson/torcases/may0399/realdata/250m0503992245_1km3DVARCA223010min90_3km03001hr9/subdomain/250m0503992245_1km3DVARCA223010min90_3km03001hr9MY3rv',
+     hdmpftrailer= '.561x561x053',
+     tintv_dmpin = 60.0,
+     tbgn_dmpin  = 4500.0,
+     tend_dmpin  = 6300.0,
+
+     grdbasfn = 'may20.hdfgrdbas',
+     nhisfile = 3,
+     hisfile(1) = 'may20.hdf000000',
+     hisfile(2) = 'may20.hdf003600',
+     hisfile(3) = 'may20.hdf007200',
+ /
+
+! budget
+
+ &budget
+     dobudget = 1,
+     doavg = 1,
+     dotimeseries = 1,
+     outrunname = '250m0503992245_1km3DVARCA223010min90_3km03001hr9MY3rv',
+     dirname    = '/data1/users/ddawson/torcases/may0399/realdata/250m0503992245_1km3DVARCA223010min90_3km03001hr9/subdomain/extra_data/',
+     hdmpftrailer= '.561x561x053',
+     budgtbgn = 4500.0,
+     budgtend = 6300.0,
+     normalize_opt=0,
+     wopt=1,
+     wthresh=-0.5,
+     zthresh=4000.0,
+     tintv_dmpin = 60.0,
+     tintv = 60.0,
+     bibgn = 2,
+     biend = 240,
+     bjbgn = 2,
+     bjend = 240,
+     bkbgn = 2,
+     bkend = 53,
+ /
+
+ &microph_param
+    mphyopt = 11,
+    dirname = '/data1/users/ddawson/torcases/may0399/realdata/250m0503992245_1km3DVARCA223010min90_3km03001hr9/subdomain/extra_data/',
+    hdmpftrailer= '.561x561x053',
+    Ntcfix = 1.0e8,
+    N0rfix = 8.0e6,
+    N0sfix = 3.0e6,
+    N0gfix = 4.0e5,
+    N0hfix = 4.0e4,
+    alpharfix = 0.0,
+    alphaifix = 0.0,
+    alphasfix = 0.0,
+    alphagfix = 0.0,
+    alphahfix = 0.0,
+    rhor = 1000.0,
+    rhoi = 500.0,
+    rhos = 100.0,
+    rhog = 400.0,
+    rhoh = 913.0,
+ /
+

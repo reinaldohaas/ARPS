@@ -1,0 +1,36 @@
+ARPS EnKF WRF API Instructions
+
+This is based on Shizhang Wang's original implementation. Only a few variables
+U, V, W, PT, PH, QV, QC etc. are analyzed.
+
+The program will read WRF history files (either joined or split) as background
+and dump WRF input file for running WRF forecast directly.
+
+1. Specify "initime" denotes the analysis time and the program looks WRF
+   history file at this time string.
+
+2. Specify "%3N" pattern for "inidirname".
+
+3. Specify "nproc_x_in (nproc_y_in)" and they must be a multiple of
+   "nproc_x (nproc_y)"  or both are 1.
+
+4. Specify "%3N" pattern for "dirname" in arps.input.
+
+5. Specify "nproc_x_out (nproc_y_out)" and they must be the same as
+   "nproc_x (nproc_y)" or both are 1.
+
+There must be a file "wrfinput_d01" in the current working directory.
+It can be one joined file or split files depending on the parameters
+"nproc_x_out (nproc_y_out)".
+
+The WRF history files for each ensemble members have the same name (based
+on "initime") but in its own directory for each memeber.
+
+The output is "wrfinput_d01" in each ensemble member's directory. And the
+background mean is in "mem_fmean" directory and the analysis mean is in
+directory "mem_amean", where "mem" can be any character string specified
+in "inidirname" and "dirname".
+
+You should make directories "mem_fmean" and "mem_amean" beforehand explicitly
+and link or copy any one member's WRF history file to them. The WRF history is
+used for copying any variable that is not analyzed.

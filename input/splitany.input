@@ -1,0 +1,183 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR SPLIT IN NAMELIST FORMAT        ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+! This file contains the input parameters in namelist format for the 
+! general spliter - splitany. This program splits any ARPS related files
+! in HDF or netCDF format. The following assumptions are made:
+!
+!   o The maximum rank of each data set/variable is 5;
+!   o If the files are in netCDF format, they must contain same dimensions
+!     i.e. xdimname/ydimname. If the files distinguish staggered 
+!     dimensions and unstaggered dimensions, the staggered dimensions
+!     are specified by xdimname/ydimane and their names must end with
+!     '_stag' and the unstaggered dimension names are the same as
+!     xdimname/ydimname with the trail '_stag' removed.
+!   o If the files are in HDF format, users can specify the dimension
+!     index to be split. However, all data set in the files that
+!     contain a dimension with the same size as the dimension index 
+!     specified will be split.
+!   o If the files are in HDF format, it is assumed that only the first
+!     two (or last two in C order) dimensions will be checked to determine
+!     whether they should be split.
+!
+! Steps to run the programs:
+!  
+!  1. Compile the program
+!     $> makearps [options] -io hdf splitany     # to split HDF files
+!     $> makearps [options] -io net splitany     # to split netCDF files
+!     $> makearps [options] -io hdfnet splitany  # to split either HDF files or netCDF files
+!                                                # a special HDF library is required.
+!  2. Edit namelist input file - this file
+!
+!  3. Run the program
+!     $> bin/splitany < input/splitany.input
+!
+!-----------------------------------------------------------------------
+!
+!  Author: Yunheng Wang (10/27/2006)
+!
+!  Modification history:
+!
+!-----------------------------------------------------------------------
+!
+!  finfmt   The format flag of the input history data.
+!          = 3, NCSA HDF4 format data dump
+!          = 7, NetCDF format
+!          = 8, NetCDF in one file
+!
+!  finopt = Indicate the way history data files are specified. 
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed. 
+!
+!  fheader  History data file name header (not including '.' at the end), 
+!               corresponding to runname plus directory name.
+!               e.g., fheader='./may20'.  (For finopt=1.)
+!
+!  ftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For finopt=1.)
+!
+!  tintvd_in  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgnd_in   Time at which input history data begins (finopt=1).
+!  tend_in    Time at which input history data ends (finopt=1).
+!  
+!  nfile      The number of time-dependent history files to be converted
+!             (finopt=2).
+!  filenames  History data files to be converted (finopt=2).
+!
+!-----------------------------------------------------------------------
+!
+ &file_names
+   finfmt = 7,
+   finopt = 2,
+
+     fheader = './may20',
+     ftrailer= '',
+     tintv_in = 300.0,
+     tbgn_in  = 0.0,
+     tend_in  = 900.0,
+
+     nfile = 1,
+     filenames(1) = 'may20.net000000',
+     filenames(2) = 'may20.net003600',
+     filenames(3) = 'may20.net007200',
+ /
+
+!-----------------------------------------------------------------------
+!
+!  MESSAGE_PASSING  Namelist for message passing version
+!
+!  There are two ways to specify the dimensions to be split:
+!
+!  dimnamein    = .TRUE., The dimensions to be split has names.
+!                 in netCDF file - xdimname/ydimname specifies the dimension names
+!                 in HDF file    - xdimname/ydimname specifies the global attributes
+!                                  all data sets in the file that have the same 
+!                                  dimension sizes as those attributes will be split.
+!                                  In the split files, the split dimensions will be 
+!                                  named as xdimname/ydimname instead of "fakeDim?".
+!               = .FALSE, The dimension sizes to be split will be reading 
+!                         the data set index "varidx" in the files and the 
+!                         dimension index to be split are "nxidx" and "nyidx".
+!                         It works with HDF files that do not contains global 
+!                         attributes "nx" and "ny". After split, the program will
+!                         renamed those split dimension with "xdimname"/"ydimname".
+!
+!  xdimname     The dimension name in file to be split in X direction
+!  ydimname     The dimension name in file to be split in Y direction
+!
+!  stagdims     Denotes whether staggered dimensions is distinguished in
+!               the data file.
+!               = .TRUE., Then the split dimensions are xdimname and xsdimname,
+!                 where xdimname = xsdimname//'_stag' and xsdimname is
+!                 determined automatically from xdimname. The same is hold
+!                 for ydimname also. It usually works with ARPS netCDF files.
+!
+!               = .FALSE., Only split dimensions xdimname/ydimname. They
+!                are the staggered dimensions. This is usually the case
+!                in HDF files.
+!
+!  varidx       Data set index to be read for split dimensions, needed 
+!               only when dimnamein = .FALSE.
+!  nxidx        Dimension index in X direction to be split
+!  nyidx        Dimension index in Y direction to be split
+!
+!  nproc_x      Number of processors in the x-direction.
+!  nproc_y      Number of processors in the y-direction.
+!
+!-----------------------------------------------------------------------
+
+ &message_passing
+   dimnamein = .TRUE.,
+     varidx     = 2,
+     nxidx      = 1,
+     nyidx      = 2,
+
+   xdimname = 'x_stag',
+   ydimname = 'y_stag',
+
+   stagdims = .FALSE.,
+   nproc_x = 2,
+   nproc_y = 2,
+ /
+
+!-----------------------------------------------------------------------
+!
+! Output
+!
+!-----------------------------------------------------------------------
+ &output
+   outdirname = './',
+ /
+
+!-----------------------------------------------------------------------
+!
+! Debugging  Namelist for program debugging
+!
+!   debug = 0, no debugging messages will be written.
+!         = 1, Write important milestons
+!         = 2, Write more detailed messages
+!
+!-----------------------------------------------------------------------
+
+ &debugging
+   debug = 0,
+ /

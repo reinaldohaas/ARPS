@@ -1,0 +1,107 @@
+#######################################################################
+!
+!  assimopt     Option of ARPS data assimilation
+!             = 0, ARPS model
+!             = 1, ARPS data assimilation
+!
+!  assimname    Name for all assimilation output files 
+!
+!  datatype     Data type; 0=model,1=Lincoln Lab,2=other
+!             = 0, model
+!             = 1, Lincoln
+!             = 2, other
+!
+!  recovopt     Switch to turn on dynamic retrieval.
+!             = 0, No retrieval.'
+!             = 1, Retrieve p, T.'
+!
+!  varopt       Switch to turn on variational adjustment.
+!             = 0, No variational adjustment.'
+!             = 1, Adjust velocities.'
+!
+!  insrtopt     Switch to turn on direct insertion.
+!             = 0, No direct velocity insertion.'
+!             = 1, Direct insertion of velocities.'
+!
+!  xshift       X location of the radar w.r.t. the grid origin (0,0,0) 
+!  yshift       Y location of the radar w.r.t. the grid origin (0,0,0) 
+!  zshift       Z location of the radar w.r.t. the grid origin (0,0,0)
+!
+!  blendwgt     Option for blending weight
+!  rtrverr      Retrieval velocity error
+!  hfilverr     Hole-fill velocity error
+!  adaserr      Adas background error
+!  spval        Bad data flag
+!
+!  nvelfile     Number of input velocity files (minimum of 3).
+!  assimdat(1)  Filename of 1st data file with total nvelfile
+!  assimdat(2)  Filename of 2nd data file with total nvelfile
+!  assimdat(3)  Filename of 3rd data file with total nvelfile
+!
+!  nadasfile    Number of ADAS files
+!  adasdat(nadas)  Filenames of ADAS background fields
+!
+!  abholetst    Option for A & B hole filling
+!             = 0, no
+!             = 1, yes
+!
+!  pbcopt       Option for pressure B.C
+!             = 0, exact B.C.
+!             = 1, Neumann B.C.
+!
+!  lpbcopt      Option for lower pressure B.C.
+!             = 0, interpolation
+!             = 1, zero gradient
+!
+!  voltim1      
+!  voltim2      
+!  voltim3      
+!
+!  radid       
+!  latrad     
+!  lonrad      
+!  elvrad      
+!        
+!#######################################################################
+
+ &assimilation
+   assimopt  = 0,
+     assimname = 'retrv0a',
+
+     indirname = './',
+
+     datatype  = 1,
+     recovopt  = 1,
+     varadjopt = 0,
+     insrtopt  = 1,
+
+     xshift    = 180000.0,
+     yshift    = 180000.0,
+     zshift    =      0.0,
+
+     blendwgt  = 1,
+     retrverr  = 1.0,
+     hfillverr = 3.0,
+     adaserr   = 3.0,
+     spval     = 999.0,
+
+     nvelfile = 3,
+       assimdat(1) = 'MGKICT.940817.1836',
+       assimdat(2) = 'MGKICT.940817.1841',
+       assimdat(3) = 'MGKICT.940817.1847',
+     nadasfile = 1,
+       adasdat(1) = 'P2ICT8.bin000000.9408171836',
+
+     abholetst = 0,
+     pbcopt   = 0,
+     lpbcopt  = 1,
+
+     voltim1 = 0000,
+     voltim2 = 0350,
+     voltim3 = 0700,
+
+     radid  = 'KTLX',
+     latrad = 35.33,
+     lonrad = -97.28,
+     elvrad = 0384.0,
+ /

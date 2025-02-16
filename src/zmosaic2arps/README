@@ -1,0 +1,36 @@
+This directory contains source codes for program "ZMOSAIC2ARPS".
+
+PURPOSE: Generate reflectivity files in ARPS grid from 
+         NSSL mosaic reflectivity.  
+
+NAMELIST: Namelist template is file "input/Zmosaic2arps.input".
+
+STEPS:
+
+  1. Compile the program. 
+     For example, "makearps Zmosaic2arps".
+
+  2. Edit the namelist file based on the template "input/Zmosaic2arps.input". 
+     There are instructions commented for each variable in the template.
+
+  3. Run the program. 
+     For example, "bin/Zmosaic2arps < Zmosaic2arps.input >& output".
+
+  4. The program will generate 
+     o A radar column file (similar as output from 88d2arps or ncrad2arps) in binary format. 
+     o File for the 2D composite reflectivity, or
+     o File for hourly accumulated precipitation (in binary, HDF 4 or netCDF format).
+
+  5. You can plot those 2D files with ARPSPLT using option for 
+     plotting arbitrary variables (arbvaropt > 10). You need to set 
+     arbvaropt > 10 so that it will read only one set of history files 
+     (grid and base file, and one time-dependent history file). 
+     Otherwise, It requires for ARPS history at all mosaic time levels.
+
+  6. The 3D radar column file can be plotted using program "pltradcol", 
+     but please use that program from earlier ARPS package (see note below).
+
+NOTE:
+
+  The radar column file only support binary format. Furthermore, it is 
+  still in the old 88d2arps format (earlier version than arps5.2.8). 

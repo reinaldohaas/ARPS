@@ -1,0 +1,58 @@
+Skew-T Plotting Program 
+Richard Carpenter
+Univ. of Oklahoma/CAPS
+March 2000
+
+Included into the ARPS package. It requires NCARGraphics only if 
+NCARG gmeta file is desired.           --Yunheng Wang 02/10/2006
+
+Usage:
+
+  1. Compile either skewtpost or skewtncar from ARPS root directory
+
+     $> makearps skewtpost/skewtncar
+
+  2. Run the program as noted below. The executable can be found
+     in directory bin/ starting from ARPS root directory.
+    
+     Examples:
+
+     $> bin/skewtncar file1 file2
+     $> bin/skewtpost -std -colorfile data/arpsplt/skewt.pltcbar file1 file2
+
+Note:
+
+  1. Default color file is data/arpsplt/skewt.pltcbar. If working 
+     directory is a subdirectory of the ARPS root directory, it will
+     look for that file automatically and users need to do nothing. 
+     Otherwise, you should use "-colorfile" option.
+
+  2. Sample TEXT soundings are provided in data/data.test/ starting 
+     from ARPS root directory.
+
+  3. Support sounding formats are
+
+     o GEMPAK text (output of ARPSEXTSND)
+
+       This is also the output of the GEMPAK program called SNLIST.
+       When running GEMPAK SNLIST to create a file, one must specify 
+       the output parameters as follows:
+          SNPARM   = hght;tmpc;dwpc;drct;sped
+
+     o FSL sounding
+
+       These are the soundings that can be obtained from the historic 
+       CD's or the recent near-real-time data that is available from 
+       FSL, now known as the Global Systems Division (GSD) from
+       http://raob.fsl.noaa.gov/
+
+       For some information about these files and databases see:
+       http://raob.fsl.noaa.gov/Raob_Software.html
+
+     o The input sounding to ARPS, such as the file: may20.snd 
+       that is supplied in the ARPS release.
+
+       NOTE: you should add a '&' character at the first column of the first line.
+
+     o The ARPS output sounding format, such as may20.sound
+

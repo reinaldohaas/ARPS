@@ -1,0 +1,492 @@
+			  ============================
+			      A2 I/O DOCUMENTATION 
+			      Last updated 03/13/03
+			  ============================
+
+-------------------------------------------------------------------------------
+
+The A2 I/O software has many useful features.  They include:
+
+o  Several forms of data compression are supported.  This include:
+
+   -  Compress (.Z)
+   -  Gzip (.gz)
+   -  Bzip2 (.bz2)
+   -  Modified bzip2 format used by LDM to transfer 88D data.
+
+o  TDWR data support is included.  A2IO isn't only NEXRAD format any more.
+
+o  Little/big endian issues are handled.  The software runs flawless on Linux
+   systems.
+
+o  "One binary fits all".  All binaries can read tape format, disk format
+   (in A2 format) and realtime.  Not all systems will have all features built
+   in.  See "config.h" for things that can be turned on or not.
+
+IMPORTANT:  If "bzip2" is being used, then "BZIP2_OLD" *MUST* be defined in
+	    "config.h" if the installed version is earlier than 1.0  Type
+	    "bzip2 --help".  The version number is on the first line of the
+	    output.
+
+-------------------------------------------------------------------------------
+
+The following set of calls can be made at any time, as they return information
+that is available at compile time.
+
+
+get_field_num(char *s)	All data requests are made by field number instead of
+			a character string to make the code run faster.  The
+			value returned is the field number, or -1 if the input
+			field isn't correct.  All routines check to see if
+			there is a good field number before continuing, so
+			users do not need to do this in their code.  The valid
+			input for 88D data is (case important):  "DBZ", "VEL",
+			and "SPW".
+
+			For TDWR "VEL" will get dealiased data.  To get the
+			raw velocities, use "RVEL".
+
+get_field_name(int n, char *s)
+			This is a reverse of get_field_num().  User supplies
+			a field number, and the name is returned in "s".  If
+			"s" isn't at three bytes in length, then a core dump
+			could occur.  If the field number isn't valid, then
+			"???" is returned in "s".  The return value of the
+			function is meaningless.
+
+get_beamwidth()		Returns 95 (0.95 * 100) for NEXRAD and MISSING for
+			TDWR.
+
+get_proj_name(char *s)	Returns "REALTIME NEXRAD " in "s".  "s" should be 16
+			bytes in length.
+
+-------------------------------------------------------------------------------
+
+The following routine may optionally appear before the radar initialization
+call.
+
+set_radar_name(char *s)	Specify 88D site name, in all caps.  Length should be
+			at least four bytes to prevent a core dump.  See below.
+			NCDC headers will be read and believed if a valid
+			radar name isn't set.
+
+get_radar_name(char *s)	Returns radar name in "s".  "s" should be 16 bytes in
+			length.  (This call no long requires a call to
+			radar_init() first.)
+
+-------------------------------------------------------------------------------
+
+The following routine *MUST* be called before any of the rest of the routines
+are called.  Failure to do this may cause either a fatal error, trash data, or
+a core dump.
+
+radar_init( char *s )	"s" is the device.
+
+			The input could be a local tape drive ("/dev/rst5")
+			or a remote tape drive ("lion:/dev/rst5").
+
+			For realtime, use "R" or "Raw" for the raw circular
+			buffer.  Use "E" or "Edit" for the crems/dealiasing
+			circular buffer.
+
+			For disk data, use the name of the directory containing
+			the files.
+
+			Note that "radar_init()" doesn't do any i/o.  It just
+			opens the i/o device, and a variety of internal
+			initialization.
+
+			If the input is a tape drive, then this is a local tape
+			drive, such as "/dev/rst5", or perhaps
+			a remote drive, such as as "lion:/dev/rst5".
+
+-------------------------------------------------------------------------------
+
+The following routines can be called any time after a radar_init() call is made
+and after a call to either read_radial() or read_record().
+
+If it is important to get this information earlier than radar_init(), make
+a call to get_radar_info(), which is the routine that really does the decoding.
+
+See a later section for the rules on radar name, latitude, and longitude.
+
+get_site_name(char *s)	Returns site name in "s".  "s" should be 16 bytes
+			in length.
+
+get_latitude()		Returns latitude * 10000.
+
+get_latitude_dms(int d, int m, int s)
+			"d" is degrees, "m" is minutes, and "s" is seconds.
+			Return value is meaningless.
+
+get_longitude()		Returns latitude * 10000.  See below.
+
+get_longitude_dms(int d, int m, int s)
+			"d" is degrees, "m" is minutes, and "s" is seconds.
+			Return value is meaningless.
+
+set_console_messages( int n )
+			When "n" is one, 88D console messages are displayed.
+			When "n" is zero, 88D console messages are not
+			displayed.  The default is "1" (enabled) for realtime, 
+			and "0" (disabled) otherwise.
+
+			Calls to radar_init() always resets the default.
+
+-------------------------------------------------------------------------------
+
+One of the following calls must be used to perform the i/o.
+
+read_record_raw( char *mybuf )  [Was read_record() in the previous release.]
+
+			Read a data record.
+
+		        For tape input, a data record will probably contain
+			more than one 88D data messages.  It will be up to the
+			user to sort them out.  The array size should be
+			145920.  Any size smaller may generate may cause
+			a fatal error or a core dump.
+
+			For realtime input, a data record will contain one
+			88D message, or NSSL locally added (types 201 and 202)
+			message.  The size should be 8192.
+
+			For disk input, a data record will contain one 88D
+			message or some kind of header message.  The data is
+			already unblocked, so only one message is returned.
+			The size should be 2432.
+
+			For TDWR, 6144 should be sufficient.
+
+			For RADS???
+
+			Return values are the number of bytes of data read
+			or "A2_END_OF_DATA" (-1) if the end of data set
+			occurs (disk and tape only).
+
+			THE USER IS RESPONSIBLE FOR DECODING THE DATA, AND
+			SHOULD BE AWARE THAT THE DATA MAY NOT BE IN ANY
+			VALID LEVEL 2 OR TDWR FORMAT.  FOR EXAMPLE, IF THE
+			INPUT FILE IS "rads", THE USER WON'T GET ANYTHING
+			USEFUL!
+
+			NO OTHER CALLS BEYOND THIS POINT SHOULD BE USED
+			IF THE USER PROGRAM USES read_record_raw() TO DO THE
+			I/O, AS read_record_raw() DOES NOT DO ANY DATA DECODING.
+			SEE read_record()/get_record() BELOW FOR A WAY TO GET
+			BOTH THE RAW RECORD AND DATA DECODING.
+
+
+read_radial()		Read data records, stopping when a radial is found or
+			the end of data set occurs.  Data may be retrieve via
+			the various "get" routines below.
+
+			Volume scan information is handled automatically, so
+			that get_scan() will behave as expected.
+
+			Return values are 0 for data and 1 for the end of the
+			data set.
+
+read_record()		Read the next data record.  In the event of i/o error,
+			the read is automatically requeued.  End of file is
+			ignored unless it is also the end of the data set.
+
+			Data decoding occurs for volume scan id and radial
+			data records.  Users should not use the "get" routines
+			below unless it has been confirmed that
+
+			The data record can be retrieved via a get_record()
+			call.
+
+			The return value is the message type.  The message type
+			may be a valid 88D type, a local realtime addition, or
+			a type assigned for messages that normally don't have a
+			message type.
+
+			The valid values are:
+
+  	  -2   A2_CANT_CONVERT	Data format can't be converted (see the
+				set_record_format() call.
+	  -1   A2_END_OF_DATA	End of data set (tape and disk only).
+	   0   A2_UNKNOWN_TYPE	Unknown data type (data may be corrupt)
+	   1   A2_DATA_TYPE	88D radial message
+	 201   A2_VOLSCAN_TYPE	NSSL Volume Scan Message (realtime only)
+	 202   A2_SITE_TYPE	NSSL Site/Timestamp Message (realtime only)
+	 241   A2_ARCHIVE2	"ARCHIVE2" tape header record, 8-byte version
+	 242   A2_ARCHIVE_NCDC	"ARCHIVE2" tape header record, NCDC version
+	 243   A2_VS_24_BYTE	Volume Scan Message (tape and disk only)
+
+			For TDWR, A2_CANT_CONVERT, A2_END_OF_DATA, and
+			A2_UNKNOWN_TYPE are valid.  Other return values
+			are valid TDWR data types such as 0x2b00.
+
+get_record( char *s )	Return the current data record in "s".  The format
+			is controlled by the "set_record_format()" call and
+			the original format of the data.  See the
+			"set_record_format()" call below.  The size of "s"
+			should be 8192.
+
+			The return value is either the number of bytes in "s"
+			or "A2_CANT_CONVERT" if a format conversion was not
+			possible.  If "A2_CANT_CONVERT" is returned, than the
+			data in "s" is meaningless.
+
+			At the current time, trying to read a record type
+			"A2_VS_24_BYTE" in "live" format returns
+			"A2_CANT_CONVERT".
+
+set_record_format( int n )  Set the format of the data to be returned in the
+			get_record() call.  Live ("realtime") data records
+			aren't the same as tape/disk data records.
+
+			The "n" is 0, then get_record() will return records in
+			tape format.  If "n" is 1, then get_record() will
+			return records in live format.  Anything else will
+			be an error, and the format won't be changed.
+
+			The default format is "live" for "live" data and "tape"
+			for tape and disk data.
+
+-------------------------------------------------------------------------------
+
+The "get" routines are only valid after a successful "read_radial()" call
+(return value is 0) or when read_record() returns A2_DATA_TYPE (1) or a
+valid TDWR type.  A call to "radar_init()" must have also occurred before
+any i/o is attempted.
+
+If none of these conditions are met, then anything returned can be corrupt, or
+possibly caused a core dump.
+
+
+The first three routines retrieve DBZ, VEL, or SPW.  The rest of the routines
+retrieve data information.
+
+get_data_field( int num, float data[], int n )
+			Loads "n" points of data into array "data" for variable
+			"num".  See get_field_num() to determine "num".  Return
+			values are 0 if everything is ok and MISSING if the
+			data isn't present.  Arrays are handled properly, so
+			requests for more data than is available won't cause
+			a problem.
+
+get_data_field_raw( int num, unsigned short data[], int n )
+			Load "n" points of RAW (undecoded) data into array
+			"data" (note data type) for variable "num".  See
+			get_field_num() to determine "num".
+
+			Return value is MISSING if data is missing, otherwise,
+			it returns the "vel_res" information for decoding.
+			The value is 0 for DBZ.
+
+			Scaling information (without "vel_res") can be retrieved
+			via get_scale_values().
+
+			Arrays are handled properly.
+
+get_data_field_uchar( int num, unsigned char data[], int n )
+			Load "n" points of RAW (undecoded) data into array
+			"data" (note data type) for variable "num".  See
+			get_field_num() to determine "num".
+
+			Return value is MISSING if data is missing, otherwise,
+			it returns the "vel_res" information for decoding.
+			The value is 0 for DBZ.
+
+			Scaling information (without "vel_res") can be retrieved
+			via get_scale_values().
+
+			Arrays are handled properly.
+
+get_altitude()		Returns station elevation in meters.
+
+get_azi()		Returns azimuth * 10.
+
+get_day()		Returns day of month.
+
+get_elev()		Returns elevation angle * 100.  In the event of a bad
+			elevation angle, the last good value is returned.
+			(Some 88Ds have a hardware problem that cause then to
+			produce ridiculous values).
+
+			The check is not made for VCP's 54, 57, and 144-148.
+			For these VCP's the actual elevation angle is always
+			returned.
+
+			No check is made for TDWR data.
+
+get_first_gate( int n )	Range to first gate in meters.  See get_field_num() for
+			values of "n".  If the data is not available, MISSING
+			(-999) will be returned.
+
+			If the code is built with ALLOW_VERS2_CALCULATIONS,
+			then the return value of get_first_gate() is consistent
+			with version 2 of the A2IO software.
+
+			If the code is not built with ALLOW_VERS2_CALCULATIONS,
+			then the code will meet the specifications required by
+			the OSF.
+
+			WATADS and NSSL code does not define this value.
+
+			NO ONE SHOULD DEFINE "ALLOW_VERS2_CALCULATIONS"!!!
+
+get_fixed_angle()	Return fixed elevation angle * 100.
+
+*get_frequency() 	Return MISSING.
+
+get_gate_spacing(int n)	Gate spacing in meters.  See get_field_num() for values
+			of "n".
+
+get_hour()		Returns hour of day.
+
+
+get_min()		Returns minute of hour.
+
+get_month()		Returns month of year (range 1 to 12).
+
+get_nyquist()		Returns nyquist if velocity data is present, otherwise
+			it returns MISSING.  Value is m/s * 100.
+
+get_number_of_gates(n)	Returns number of gates.  See get_field_num() for
+			values of "n".
+
+*get_polarization()	Returns 1.
+
+*get_power()		Returns MISSING.
+
+*get_prf()		Returns 1000 (not a real prf value).
+
+*get_prt()		Returns MISSING.
+
+*get_pulse_width()	Returns MISSING.
+
+get_radial_status()	Returns the "radial status" from the 88D data record.
+
+get_restart_flag()	When set to one, an elevation restart has occurred.
+			User programs should throw out all results for the
+			current sweep, and restart the processing.  Any program
+			that doesn't do this isn't consistent with the OSF
+			design.
+
+get_rt_mode()		Returns 0 if the data source is tape or disk.  Returns
+			1 if the data source is live.
+
+get_scan()		Returns scan number.
+
+*get_scan_dir()		Returns -1, 0, or 1.  Don't depend on these values!
+
+get_scan_status()	Returns 1 if volume scan number has changed, otherwise,
+			returns 0.  Always returns 1 for first radial.
+
+get_scale_values( int num, int sf, int offset )
+			"Sf" is the scale factor for field "num". "Offset" is
+			the offset value.  Both "sf" and "offset" MUST BE
+			CALLED BY ADDRESS.
+
+			Return values are 0 if the values are valid, otherwise
+			MISSING is returned.  Do not use the values if MISSING
+			is returned.
+
+			The equation is:
+
+				real_data_value = ( 88D_value - offset ) / sf
+
+			88D_value of 0 is "missing".
+			88D_value of 1 is "range folded".
+			88D_value of 2 thru 255 are valid.
+
+get_sec()		Returns seconds.
+
+get_status( int n ) 	Returns 1 if data is present.  Returns 0 if data is not
+			present.  "n" is same as in get_field_num().
+
+get_tilt()		Return tilt number.
+
+get_tilt_status()	Returns 1 if if volume scan or tilt number have
+			changed, otherwise, returns 0.  Always returns 1 for
+			first radial.
+
+*get_tilt_type()	Returns 1.
+
+get_timestamp()		Returns time in the same format as time(3).
+
+get_vcp()		Returns VCP number.  TDWR always returns 0.
+
+get_year()		Returns year (2 digit).  There won't be any year 2000
+			decoding problems.
+
+NOTES:
+Missing is (integer) -999.
+Routines flagged with "*" don't return anything of value.  These routines will
+be deleted in future releases.  There were originally written to be compatible
+with now obsolete software.
+
+-------------------------------------------------------------------------------
+
+Radar name, site name, latitude, longitude rules...
+
+The radar name is determined by:
+
+(1)  User program.  A "set_radar_name(char *s)" function is available.  This
+     function must be called BEFORE radar_init().
+(2)  If there isn't a call to set_radar_name(), then the program looks for
+     the environmental variable RADARNAME.  If found, the name is used, and
+     the code falls thru to the site name code.
+(3)  If neither conditions is met, the radar name returns "UNKN", the site
+     name is "UNKNOWN ".  Altitude is MISSING.  Lat/long are zero.
+
+If a radar name is found, then the site name is determined by:
+
+(1)  Look for the environmental variable RADARFILE.  This points to a file
+     that follows the exact format of "radarinfo.dat".
+
+(2)  If RADARFILE isn't used or if the file pointed to doesn't exist, then
+     the program looks for "radarinfo.dat" in the current directory.
+
+(3)  If there still isn't a valid file, then site becomes "UNKNOWN ".
+     Altitude is MISSING.  Lat/long are zero.
+
+(4)  If a valid file is found, then site, lat, and long info is read from
+     the file.  Elevation info is read if the file contains the data (1995
+     version), else MISSING is returned (1994 version).  If radar name isn't
+     found, site becomes "UNKNOWN ".  Lat/long are set to zero.  The user
+     will be notified when this occurs.  If radar name is found, correct info
+     for site name, lat, and long will be available.
+
+Restricted data processing...
+
+The user can control the amount of data processed by setting environmental
+parameters.  This control only applies to tape and disk input.  The parameters
+are ignored for the realtime ("live") system.
+
+The following are available:
+
+A2_START_SCAN:	first volume scan processed, default is 1
+A2_END_SCAN:	last volume scan processed, default is 9999
+A2_NUM_SCAN:	total number of volume scans processed, default is 9999
+
+(A2_NUM_SCAN will probably go away in the future.)
+
+User information will be printed out, so that the user can verify the
+information was processed by the software.
+
+No tape positioning is done.  If A2_END_SCAN is set, and is before the current
+tape volume scan, the user will get "1" for read_radial() and "A2_END_OF_DATA"
+for read_record().  Disk data doesn't have this problem.
+
+The first end scan event that occurs (A2_END_SCAN, A2_NUM_SCAN) will trigger
+the appropriate end of data flag.
+
+If the data is located before A2_START_SCAN, the software will go into "search"
+mode.  The user will see messages as each volume scan is read.
+
+Messages:
+read_radial:  logic fault:  (text)
+
+Something went wrong in the bookkeeping in preparation to access the next
+radial (not necessary the next record).  The rest of the record will be
+discarded and a new record will be read in at the next read_radial() call.
+This shouldn't happen!
+
+Linking:
+See "config.h" for files and libraries to be linked when features are enabled.

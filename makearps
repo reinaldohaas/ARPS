@@ -1,0 +1,3667 @@
+#!/bin/csh -f
+#
+#     ##################################################################
+#     ##################################################################
+#     ######                                                      ######
+#     ######      Advanced Regional Prediction System (ARPS)      ######
+#     ######                                                      ######
+#     ######                     Developed by                     ######
+#     ######     Center for Analysis and Prediction of Storms     ######
+#     ######                University of Oklahoma                ######
+#     ######                                                      ######
+#     ##################################################################
+#     ##################################################################
+#
+#
+#-----------------------------------------------------------------------
+#
+#  PURPOSE: This C-shell script executes the ARPS makefile.
+#
+#  AUTHORS: Richard Carpenter, A. Sathye, Yuhe Liu
+#
+#  HISTORY:
+#       1994/10/06  First written
+#       1994/10/18  Support for arps, arpspltncar, arpscvt on RS/6000.
+#       1994/11/**  Added options for Sun, Cray and Alpha. Modified
+#                   some options for IBM. (Adwait Sathye)
+#       1994/11/07  Changed default -O option to -O1 since some
+#                   compilers look for an argument to the -O option.
+#                   (Adwait)
+#       1994/11/08  Added the code to get the local architecture
+#                   (Adwait)
+#       1994/11/08  Included arpssfc, arpstern, dir1deg, dir5min and
+#                   dir30sec set of pre-processors. (Adwait)
+#       1994/11/10  Added arps0.tar arpstplt.tar arpsprt.tar
+#                   arpstern.tar arpssfc.tar, etc. (Yuhe Liu)
+#       1995/08/07  Added options to compile MPP code for the Cray T3D
+#                   and the IBM SP-2 (Adwait)
+#       1996/08/12  Removed the version number from the name of
+#                   executable and input files
+#
+#       Later changes are documented in HISTORY file found in ARPS root
+#       directory.
+#
+#  USAGE:
+#       makearps [options] cmd
+#       makearps help
+#       See below for further information.
+#
+#  SPECIAL REQUIREMENTS:
+#       - make
+#       - HOSTTYPE or uname
+#
+#  OTHER INFORMATION:
+#       Machine-dependent parameters are determined from HOSTTYPE
+#       and uname.
+#
+#-----------------------------------------------------------------------
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+#= Section 0: Initialization and machine type
+#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#{
+
+#-----------------------------------------------------------------------
+#
+# Name of this script
+#
+#-----------------------------------------------------------------------
+
+set cmd = $0
+set cmd = $cmd:t
+
+set CURDIR = `pwd`
+set WRKDIR = $CURDIR
+set TOPDIR = $CURDIR
+
+if ( ! -d $WRKDIR/bin ) mkdir $WRKDIR/bin
+if ( ! -d $WRKDIR/lib ) mkdir $WRKDIR/lib
+if ( ! -d $WRKDIR/modules ) mkdir $WRKDIR/modules
+
+#-----------------------------------------------------------------------
+#
+# The following are used only in the informational messages
+#
+#-----------------------------------------------------------------------
+
+set UPDATEDATE  = 01/27/2012
+set ARPSVER     = `echo $cwd:t |cut -c 5- -`
+
+#-----------------------------------------------------------------------
+#
+# Set defaults
+# Support for packed binary is on by default
+#
+#-----------------------------------------------------------------------
+
+set MAKE = make
+set MAKEFILE = Makefile
+
+set FIXFLAG_str  =
+set FREEFLAG_str =
+
+set CMD = arps
+set DBG_str PAR_str OPT_str OPT_main_str PERF_str FFLAGS0 copt          \
+    DUMP_str LIBS INLINE_str LDR_str LDFLAGS TERN_str FTN_str LIB_str   \
+    AWK_str mpi_inc mpi_lib MP_str                                      \
+    DIR_str CFLAGS0 ICEFLAG RADFLAG THMFLAG                             \
+    GEMINC MACH_str IOOBJ_str MAKE_opt TAR_opt ASSIM_str
+
+set mach = unix
+
+set AWK_str = "'AWK = /bin/awk'"
+set ASSIM_str = 'ASSIMOPT=ASSIMDUMMY'
+
+cat << END
+
+ARPS Makefile configuration utility
+Updated: $UPDATEDATE (ARPS version $ARPSVER)
+
+END
+
+if ($#argv < 1 ) then
+  echo "An ARPS command name needed."
+  goto usage
+endif
+
+#-----------------------------------------------------------------------
+#
+#  Get machine type. Check HOSTTYPE first, then uname
+#
+#-----------------------------------------------------------------------
+
+if ($?HOSTTYPE) then
+
+  set mach = $HOSTTYPE
+  if ( $mach == unknown ) then
+#    set os   = "`/bin/uname -s`"
+#    set hw   = "`/bin/uname -m`"
+    set os   = "`uname -s`"
+    set hw   = "`uname -m`"
+    set mach = "$os,$hw"
+  endif
+
+#-----------------------------------------------------------------------
+
+else if (-f /bin/uname) then
+
+  set os   = "`/bin/uname -s`"
+  set hw   = "`/bin/uname -m`"
+  set mach = "$os,$hw"
+#  if (! $?HOST) set HOST = "`/bin/uname -n`"
+  if (! $?HOST) set HOST = "`uname -n`"
+
+endif
+
+switch ("$mach")
+
+  case *intel-mac*: # Added by DTD for Intel Mac Pro
+    set mach = linux
+    breaksw
+
+  case *[mM]ac*:
+    set mach = mac
+    breaksw
+
+  case *SunOS*:
+    set mach = sun4
+    breaksw
+
+  case *ULTRIX*:
+  case *alpha*:
+  case *OSF*:
+    set mach = alpha
+    breaksw
+
+  case *AIX*:
+    set mach = rs6000
+    breaksw
+
+  case *HP*:
+    set mach = hp-risc
+    breaksw
+
+  case *IRIX*:
+  case *SGI*:
+    set mach = iris4d
+    breaksw
+
+  case *T3E*:        # case T3E must come before case cray
+  case *t3e*:        # this class does NOT include T3D
+    set mach = t3e
+    breaksw
+
+  case *CRAY*:
+    set mach = cray
+    breaksw
+
+  case *cray*:
+    set mach = cray
+    breaksw
+
+  case *HI-UX*:
+    set mach = hi-ux
+    breaksw
+
+  case *intel-pc*  # Added by DTD for Intel Mac Pro
+  case *Linux*:
+  case *linux*:
+  case *i686*:
+  case *i386*:
+    set mach = linux
+    breaksw
+
+  case *SUPER-UX*:
+    set mach = nec
+    breaksw
+
+endsw
+
+if ($mach == unix) then
+
+  if (-d /usr/convex ) then
+    mach = convex
+  endif
+
+  if (-f /unicos ) then
+    mach = cray
+  endif
+
+  if (-f /etc/vg ) then
+    mach = rs6000
+  endif
+
+  if (-f /bin/4d ) then
+    mach = iris4d
+  endif
+
+endif
+
+#}
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+#= Section 1: Default settings
+#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#{
+
+set fort_cmp = gfortran        # set default F90 compiler
+set c_cmp    = gcc
+set cpp_cmp  = cpp    #/lib/cpp
+set opt      = 4          # for default optimization option
+set lib_hdf               # default include HDF library
+if ($?HDF_GOOD_WITH_NET ) set hdfnet
+
+if ($mach == linux) then       # set default for Linux
+  set fort_cmp = ifort
+  if ( $?F90 ) then
+    set fort_cmp = "$F90"
+  endif
+  set cpp_cmp  = /usr/bin/cpp
+  set opt      = 3
+else if ($mach == rs6000) then # IBM AIX default
+  set fort_cmp = xlf95
+  set c_cmp    = xlc
+else if ($mach == mac) then    # set default for Mac OS X
+  set fort_cmp = xlf90
+  #unset lib_hdf
+else if ($mach == intel-mac) then # set default for Intel Mac OS X (at least for 10.6)
+  set fort_cmp = ifort
+endif
+
+#}
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+#= Section 2: Settings from command line and library dependency
+#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#{
+
+#-----------------------------------------------------------------------
+#
+# get command line arguments
+#
+#-----------------------------------------------------------------------
+
+set argvsaved = "$*"
+
+while ($#argv)
+
+  set arg = $argv[1]
+
+  switch ($arg)
+
+    case -n:
+      set MAKE_opt = "$MAKE_opt -n"
+      shift
+      breaksw
+
+    case -P:   # execute make in parallel (on SGI setenv PARALLEL to # procs)
+      set MAKE_opt = "$MAKE_opt -P"
+      shift
+      breaksw
+
+    case -p:
+      set par
+      shift
+      breaksw
+
+    case -omp:    # Open MP
+      set openmp
+      shift
+      breaksw
+
+    case -s:
+      set perf
+      shift
+      breaksw
+
+    case -inline:
+      set inline
+      shift
+      breaksw
+
+    case -abi:
+      shift
+      if ( $#argv < 1 ) then
+        echo "-abi requires options"
+        goto usage
+      endif
+      set sgi_abi = "-$argv[1]"
+      if ( "$sgi_abi" == "-64") set obj_64
+      shift
+      breaksw
+
+    case -f:
+      shift
+      if ( $#argv < 1 ) then
+        echo "-f requires option"
+        goto usage
+      endif
+      set fort_cmp = "$argv[1]"
+      shift
+      breaksw
+
+    case -cc:
+      shift
+      if ($#argv < 1) then
+        echo "-cc requires option"
+        goto usage
+      endif
+      set c_cmp = "$argv[1]"
+      shift
+      breaksw
+
+    case -f90:
+      set fort_cmp = f90
+      shift
+      breaksw
+
+    case -mpi:
+      set mp_opt = "mpi"
+      shift
+      breaksw
+
+    case -nomainopt:
+      set nomainopt
+      shift
+      breaksw
+
+    case -rd:
+      shift
+      if ($#argv < 1) then
+        echo "-rd requires options"
+        goto usage
+      endif
+      if ( -d $argv[1] ) then
+        set TOPDIR = $argv[1]
+      endif
+      shift
+      breaksw
+
+    case -largearrays
+      shift
+      set largearrays
+      breaksw
+
+    case -io:
+      shift
+
+      if ($#argv < 1) then
+        echo "-io requires options"
+        goto usage
+      endif
+
+      while ($#argv > 1)
+        set ioopt = $argv[1]
+        if ("$argv[1]" =~ -*) goto done
+
+        shift
+
+        switch ($ioopt)
+          case pak*:
+            set lib_pak
+            breaksw
+          case hdf:
+            set   lib_hdf
+            unset lib_net
+            breaksw
+          case nohdf:
+            unset lib_hdf
+            breaksw
+          case net:
+            set   lib_net
+            unset lib_hdf
+            breaksw
+          case nethdf:
+          case hdfnet:
+            set lib_net
+            set lib_hdf
+            set hdfnet
+            breaksw
+          case s*:
+            set lib_svi
+            breaksw
+          case v*:
+            set v5dio
+            breaksw
+          case bin:
+            unset lib_hdf
+            unset lib_net
+            breaksw
+          case phdf5:
+            set lib_phdf5
+            breaksw
+          case grib2:
+            set lib_grb2
+            breaksw
+          case nogrib2:
+            set nolib_grb2
+            breaksw
+          case gempak:
+            set lib_gempak
+            breaksw
+          case nogempak:
+            set lib_nogempak
+            unset lib_gempak
+            breaksw
+          case crtm:
+            set lib_crtm
+            breaksw
+          case citm:
+            set lib_citm
+            breaksw
+          case all:
+            set lib_pak lib_hdf lib_net v5dio
+            breaksw
+          default:
+            echo "Unrecognized option: $ioopt"
+            goto usage
+        endsw
+
+      end
+      done:                        #end of -io options
+    breaksw
+
+    case -opt:
+      shift
+      if ( $argv[1] >= 0 && $argv[1] <= 99 ) then
+        set opt = $argv[1]
+        shift
+      else
+        echo "Unexpected optimization level, "$argv[1]
+        goto usage
+      endif
+      breaksw
+
+    case -d:
+      set dbg
+      set opt = 0
+      shift
+      breaksw
+
+    case -j:
+      shift
+      if ($#argv < 1) then
+        echo "-j requires options"
+        goto usage
+      endif
+      set MAKE_opt = "$MAKE_opt -j $argv[1]"
+      shift
+      breaksw
+
+    case -m:
+    case -mach:
+      shift
+      if ($#argv < 1) then
+        echo "-mach requires options"
+        goto usage
+      endif
+      set mach = $argv[1]
+      shift
+      breaksw
+
+    case -mp_inc:
+      shift
+      if ($#argv < 1) then
+        echo "-mp_inc requires options"
+        goto usage
+      endif
+      set mp_inc = $argv[1]
+      shift
+      breaksw
+
+    case -mp_lib:
+      shift
+      if ($#argv < 1) then
+        echo "-mp_lib requires options"
+        goto usage
+      endif
+      set mp_lib = $argv[1]
+      shift
+      breaksw
+
+    case -copt:
+      shift
+      if ($#argv < 1) then
+        echo "-copt (compiler option requires options"
+        goto usage
+      endif
+      set copt = "$argv[1]"
+      shift
+      breaksw
+
+    case -help:
+      goto usage
+      shift
+      breaksw
+
+    case -ncarg:
+      set ncarg
+      shift
+      breaksw
+
+    case -zxncar:
+      set zxncar
+      shift
+      breaksw
+
+    case -zxpost:
+      set zxpost
+      shift
+      breaksw
+
+    case -x[KWT]:
+      set proc_type = $argv[1]
+      switch("$fort_cmp")
+        case ifc*:
+        case ifort:
+        case pgf90:
+          breaksw
+        default:
+          echo "WARNING: " $argv[1] " option only works for Intel compiler."
+      endsw
+      shift
+      breaksw
+
+    case -intelopt:
+      set intelopt
+      shift
+      breaksw
+
+    case -nointelopt:
+      set nointel
+      shift
+      breaksw
+
+    case -64:
+      set obj_64
+      shift
+      breaksw
+
+    case -dbl:
+      set dbl
+      shift
+      breaksw
+
+    case -*:
+      echo "unrecognized option: $arg"
+      goto usage
+      shift
+      breaksw
+
+    default:
+      set CMD = $arg
+      shift
+      breaksw
+
+  endsw
+
+end
+
+set DIR_str = "'TOPDIR=$TOPDIR' 'WRKDIR=$WRKDIR'"
+set FFLAGS0 = "$FFLAGS0 -I$TOPDIR/include $copt"
+set CFLAGS0 = "$CFLAGS0 -I$TOPDIR/include"
+
+set TAR_opt = "-cf"
+set TAR_opt = "-cvf"
+set CPPFLAG = " -P -traditional"
+
+#
+# Set MPI compiler if necessary
+#
+if ($CMD =~ *_mpi) then
+  if ($mach == rs6000) then
+    set fort_cmp = "mp"$fort_cmp
+  else if  ($mach == mac) then
+    set fort_cmp = "mpif90"
+  endif
+endif
+
+setenv FC "$fort_cmp"
+setenv CC "$c_cmp"
+set LDR_str = "'ARPS_LD = $fort_cmp'"
+set FTN_str = "'FTN = $fort_cmp'"
+set C_str   = "'CC = $c_cmp'"
+set CPP_str = "'CPP = $cpp_cmp'"
+
+#-----------------------------------------------------------------------
+#
+# Check the CMD
+#
+#-----------------------------------------------------------------------
+
+if (! $?HOST) then
+  if (-f /bin/hostname) then
+    set HOST = "`/bin/hostname`"
+  else                                   # Punt. No hostname
+    echo "HOST undefined. It was set to 'undefined'."
+    set HOST = undefined
+   endif
+endif
+
+switch ($CMD)
+
+  case all:
+  case 88d2arps_fake:
+  case tmatrix:
+  case adas:
+  case arps:
+  case arps2eta212:
+  case arps2rad:
+  case arps3dvar:
+  case arpsagr:
+  case arpscvt:
+  case arpsdiff:
+  case arpsensbc:
+  case ensscores:
+  case arpsextsnd:
+  case arpsintrp:
+  case arpsintrp_ls:
+  case arpssolver:
+  case arpspltpost:
+  case arpsprt:
+  case arpsraindiff:
+  case arpsread:
+  case arpsshift:
+  case arpssoil:
+  case arpstintrp:
+  case arpstrajc:
+  case arpscalctrajc:
+  case arpsverif:
+  case typhoontrack:
+  case atten:
+  case difobs:
+  case dir1deg:
+  case dir30sec:
+  case dir5min:
+  case ens_ana:
+  case ens_cal:
+  case extract_avn:
+  case fsl2snd:
+  case mergesat:
+  case meso2lso:
+  case nids2arps:
+  case radardtaintrp:
+  case radaremul:
+  case radarpltpost:
+  case radmosaic:
+  case rndprt:
+  case wtretcol:
+  case arpsenkf:
+  case arpsmpbudget:
+  case endgns:
+  case initensmbl:
+  case ossedata:
+  case postinnov:
+  case test:
+    if($?hdfnet) set lib_net
+    breaksw
+
+  case skewtpost:
+    unset lib_hdf
+    breaksw
+
+  case hdf2grads:       # require HDF explicitly
+  case joinbin2hdf:
+  case joinhdf:
+  case mci2arps:
+  case sat2arps:
+  case splithdf:
+  case arpssubdomain:
+  case hdfsubdomain:
+    set lib_hdf
+    breaksw
+
+  case arps2wdssii:      # Require netCDF explicitly
+    set lib_net
+    set lib_hdf
+    breaksw
+
+  case arps2wrf:
+  case wrf2arps:
+  case wrfextsnd:
+  case wrfstatic:
+    set LIBS = "-L$TOPDIR/lib -lwrfio_int"
+  case arps2ncdf:
+  case arps2coamps:
+  case casa2arps:
+  case coamps2arps:
+  case joinwrfh:
+  case ncrad2arps:
+  case radbin2cdf:
+  case radsector:
+  case Zmosaic2arps:
+    set lib_net
+    if(! $?hdfnet) unset lib_hdf
+    breaksw
+
+  case joinfile:           # Hybrid
+  case joinfiles:
+  case splitfiles:
+  case splitany:
+    if ($?HDF_GOOD_WITH_NET ) then
+      set hdfnet
+      set lib_net
+      set lib_hdf
+    endif
+    breaksw
+
+  #
+  # require ZXPLOT
+  #
+  case arpspltmax:
+  case arpsenscv:
+  case mergetrn:
+  case pltgrid:
+  case pltradcol:
+  case ppiplt:
+    if ( $?zxncar ) then
+      set ZXPLOT_str = 'ZXPLOTDEP=ZXPLOTOBJ_NCAR'
+      set lib_ncarg
+    else
+      set ZXPLOT_str = 'ZXPLOTDEP=ZXPLOTOBJ_POST'
+    endif
+    breaksw
+
+  case arpstrn:
+    if ( $?zxncar ) then
+      set ZXPLOT_str = 'ZXPLOTDEP=ZXPLOTOBJ_NCAR'
+      set lib_ncarg
+    else if ( $?zxpost ) then
+      set ZXPLOT_str = 'ZXPLOTDEP=ZXPLOTOBJ_POST'
+    else
+      set ZXPLOT_str = 'ZXPLOTDEP=ZXPLOTOBJ_OFF'
+    endif
+    breaksw
+
+  case arpssfc:          # require NCARG
+  case arpstern:
+    if ( $?ncarg ) then
+      set NCARG_str = 'NCARGDEP=NCARGOBJ_ON'
+      set lib_ncarg
+    endif
+    breaksw
+
+  case skewtncar:
+    unset lib_hdf
+  case radarpltncar:     # require netCDF
+    set lib_net
+  case all_plot:
+  case arpspltncar:
+  case plt1dtrajc:
+  case plt3dtrajc:
+  case pltsatfld:
+    set NCARG_str = 'NCARGDEP=NCARGOBJ_ON'
+    set lib_ncarg
+    breaksw
+
+  case arpscvtobs:        # require Gempak
+    set lib_hdf
+  case all_gempak:
+  case arps2gem:
+  case bin2gem:
+  case ext2arps.gempak:
+    set lib_gempak
+    breaksw
+
+  case arpspost:
+    if (! $?lib_nogempak) set lib_gempak
+    breaksw
+
+  case ext2arps:          # Special serial programs
+    if (! $?nolib_grb2) set lib_grb2
+    if (  $?hdfnet    ) set lib_net
+    breaksw
+
+  case ext2arps.laps:
+    set LIBS = '/laps/vortex95/lib/liblapsdebug.a /laps/lib/mthermo/mthermo.a -lnetcdf'
+    breaksw
+
+  case arpsassim:
+    set ASSIM_str = 'ASSIMOPT=ASSIMOBJ'
+    breaksw
+
+  case arpsensic_mpi:
+    set mp_opt = "mpi"
+  case arpsensic:
+  case arpsenkfic:
+    if($?hdfnet) set lib_net
+    set lib_lapack
+    breaksw
+
+  #
+  # Require hdf5 libary
+  #
+  case sathdf52arps:
+    set lib_hdf5
+    breaksw
+
+  #
+  # MPI programs without requirements
+  #
+  case arps_mpi:
+    if ($?hdfnet) set lib_net
+  case adas_mpi:
+  case arps3dvar_mpi:
+  case arpsextsnd_mpi:
+  case arpspltpost_mpi:
+  case arpstintrp_mpi:
+  case arpsverif_mpi:
+  case splitfiles_mpi:
+  case splithdf_mpi:
+    set mp_opt = "mpi"
+    breaksw
+
+  case arps2coamps_mpi:
+  case coamps2arps_mpi:
+  case nids2arps_mpi:
+  case arpsenkf_mpi:
+    if($?hdfnet) set lib_net
+    set CPPFLAG = "$CPPFLAG -DMPI_PARALLEL"
+    set mp_opt = "mpi"
+    breaksw
+
+  #
+  # MPI programs require HDF explicitly
+  #
+  case hdfsubdomain_mpi:
+    set mp_opt = "mpi"
+    set lib_hdf
+    breaksw
+
+  #
+  # MPI programs require netCDF
+  #
+  case arps2wrf_mpi:
+    set LIBS = "-L$TOPDIR/lib -lwrfio_int"
+  case ncrad2arps_mpi:
+    set CPPFLAG = "$CPPFLAG -DMPI_PARALLEL"
+    set lib_net
+    if (! $?hdfnet) unset lib_hdf
+    set mp_opt = "mpi"
+    breaksw
+  #
+  # MPI programs require NCARG
+  #
+  case arpspltncar_mpi:
+    set lib_ncarg
+    set NCARG_str = 'NCARGDEP=NCARGOBJ_ON'
+    set mp_opt = "mpi"
+    breaksw
+  #
+  # MPI programs require GEMPAK
+  #
+  case arpspost_mpi:
+    if (! $?lib_nogempak) set lib_gempak
+    set mp_opt = "mpi"
+    breaksw
+  #
+  # MPI program requires both netCDF & GEMPAK
+  #
+  case wrf2arps_mpi:
+    set lib_net
+    if (! $?hdfnet)  unset lib_hdf
+    set LIBS = "-L$TOPDIR/lib -lwrfio_int"
+    set mp_opt = "mpi"
+    breaksw
+  #
+  # MPI program requires GRIB2 library
+  #
+  case ext2arps_mpi:
+    if (! $?nolib_grb2) set lib_grb2
+    if (  $?hdfnet    ) set lib_net
+    set mp_opt = "mpi"
+    breaksw
+
+  #
+  # Programs with special rquirements
+  #
+  case 88d2arps_mpi:
+    set mp_opt = "mpi"
+    set CFLAGS0 = "$CFLAGS0 -DMPI_PARALLEL"
+    set CPPFLAG = "$CPPFLAG -DMPI_PARALLEL"
+   #case 88d2arps_a2:
+   #case 88d2arps_rt:
+   #  set CMD = '88d2arps'
+  case 88d2arps:
+  case solo2arps:
+     set lib_bz2
+     breaksw
+
+  case arps4wrf_mpi:
+  case nmm2arps_mpi:
+    set mp_opt = "mpi"
+    set CPPFLAG = "$CPPFLAG -DMPI_PARALLEL"
+  case arps4wrf:    # require netcdf library and WRF libraries
+  case nmm2arps:
+    set LIBS = "-L$TOPDIR/lib -lwrfio_net -lwrfio_int"
+    set lib_net
+    if(! $?hdfnet) unset lib_hdf
+    breaksw
+
+  case libadas:
+  case libenkf:
+  case libarps:
+  case libzxpost:
+  case libzxncar:
+  case iplib:
+  case prdlib:
+    breaksw
+
+  case Allfiles.tar:
+  case Allfiles.tar.gz:
+  case adas.tar:
+  case arps3dvar.tar:
+  case arpsenkf.tar:
+  case arps.tar:
+  case arpsagr.tar:
+  case arpsassim.tar:
+  case arpscvt.tar:
+  case arpsmpbudget.tar:
+  case arpscvtobs.tar:
+  case arpsintrp.tar:
+  case arpstintrp.tar:
+  case arpsplt.tar:
+  case arpsprt.tar:
+  case arps2gem.tar:
+  case arpsdiff.tar:
+  case arpsens.tar:
+  case arpsextsnd.tar:
+  case skewt.tar:
+  case arpssfc.tar:
+  case arpssoil.tar:
+  case arpstern.tar:
+  case arpstrn.tar:
+  case mergetrn.tar:
+  case ext2arps.tar:
+  case extract_avn.tar:
+  case 88d2arps.tar:
+  case mci2arps.tar:
+  case arps_mp.tar:
+  case arps2eta212.tar:
+  case arps2wrf.tar:
+  case wrf2arps.tar:
+  case difobs.tar:
+  case radmos.tar:
+  case arps2rad.tar:
+  case zxplot.tar:
+  case all-tar:
+    if ( $?dbg ) then
+      set TAR_opt = "-cvf"
+    endif
+    breaksw
+
+  case clean:
+  case clean.exe:
+  case clean.tar:
+  case clean.adas:
+  case clean.arps:
+  case clean.arps3dvar:
+  case clean.arpsenkf:
+  case clean.meso2lso
+  case clean.arpsagr:
+  case clean.arpsassim:
+  case clean.arpscvt:
+  case clean.arpscvtobs:
+  case clean.arpsmpbudget:
+  case clean.arpsintrp:
+  case clean.arpstintrp:
+  case clean.arpsplt:
+  case clean.arpsprt:
+  case clean.arps2gem:
+  case clean.arps2coamps:
+  case clean.coamps2arps:
+  case clean.arpsdiff:
+  case clean.arpsens:
+  case clean.arpsextsnd:
+  case clean.skewt:
+  case clean.arpssfc:
+  case clean.arpssoil:
+  case clean.arpstern:
+  case clean.arpstrn:
+  case clean.mergetrn:
+  case clean.dirtern:
+  case clean.ext2arps:
+  case clean.extract_avn:
+  case clean.88d2arps:
+  case clean.tmatrix:
+  case clean.prdlib:
+  case clean.casa2arps:
+  case clean.ncrad2arps:
+  case clean.mci2arps:
+  case clean.arpsread:
+  case clean.arpsraindiff:
+  case clean.wtretcol:
+  case clean.initensmbl:
+  case clean.ossedata:
+  case clean.test:
+  case clean.obsstd:
+  case clean.postinnov:
+  case clean.endngs:
+  case clean.split:
+  case clean.join:
+  case clean.joins:
+  case clean.joinbin2hdf:
+  case clean.joinhdf
+  case clean.splithdf
+  case clean.mptrans:
+  case clean.arps_mp:
+  case clean.arpsverif:
+  case clean.arps2eta212:
+  case clean.arps2wrf:
+  case clean.wrf2arps:
+  case clean.difobs:
+  case clean.radmosaic:
+  case clean.arps2rad:
+  case clean.arpstrajc:
+  case clean.arps4wrf:
+  case clean.nmm2arps:
+  case clean.libarps:
+  case clean.libzxpost:
+  case clean.libzxncar:
+    unset lib_hdf
+    unset lib_net
+    unset lib_ncarg
+    breaksw
+
+  default:
+    echo Cannot make the command: $CMD
+    goto usage
+    breaksw
+
+endsw
+
+goto usage_end
+
+#-----------------------------------------------------------------------
+#
+# Usage
+#
+#-----------------------------------------------------------------------
+
+usage:
+
+cat << END
+
+Usage: $cmd [options] cmd
+
+cmd is one of the following [default is arps]:
+
+    Executable commands:
+
+        all               Make all executables except parallel and plotting programs
+        all_plot          Make executables of all programs involving plotting using ZXPLOT.
+        adas              Produce ADAS executable adas
+        adas_mpi          Produce MPI version adas
+        arps3dvar         Produce 3DVAR executable arps3dvar
+        arpsenkf          Produce ENKF executable arpsenkf
+        arps              Produce ARPS executable arps
+        arps_mpi          Produce MP version ARPS executable arps (using MPI)
+        arpsagr           Produce executable arpsagr
+        arpsassim         Produce executable arpsassim
+        arpscvt           Produce executable arpscvt
+        arpscvtobs        Converts LSO surface data to HDF format files.
+        arpsmpbudget      Calculates microphysical budget statistics
+        arps2gem          Convert ARPS history format data to Gempak format
+        arps2ncdf         Convert ARPS history format data to NetCDF format
+        arpsdiff          Produce executable arpsdiff for ARPSDIFF
+        arpsenscv         Generate 2-D plots for ensemble variables
+        arpsextsnd        Produce executable arpsextsnd for ARPSEXTSND
+        arpsintrp         Produce executable arpsintrp
+        arpsintrp_ls      Produce executable arpsintrp_ls
+        arpstintrp        Produce executable arpstintrp
+        arpspltmax        Produce executable arpspltmax for ARPSPLTMAX
+        arpspltncar       Produce NCAR Graphics executable arpspltncar for ARPSPLT
+        arpspltpost       Produce PostScript executable arpspltpost for ARPSPLT
+        arpspltpost_mpi   Produce Message passing executable arpspltpost
+        arpspltncar_mpi   Produce Message passing executable arpspltncar
+        arpsprt           Produce executable arpsprt for ARPSPRT
+        arpsensic         Generate perturbation IC for ensemble fcst
+        arpsenkfic        Generate perturbation IC for EnKF
+        rndprt            Generate perturbation for DSD parameters
+        arpsensbc         Generate perturbation BC for ensemble fcst
+        arpsread          Produce executable arpsread, a sample program
+        arpssfc           Produce executable arpssfc for ARPSSFC
+        arpssoil          Produce executable arpssoil for ARPSSOIL
+        arpstern          Produce executable arpstern for ARPSTERN
+        arpstrn           Produce executable arpstrn for ARPSTRN
+        arpsverif         Produce executable arpsverif for ARPSVERIF
+        dir1deg           Produce executable dir1deg for DIR1DEG
+        dir5min           Produce executable dir5min for DIR5MIN
+        dir30sec          Produce executable dir30sec for DIR30SEC
+        mergetrn          Produce executable mergetrn for MERGETRN
+        pltgrid           Produce executable pltgrid to plot ARPS grids
+        splitfiles        Produce executable splitfiles
+        splitfiles_mpi    Produce MPI version splitfiles executable
+        splithdf          Produce executable splithdf
+        splithdf_mpi      Produce MPI version splithdf executable
+        joinfile          Produce executable joinfile
+        joinfiles         Produce executable joinfiles
+        joinbin2hdf       Produce executable joinbin2hdf
+        joinhdf           Produce executable joinhdf
+        initensmbl        Produce executable initensmbl
+        ossedata          Produce executable ossedata
+        obsstd            Produce executable obsstd
+        postinnov         Produce executable postinnov
+        endgns            Produce executable endgns
+        ensscores         Produce executable ensscores
+
+    Data exchange:
+        88d2arps          Produce executable 88d2arps
+        88d2arps_fake     Produce executable 88d2arps_fake
+        ext2arps_mpi      Produce MPI version ext2arps executable
+        arps2wrf          Produce executable ARPS2WRF
+        ext2arps          Produce executable ext2arps for user''s external data
+        extract_avn       Extract a patch of data from AVN global 1x1 degree data
+        ext2arps.laps     Produce executable ext2arps for LAPS data
+        ext2arps.gempak   Produce executable ext2arps for GEMPAK data
+        hdf2grads         Produce executable hdf2grads
+        mci2arps          Produce executable mci2arps
+        nids2arps         Produce executable nids2arps
+        pltradcol         Produce executable pltradcol
+        pltsatfld         Produce executable pltsatfld
+        wtretcol          Produce executable wtretcol
+        wrf2arps          Produce executable WRF2ARPS
+        tmatrix           Produce executable tmatrix
+
+    Objective archive:
+
+        libarps           Compile libarps.a
+        libadas           Compile libadas.a
+        libenkf           Compile libenkf.a
+        prdlib            Compile prdlib.a
+        libzxpost         Compile libzxpost.a
+        libzxncar         Compile libzxncar.a
+        arpssolver        Produce an object library for the ARPS solver
+
+    Tar up files:
+
+        Allfiles.tar      Tar up all files of the entire ARPS system
+                          except for the documentation
+        arps.tar          Tar up files associated with ARPS
+        adas.tar          Tar up files associated with ADAS
+        arps3dvar.tar     Tar up files associated with 3DVAR
+        arpsenkf.tar      Tar up files associated with EnKF
+        arps_mp.tar       Tar up files associated with message passing
+        arpsagr.tar       Tar up files associated with ARPS Adaptive Grid Refinement
+        arpsassim.tar     Tar up files associated with ARPSASSIM
+        arpscvt.tar       Tar up files associated with ARPSCVT
+        arpscvtobs.tar    Tar up files associated with ARPSCVTOBS
+        arpsmpbudget.tar  Tar up files associated with ARPSMPBUDGET
+        arpsdiff.tar      Tar up files associated with ARPSDIFF
+        arpsens.tar       Tar up files associated with ARPSENS
+        arpsextsnd.tar    Tar up files associated with ARPSEXTSND
+        arpsintrp.tar     Tar up files associated with ARPSINTRP
+        arpstintrp.tar    Tar up files associated with ARPSTINTRP
+        arpsplt.tar       Tar up files associated with ARPSPLT
+        arpsprt.tar       Tar up files associated with ARPSPRT
+        arpssfc.tar       Tar up files associated with ARPSSFC
+        arpssoil.tar      Tar up files associated with ARPSSOIL
+        arpstern.tar      Tar up files associated with ARPSTERN
+        arpstrn.tar       Tar up files associated with ARPSTRN
+        arpsverif.tar     Tar up files associated with ARPSVERIF
+        mergetrn.tar      Tar up files associated with MERGETRN
+
+        88d2arps.tar      Tar up files associated radar remap
+        ARPS2WRF.tar      Tar up files associated with ARPS2WRF
+        ext2arps.tar      Tar up files associated with EXT2ARPS
+        extract_avn.tar   Tar up files associated with EXTRACT_AVN
+        mci2arps.tar      Tar up files associated satellite data converter
+        wrf2arps.tar      Tar up files associated with WRF2ARPS
+        zxplot.tar        Tar up files associated with ZXPLOT
+
+        ossedata.tar      Tar up files associated with OSSEDATA
+        postinnov.tar     Tar up files associated with POSTINNOV
+        endgns.tar        Tar up files associated with ENPOSTPROC
+
+    Clean up object files:
+
+        clean             Delete all object, library and tar files
+        clean.exe         Delete all executables
+        clean.tar         Delete all tar files
+        clean.adas        Delete all object files related to ADAS
+        clean.arps3dvar   Delete all object files related to 3DVAR
+        clean.arpsenkf    Delete all object files related to EnKF
+        clean.arps        Delete all object files related to ARPS
+        clean.arps_mp     Delete all object files and temporary source
+                          files for the message passing verions of ARPS
+        clean.arpsagr     Delete all object files related to ARPS AGR
+        clean.arpsassim   Delete all object files related to ARPSASSIM
+        clean.arpscvt     Delete all object files related to ARPSCVT
+        clean.arpscvtobs  Delete all object files related to ARPSCVTOBS
+        clean.arpsmpbudget Delete all object files related to ARPSMPBUDGET
+        clean.arpsdiff    Delete all object files related to ARPSDIFf
+        clean.arpsextsnd  Delete all object files related to ARPSEXTSND
+        clean.arpsintrp   Delete all object files related to ARPSINTRP
+        clean.arpstintrp  Delete all object files related to ARPSTINTRP
+        clean.arpsplt     Delete all object files related to ARPSPLT
+        clean.arpsprt     Delete all object files related to ARPSPRT
+        clean.arpssfc     Delete all object files related to ARPSSFC
+        clean.arpssoil    Delete all object files related to ARPSSOIL
+        clean.arpstern    Delete all object files related to ARPSTERN
+        clean.arpstrn     Delete all object files related to ARPSTRN
+        clean.arpsverif   Delete all object files related to ARPSVERIF
+        clean.dirtern     Delete dir1deg.o dir5min.o dir30sec.o
+        clean.mergetrn    Delete all object files related to MERGETRN
+
+        clean.join        Delete all object files joinfile
+        clean.joins       Delete all object files joinfiles
+        clean.split       Delete all object files splitfiles
+        clean.splithdf    Delete all object files splithdf
+        clean.joinbin2hdf Delete all object files joinbin2hdf
+        clean.joinhdf     Delete all object files joinhdf
+        clean.mptrans     Delete all object files mptrans
+
+        clean.88d2arps    Delete all object files related to radar remap
+        clean.arps2wrf    Delete all object files related to ARPS2WRF
+        clean.mci2arps    Delete all object files related to mci2arps
+        clean.ext2arps    Delete all object files related to ext2arps
+        clean.extract_avn Delete all object files related to extract_avn
+        clean.wrf2arps    Delete all object files related to WRF2ARPS
+        clean.libzxpost   Delete all object files related to ZXPLOT
+        clean.libzxncar   Delete all object files related to ZXPLOT
+        clean.tmatrix     Delete all object files related to TMATRIX
+
+        clean.initensmbl  Delete all object files related to INITENSMBL
+        clean.ossedata    Delete all object files related to OSSEDATA
+        clean.obsstd      Delete all object files related to OBSSTD
+        clean.postinnov   Delete all object files related to POSTINNOV
+        clean.endgns      Delete all object files related to ENPOSTPROC
+
+Directory option:
+        -rd root_dir      Specify root_dir as ARPS root directory
+
+Compiler options (machine dependent):
+
+        -opt n            n = 0, 1, 2, or 3 for different optimization levels
+        -d                Turn on debug option, reset optimization level to 0
+        -p                parallel
+        -omp              Open MP parallel
+        -s                Performance statistics
+        -copt             Explicit compiler option
+        -inline           Inline small, frequently called routines
+        -f fort_cmp       Set the Fortran compiler.
+                          For example, on Linux with Portland Group fortran, use
+                          -f pgf90. f90 is default (ifc is default for linux).
+        -cc c_cmp         Set C compiler
+        -f90              Use f90 compiler (default)
+        -abi abi_opt      Use -"abi_opt" (64, n32, o32) default compile
+                          option on SGI
+        -l lib            Use "-l lib" when linking
+        -L linkdir        Use "-L linkdir" when linking
+        -x[KWNBP]         Specify the minimum set of processor extensions required.
+                          It applys only to ifc on Intel processors (P, PII, PIII and P4).
+        -nomainopt        Specify to compile several main programs & ZXPLOT librier, i.e.
+                          "adas", "arps", "ext2arps", "arpsplt", & "libzxpost", "libzxncar" etc.
+                          without optimization. ifc compiler version 5 has
+                          compile optimization problem for these programs.
+        -64               Generates 64-bit objects
+                          -64                 on SGI
+                          -q64=largetype      on AIX greater than or equal to 5.0
+        -dbl              Convert single-precision floating-point calculations to double-
+                          precision.
+
+History file (I/O) support:
+
+        -io opt1 [opt2 ...] where options are:
+
+            hdf           HDF, default
+            nohdf         No HDF
+            net           Link with netCDF library
+            hdfnet/nethdf Link with both HDF and netCDF libraries,
+                          Require HDF library to be compiled with macro "HAVE_NET".
+
+        -mp_inc incl_dir  MP include directory
+        -mp_lib lib_dir   MP library directory
+
+
+NCAR graphics plotting option:
+
+        -ncarg            NCAR graphics plotting for ARPSSFC and ARPSTERN
+                          default: no NCAR graphics plotting
+
+ZXPLOT graphics plotting option for ARPSTRN, MERGETRN, PLTGRID, ARPSPLTMAX,
+                                    ARPSENSCV, pltradcol, etc.:
+        -zxpost           Use ZXPLOT to produce Postscript output
+        -zxncar           Use ZXPLOT to produce ncar graphics output
+                          default: No graphics output for ARPSTRN.
+                                   PostScript output for others.
+
+Options passed to make:
+
+        -n                Displays commands, but does not run them.
+        -j nproc          Execute make in parallel
+        -P                Execute make in parallel (on SGI setenv PARALLEL
+                          to # processors).
+
+Misc. options:
+
+        -m mach           Force machine type mach (otherwise uses tcsh
+                          HOSTTYPE to get the machine type). Recognized
+                          machine types include:
+
+                            t3e  cray  hi-ux  iris4d  linux  rs6000  sun4
+
+                          If none of the above machines, default type unix
+                          is used.
+
+        -help             Print this helpful message
+
+END
+
+exit 1
+
+usage_end:
+
+#-----------------------------------------------------------------------
+#        Echo options
+#-----------------------------------------------------------------------
+
+echo Making $CMD for $mach
+echo " "
+
+if ($opt == 0) echo Compilation options: No optimization.
+if ($opt == 4) echo Compilation options: Default optimization options.
+if ($opt > 0 && $opt < 4) echo Compilation options: $opt
+if ($?dbg)  echo Compilation options: Debug.
+if ($?perf) echo Compilation options: Performance statistics
+if ($?par)  echo Compilation options: With automatic Parallelization.
+if ($CMD =~ *_mpi) echo "Compiling MPI (message passing) support for $CMD."
+
+if ($?lib_pak) then
+  echo Support for 16-bit packed integer I/O.
+  set PAK_str = 'PAKDEP=PAKOBJ_ON'
+  set DUMP_str = "$DUMP_str '$PAK_str'"
+endif
+#}
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+#= Section 3: Settings for external libraries
+#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#{
+
+#-----------------------------------------------------------------------
+# Specify NetCDF include and library location
+# ATTENDION: Do not change the order of this IF block with that for HDF.
+#-----------------------------------------------------------------------
+
+set INC_NET = ./
+set LIB_NET =
+
+if ($?lib_net) then
+  echo 'Support for netCDF I/O.'
+  set NET_str = 'NETDEP=NETOBJ_ON'
+  set DUMP_str = "$DUMP_str '$NET_str'"
+
+  switch ("$HOST")
+
+  case s10c2b*: IU Big Red
+    set INC_NET = "/N/u/tg-drlead/BigRed/libs/netcdf-4.0/include"
+    set LIB_NET = "-L/N/u/tg-drlead/BigRed/libs/netcdf-4.0/lib -lnetcdf"
+    breaksw
+
+  case modi*: # On  NCSA SGI O2K cluster
+  case aegir*:
+  case saga*:
+  case hod*:
+  case jord*:
+  case forseti*:
+  case balder*:
+  case mimir*:
+  case nerthus*:
+  case huldra*:
+  case eir*:
+    set INC_NET = "/usr/ncsa/include"
+    set LIB_NET = "-L/afs/ncsa.uiuc.edu/packages/netcdf/IRIX_6.4/lib -lnetcdf_n32"
+    breaksw
+
+  case rachel*:          # rachel.pcs.edu - HP Tru64
+  case carson*:
+    set INC_NET = "/usr/users/5/fkong/packages/netcdf-3.6.0-p1/include"
+    set LIB_NET = "-L/usr/users/5/fkong/packages/netcdf-3.6.0-p1/lib -lnetcdf"
+    breaksw
+
+  case co-login*:
+    set INC_NET = "/usr/apps/lib/netcdf/include"
+    set LIB_NET = "-L/usr/apps/lib/netcdf/lib -lnetcdf"
+    breaksw
+
+  case tun*:            # Tungsten on NCSA
+    set INC_NET = "/u/ac/yhwang/tools/netcdf/include"
+    set LIB_NET = "-L/u/ac/yhwang/tools/netcdf/lib -lnetcdf"
+    breaksw
+
+  case herbie.psc.edu:  # Herbie on PSC
+  case *blacklight*:
+    set LIB_NET = "-L/usr/local/packages/netcdf-3.6.2/gcc/lib -lnetcdf"
+    set INC_NET = "/usr/local/packages/netcdf-3.6.2/gcc/include"
+    #set INC_NET = "/usr/local/apps/netcdf3.6.0-p1/include"
+    #set LIB_NET = "-L/usr/local/apps/netcdf3.6.0-p1/lib -lnetcdf"
+    breaksw
+
+  case tg-login*:      # Mercury on NCSA
+    set INC_NET = "/home/ac/yhwang/tools/netcdf/include"
+    set LIB_NET = "-L/home/ac/yhwang/tools/netcdf/lib -lnetcdf"
+    breaksw
+
+  case kraken*:         # Kraken on NICS
+  case darter*:
+    set INC_NET = "$NETCDF/include"
+    set LIB_NET = "-L$NETCDF/lib -L$HDF5_DIR/lib -lnetcdf"
+    breaksw
+
+  case boomer*:         # OSCER new boomer on 2012
+    if ( ! $?NETCDF) set NETCDF = '/home/ywang/tools/netcdf'
+    set INC_NET = "$NETCDF/include"
+    set LIB_NET = "-L$NETCDF/lib -Bstatic -lnetcdff -lnetcdf -Bdynamic -lcurl"
+    breaksw
+
+  case ds*:             # Datastar on SDSC
+    set INC_NET = "/usr/local/apps/netcdf3.6.0-p1/include"
+    set LIB_NET = "-L/usr/local/apps/netcdf3.6.0-p1/lib -lnetcdf"
+    breaksw
+
+  case *stampede*:      # TACC stampede
+    if ( ! $?TACC_NETCDF_DIR) then
+      echo "Please load module hdf5 and netcdf first." 
+      exit 
+    endif
+    set INC_NET = "$TACC_NETCDF_INC"
+    set LIB_NET = "-L$TACC_NETCDF_LIB -lnetcdf -L$TACC_HDF5_LIB -lhdf5_hl -lhdf5"
+    breaksw
+
+  #case gordon*:        # gordon.sdsc.edu
+  #  set INC_NET = "$NETCDFHOME/include"
+  #  set LIB_NET = "-L$NETCDFHOME/lib -lnetcdf"
+  #  breaksw
+
+  default:
+    if (! $?NETCDF ) setenv NETCDF "/usr/local/netcdf"
+
+    if ( -r $NETCDF/lib/libnetcdff.a ) then       # new version later than 4.0
+      set INC_NET = "$NETCDF/include"
+      set LIB_NET = "-L$NETCDF/lib -lnetcdff"
+    else if ( -r $NETCDF/lib/libnetcdf.a ) then  # to be compatible with old version
+      set INC_NET = "$NETCDF/include"
+      set LIB_NET = "-L$NETCDF/lib -lnetcdf"
+    else
+      echo ' '
+      echo "WARNING: NetCDF library is required for '$CMD' and it is not found in the default"
+      echo "         location 'NETCDF = $NETCDF'. Please install netCDF package, "
+      echo "         define environment variable 'NETCDF' to be the top directory of "
+      echo "         the installed netCDF package and try again."
+      echo ' '
+      exit
+    endif
+    breaksw
+  endsw
+
+  endsw
+
+  set LIBS = "$LIBS $LIB_NET"
+  set FFLAGS0 = "$FFLAGS0 -I$INC_NET"
+  set CFLAGS0 = "$CFLAGS0 -I$INC_NET"
+
+endif
+
+if ($?lib_svi) then
+  echo Support for savi3D I/O.
+  set SVI_str = 'SVIDEP=SVIOBJ_ON'
+  set DUMP_str = "$DUMP_str '$SVI_str'"
+  set LIBS = "$LIBS -munch /usr/local/MeRAF/bin -start /usr/local/MeRAF/lib -L/usr/local/MeRAF/lib -lMERAF -lnetcdf -lCns -lssC -L/usr/lib -lxlf "
+endif
+
+if ($?v5dio) then
+  set V5D_str = 'V5DDEP=V5DOBJ_ON'
+  set DUMP_str = "$DUMP_str '$V5D_str'"
+endif
+
+#
+#-----------------------------------------------------------------------
+# Specify HDF library link string and include directory location
+# for various systems
+#-----------------------------------------------------------------------
+#
+
+set LIB_HDF =
+set INC_HDF = ./
+
+if ($?lib_hdf) then
+  echo Support for HDF I/O.
+  switch ("$CMD")
+    case splitfiles*:
+      set HDF_str = 'HDFDEP=HDFSPLITOBJ_ON'
+      breaksw
+    case joinfile*:
+      set HDF_str = 'HDFDEP=HDFJOINOBJ_ON'
+      breaksw
+    case splitany*:
+      set HDF_str = 'HDFDEP=HDFSPLITANY_ON'
+      breaksw
+    default:
+      set HDF_str = 'HDFDEP=HDFOBJ_ON'
+  endsw
+
+  if (! $?hdfnet) unset lib_net # HDF library includes NetCDF library
+                               # well, not completely - some of them which
+                               # causes double definition fault
+
+  set DUMP_str = "$DUMP_str '$HDF_str'"
+
+  switch ("$HOST")
+
+  case squall*: # WDT 1450 4 proc Linux cluster
+    set LIB_HDF = "-L/usr/local/hdf_absoft/lib -lmfhdf -ldf -ljpeg -lz"
+    set INC_HDF = "/usr/local/hdf_absoft/include"
+    breaksw
+
+  case modi*:            # On  NCSA SGI O2K cluster
+  case aegir*:
+  case saga*:
+  case hod*:
+  case jord*:
+  case forseti*:
+  case balder*:
+  case mimir*:
+  case nerthus*:
+  case huldra*:
+  case eir*:
+    set LIB_HDF = "-L/afs/ncsa.uiuc.edu/packages/hdf/4.1r3_irix64-n32/lib -ldf -lmfhdf -lz -ljpeg"
+    set INC_HDF = "/usr/ncsa/include"
+    breaksw
+
+  case tun*:        # Tungsten on NCSA
+    set LIB_HDF = "-L/usr/apps/hdf/lib -lmfhdf -ldf -lz -L/u/ncsa/slu/HDF/jpeg_lib/lib -ljpeg -L/u/ncsa/slu/HDF/szip_lib/lib -lsz"
+    set INC_HDF = "/usr/apps/hdf/include"
+    breaksw
+
+  case co-login*:   # SGI Altix Itanium 2 cluster at NCSA
+    set LIB_HDF = "-L/usr/apps/hdf4/HDF4.2r1/lib -lmfhdf -ldf -L/usr/lib -ljpeg -lz"
+    set INC_HDF = "/usr/apps/hdf4/HDF4.2r1/include"
+    breaksw
+
+  case rachel*:     # PSC HP Alphaserver Cluster - Rachel
+  case carson*:     # Rachel compute nodes
+    set LIB_HDF = "-L/usr/local/packages/hdf/lib -L/usr/local/packages/jpeg/lib -L/usr/local/packages/szip/lib -lmfhdf -ldf -lz -lsz -noso -ljpeg -so_archive"
+    set INC_HDF = "/usr/local/packages/hdf4-2.0/include"
+    breaksw
+  case *blacklight*:     # Blacklight
+  case herbie.psc.edu:
+    set LIB_HDF = "-L/usr/local/packages/HDF4.2r1-disable_netcdf/lib -L/usr/local/packages/jpeg/lib -L/usr/local/packages/szip/lib -lmfhdf -ldf -lz -lsz -ljpeg"
+    set INC_HDF = "/usr/local/packages/HDF4.2r1-disable_netcdf/include"
+    breaksw
+
+  case tg-login*:   # IBM Itanium 2 cluster (mercury) at NCSA
+    set LIB_HDF = "-L/usr/local/hdf4/4.2r2/lib -lmfhdf -ldf -L/usr/lib -ljpeg -lz"
+    set INC_HDF = "/usr/local/hdf4/4.2r2/include"
+    breaksw
+
+  case ds*:             # Datastar on San Diego SC
+    set LIB_HDF = "-L/usr/local/apps/hdf4/lib -lmfhdf -ldf -lz -ljpeg -lsz"
+    set INC_HDF = "/usr/local/apps/hdf4/include"
+    breaksw
+
+  case boomer*:         # OSCER new boomer
+    if ( ! $?HDFPATH ) set HDFPATH = '/home/ywang/tools/hdf'
+    set LIB_HDF = "-L$HDFPATH/lib -lmfhdf -ldf -lz -ljpeg"
+    set INC_HDF = "$HDFPATH/include"
+    breaksw
+
+  case Rei-Note*:         # gordon.sdsc.edu
+    set LIB_HDF = "-L/usr/lib -lmfhdf -ldf -lz -ljpeg"
+    set INC_HDF = "/usr/include/hdf"
+    breaksw
+
+  case origin:          # NSSL machine used by Jidong
+    set LIB_HDF = "-L/home/Jidong.Gao/tools/HDF4.2r4/lib -lmfhdf -ldf -lz -ljpeg"
+    set INC_HDF = "/home/Jidong.Gao/tools/HDF4.2r4/include"
+    breaksw
+
+  case dawson*:        # Dan Dawson's NSSL Intel Mac Pro
+    set LIB_HDF = "-L$HDFPATH/lib -lmfhdf -ldf -lz -L/Users/ddawson/jpeg/lib -ljpeg"
+    set INC_HDF = "$HDFPATH/include"
+    breaksw
+
+  default:
+    if (! $?HDFPATH) setenv HDFPATH "/usr/local/hdf"
+
+    if ( -r $HDFPATH/include/hdf.f90 ) then
+      set LIB_HDF = "-L$HDFPATH/lib -lmfhdf -ldf -lz -ljpeg"
+      set INC_HDF = "$HDFPATH/include"
+    else
+      set nohdfstr = `echo $argvsaved | sed 's/-io hdf//'`
+      echo ' '
+      echo "WARNING: HDF library is required for '$CMD' and it is not found in the default"
+      echo "         location '$HDFPATH'. Please install HDF library, define environment"
+      echo "         variable 'HDFPATH' to be the root of the installed HDF package"
+      echo "         and try again."
+      echo " "
+      echo "         If you do not want to use HDF data format, please try option '-io nohdf'"
+      echo "         For example:"
+      echo "                       ./makearps -io nohdf $nohdfstr"
+      echo ' '
+      exit
+    endif
+
+    breaksw
+
+  endsw
+
+  set LIBS = "$LIBS $LIB_HDF"
+  set FFLAGS0 = "$FFLAGS0 -I$INC_HDF"
+  set CFLAGS0 = "$CFLAGS0 -I$INC_HDF"
+
+endif
+
+#
+#-----------------------------------------------------------------------
+# Specify HDF5 library link string and include directory location
+# for various systems
+#-----------------------------------------------------------------------
+#
+
+set LIB_HDF5 =
+set INC_HDF5 =
+
+if ($?lib_hdf5) then
+  switch ("$HOST")
+  case stratus.caps.ou.edu:
+  case cirrus.caps.ou.edu:
+  case vortex.caps.ou.edu:
+  case thunder.caps.ou.edu:
+    switch ("$fort_cmp")
+    case ifort:
+      set MPI_COMPILER=intel
+      breaksw
+    case pgf90:
+    case pgf95:
+    case pgfortran:
+    case openf90:
+    case openf95:
+      set MPI_COMPILER=pgi
+      breaksw
+    default:
+      echo ' '
+      echo "WARNING: HDF5 library is still no installed for '$fort_cmp' on CAPS cluster."
+      echo " "
+      exit
+    endsw
+    set LIB_HDF5 = "-L$HDF5PATH-$MPI_COMPILER/lib -lhdf5_fortran -lhdf5 -lz"
+    set INC_HDF5 = "$HDF5PATH-$MPI_COMPILER/include"
+    breaksw
+  default:
+    if (! $?HDF5PATH) setenv HDF5PATH "/usr/local/hdf5"
+
+    if ( -r $HDF5PATH/include/hdf5.mod ) then
+      set LIB_HDF5 = "-L$HDF5PATH/lib -lhdf5_fortran -lhdf5 -lz"
+      set INC_HDF5 = "$HDF5PATH/include"
+    else
+      echo ' '
+      echo "WARNING: HDF5 library is required for '$CMD' and it is not found in the default"
+      echo "         location '$HDF5PATH'. Please install HDF5 library, define environment"
+      echo "         variable 'HDF5PATH' to be the root of the installed HDF5 package"
+      echo "         and try again."
+      echo " "
+      exit
+    endif
+
+    breaksw
+  endsw
+
+  set LIBS = "$LIBS $LIB_HDF5"
+  set FFLAGS0 = "$FFLAGS0 -I$INC_HDF5"
+  set CFLAGS0 = "$CFLAGS0 -I$INC_HDF5"
+endif
+
+set LIB_PHDF5 =
+set INC_PHDF5 =
+
+if ($?lib_phdf5) then
+
+  if ($?mp_opt) then    # parallel version only
+
+    switch ("$HOST")
+    #case sooner*:        # sooner.oscer.ou.edu
+    #  set PHDF5PATH = "/home/ywang/tools/HDF5-1.6.3-pp"
+    #  set LIB_PHDF5 = "-L$TOPDIR/lib -lwrfio_phdf5"
+    #  set LIB_PHDF5 = "$LIB_PHDF5 -L$PHDF5PATH/lib -lhdf5_fortran -lhdf5 -lm -lz -lsz"
+    #  set thread_safe
+    #  breaksw
+    case ds*:        # Datastar at San Diego SC
+      #set PHDF5PATH = '/usr/local/apps/hdf5-1.6.4-aix-64pp'
+      set PHDF5PATH = "/usr/local/apps/hdf/5-1.6.3-aix5.2-64pp"
+      set LIB_PHDF5 = "-L$TOPDIR/lib -lwrfio_phdf5"
+      set LIB_PHDF5 = "$LIB_PHDF5 -L$PHDF5PATH/lib -lhdf5_fortran -lhdf5 -lm -lz"
+      set LIB_PHDF5 = "$LIB_PHDF5 -L/usr/local/apps/hdf/szip-aix5.1-64/lib -lsz"
+      set thread_safe
+      breaksw
+    default:
+      goto phdf5_break
+      breaksw
+    endsw
+
+    echo "Support for PHDF5 I/O."
+
+    set LIBS = "$LIBS $LIB_PHDF5"
+    set DUMP_str = "$DUMP_str 'PHDF5DEP=PHDF5OBJ_ON' 'PHDF5PATH=$PHDF5PATH'"
+    set DUMP_str = "$DUMP_str 'LIBPHDF5_DEP=libwrfio_phdf5'"
+
+  endif
+
+endif
+
+phdf5_break:
+
+#
+#-----------------------------------------------------------------------
+# Specify GRIB2 library link string and include directory location
+# for various systems
+#-----------------------------------------------------------------------
+#
+
+if ($?lib_grb2) then
+
+  set CPPFLAG = "$CPPFLAG -DUSE_PNG -DUSE_JPEG2000"
+  set DUMP_str = "$DUMP_str 'GRIB2DEP=GRIB2_ON'"
+
+  switch($HOST)
+
+  case s10c2b*: IU Big Red
+    set CFLAGS0 = "$CFLAGS0 -I/N/u/tg-drlead/BigRed/libs/jasper-1.900.1/include"
+    set CFLAGS0 = "$CFLAGS0 -I/N/u/tg-drlead/BigRed/libs/libpng-1.2.34/include"
+    set LIBS = "$LIBS -L$TOPDIR/lib -lg2"
+    set LIBS = "$LIBS -L/N/u/tg-drlead/BigRed/libs/jasper-1.900.1/lib -ljasper"
+    set LIBS = "$LIBS -L/N/u/tg-drlead/BigRed/libs/libpng-1.2.34/lib -lpng"
+    breaksw
+
+  case *blacklight*:
+  case herbie.psc.edu:
+    set CFLAGS0 = "$CFLAGS0 -I/usr/users/0/ywangc/tools/jasper/include"
+    set LIBS = "$LIBS -L$TOPDIR/lib -lg2"
+    set LIBS = "$LIBS -L/usr/users/0/ywangc/tools/jasper/lib -ljasper"
+    set LIBS = "$LIBS -lpng"
+    breaksw
+
+  case boomer*:
+    set CFLAGS0 = "$CFLAGS0 -I/home/ywang/tools/jasper/include"
+    set LIBS = "$LIBS -L$TOPDIR/lib -lg2 -lpng -L/home/ywang/tools/jasper/lib -ljasper"
+    breaksw
+
+  #case kraken*:
+  #  set LIBS = "$LIBS -L$TOPDIR/lib -lg2 -ljasper -lpng"
+  #  breaksw
+
+  default:
+    set JASPER='/home/haas/WRF/Library/'
+    set PNGPATH='/home/haas/WRF/Library/'
+    set PNGLIBPATH="$PNGPATH/lib"
+    set PNGINCPATH="$PNGPATH/include"
+
+    if (-r $JASPER/lib/libjasper.a && (-r $PNGLIBPATH/libpng.so.3 || -r $PNGLIBPATH/libpng.a) ) then
+      set CFLAGS0 = "$CFLAGS0 -I$JASPER/include -I$PNGINCPATH"
+      set LIBS = "$LIBS -L$TOPDIR/lib -lg2"
+      set LIBS = "$LIBS -L$JASPER/lib -ljasper"
+      set LIBS = "$LIBS -L$PNGLIBPATH -lpng"
+    else
+      set nogrbstr = `echo $argvsaved | sed 's/-io grib2//'`
+      echo ""
+      echo "WARNING: NCEP GRIB2 library requires external libraries PNG and JPEG2000."
+      echo "         Please specify the right directories in makearps for host - '$HOST'"
+      echo "         or set correct environment variables JASPER and PNGPATH or PNGLIBPATH"
+      echo "         Read src/external/g2lib/README for more details."
+      echo ""
+      echo "         If you do not plan to decode GRIB2 data, please try option '-io nogrib2'"
+      echo "         For example:"
+      echo "                       ./makearps -io nogrib2 $nogrbstr"
+      echo ' '
+      exit
+    endif
+    breaksw
+  endsw
+
+  echo Support for GRIBV2 I/O
+
+endif
+
+#----------------------------------------------------------------------
+#
+# Set NCARG graphic support
+#
+#----------------------------------------------------------------------
+
+set LIB_NCARG =
+
+if ($?lib_ncarg) then
+  echo Support for NCARG.
+
+  switch ("$HOST")
+
+  case sooner*:                # sooner.oscer.ou.edu
+    set LIB_NCARG = "-L/home/arps/soft64/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11 -L/home/arps/lib -lgfortran"
+    breaksw
+
+  case boomer*:                # new boomer
+    if (! $?NCARG_ROOT ) setenv NCARG_ROOT "/home/ywang/tools/ncarg"
+    set LIB_NCARG = "-L$NCARG_ROOT/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lgfortran -lpng"
+    breaksw
+
+  case rachel*:   # rachel.psc.edu
+    set LIB_NCARG = "-L/usr/local/packages/ncarg/lib -lncarg -lncarg_gks -lncarg_c"
+    set LIB_NCARG = "$LIB_NCARG -L/usr/X11R6/lib -lX11"
+    breaksw
+
+  case tun*.ncsa.uiuc.edu:      # Xeon Linux Cluster tungsten.ncsa.uiuc.edu
+  case co-login?.ncsa.uiuc.edu: # NCSA cobalt cluster
+    set LIB_NCARG = "-L/u/ac/yhwang/tools/ncarg-4.4.1/lib -lncarg -lncarg_gks -lncarg_c"
+    set LIB_NCARG = "$LIB_NCARG -L/usr/X11R6/lib -lX11"
+    breaksw
+
+  case tg-login*:        # IBM Itanium 2 cluster (mercury) at NCSA
+    set LIB_NCARG = "-L/usr/local/packages/ncarg-4.4.1/lib -lncarg -lncarg_gks -lncarg_c"
+    set LIB_NCARG = "$LIB_NCARG -lX11"
+    breaksw
+
+  case ds*:                     # Datastar at San Diego SC
+    set LIB_NCARG = "-L/usr/local/apps/ncarg/lib -lncarg -lncarg_gks -lncarg_c"
+    set LIB_NCARG = "$LIB_NCARG -L/usr/X11R6/lib -lX11"
+    breaksw
+
+  case kraken*:
+  case darter*:
+    set LIB_NCARG = "-L$NCARG_ROOT/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lxcb-xlib -lxcb -lXau -ldl"
+    breaksw
+
+
+  case stratus.caps.ou.edu:
+  case cirrus.caps.ou.edu:
+  case vortex.caps.ou.edu:
+  case thunder.caps.ou.edu:
+  case cyclone.caps.ou.edu:
+  case tornado.caps.ou.edu:
+    set LIB_NCARG = "-L/usr/local/ncl_5.1.1/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11 -lgfortran -lpng"
+    breaksw
+
+  case *stampede*:    # TACC Stampede.tacc.utexas.edu
+    set LIB_NCARG = "-L/work/00315/tg455890/tools/ncl-6.1.0/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lgfortran"
+    breaksw
+
+  case origin:    # NSSL machine used by Jidong
+    set LIB_NCARG = "-L/usr/local/ncl_ncarg-5.0.0/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib -lX11 -L$HOME/lib -lgfortran"
+    breaksw
+
+  default:
+    if (! $?NCARG_ROOT ) setenv NCARG_ROOT "/usr/local/ncarg"
+
+    if ( -r $NCARG_ROOT/lib/libncarg.a ) then
+      if ( -d /usr/X11R6/lib64 ) then
+        set LIB_NCARG = "-L$NCARG_ROOT/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib64 -lX11"
+      else if ( -d /usr/X11R6/lib ) then  ## Darwin
+        set LIB_NCARG = "-L$NCARG_ROOT/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib -lX11 -lcairo -lfreetype"
+      else if ( -f /usr/lib64/libX11.so ) then
+        set LIB_NCARG = "-L$NCARG_ROOT/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lgfortran"
+      else if ( -f /lib/libX11.dll.a ) then  ## cygwin with NCARG6.1.2
+        set LIB_NCARG = "-L$NCARG_ROOT/lib -lncarg -lncarg_gks -lncarg_c -lX11 -lgfortran -lcairo -lfreetype"
+      else
+        echo ' '
+        echo "WARNING: Command '$CMD' requires a link with NCARG package that requies X11 shared library."
+        echo "         But, it is not found in either /usr/X11R6/lib64 or /usr/X11R6/lib. "
+        echo "         Please check with your system administrator and try again."
+        echo ' '
+        exit
+      endif
+    else
+      echo ' '
+      echo "WARNING: NCARG package is required for '$CMD' and it is not found in the default"
+      echo "         location 'NCARG_ROOT = $NCARG_ROOT'. Please install NCARG package, "
+      echo "         define environment variable 'NCARG_ROOT' to be the top directory of "
+      echo "         the installed NCARG package and try again."
+      echo ' '
+      exit
+    endif
+
+    breaksw
+  endsw
+
+  set LIBS = "$LIBS $LIB_NCARG"
+
+endif
+
+#-----------------------------------------------------------------------
+# set up GEMPAK support
+#-----------------------------------------------------------------------
+
+if ($?lib_gempak) then
+  set DUMP_str = "$DUMP_str 'GEMDEP=GEMOBJ_ON'"
+
+  unset lib_grb2        # We do not want to link with GRIB2 library again
+
+  switch ("$HOST")
+    case stratus.caps.ou.edu:
+    case cirrus.caps.ou.edu:
+    case thunder.caps.ou.edu:
+    case vortex.caps.ou.edu:
+      if (! $?NAWIPS) then
+        setenv NAWIPS /usr/local/GEMPAK6.4.0
+        source $NAWIPS/Gemenviron
+      endif
+      #set INC_str = "INCFILE=$NAWIPS/config/Makeinc.common"
+      set LIBS = "${OS_LIB}/gemlib.a ${OS_LIB}/textlib.a ${OS_LIB}/appl.a ${OS_LIB}/syslib.a ${OS_LIB}/cgemlib.a ${OS_LIB}/libxslt.a ${OS_LIB}/libxml2.a ${OS_LIB}/libz.a $LIBS -L/usr/local/gcc-4.3.2/lib64 -lgfortran"
+      breaksw
+
+    case boomer*:         # New boomer
+      if (! $?NAWIPS) then
+        setenv NAWIPS "/home/ywang/tools/gempak"
+        source $NAWIPS/Gemenviron
+      endif
+      #set INC_str = "INCFILE=$NAWIPS/config/Makeinc.common"
+      set LIBS = "${OS_LIB}/gemlib.a ${OS_LIB}/textlib.a ${OS_LIB}/appl.a ${OS_LIB}/syslib.a ${OS_LIB}/cgemlib.a ${OS_LIB}/libxslt.a ${OS_LIB}/libxml2.a ${OS_LIB}/libz.a $LIBS -lgfortran"
+      breaksw
+
+    case *stampede*:         # Stampede
+      if (! $?NAWIPS) then
+        setenv NAWIPS "/home1/00315/tg455890/temp/GEMPAK6.7.0"
+        source $NAWIPS/Gemenviron
+      endif
+      #set INC_str = "INCFILE=$NAWIPS/config/Makeinc.common"
+      set LIBS = "${OS_LIB}/gemlib.a ${OS_LIB}/textlib.a ${OS_LIB}/appl.a ${OS_LIB}/syslib.a ${OS_LIB}/cgemlib.a -L${OS_LIB} -lxslt $LIBS -lgfortran"
+      breaksw
+
+    case darter*:
+      source $NAWIPS/Gemenviron
+      #set INC_str = "INCFILE=$NAWIPS/config/Makeinc.common"
+      set LIBS = "${OS_LIB}/gemlib.a ${OS_LIB}/textlib.a ${OS_LIB}/appl.a ${OS_LIB}/syslib.a ${OS_LIB}/cgemlib.a -L${OS_LIB} -lxslt -lxml2 $LIBS -L/opt/gcc/4.7.2/snos/lib64 -lgfortran"
+      breaksw
+
+    default:
+      if (! $?NAWIPS) setenv NAWIPS /usr/local/gempak
+
+      if ( -r $NAWIPS/Gemenviron) then
+        source $NAWIPS/Gemenviron
+        #set INC_str = "INCFILE=$NAWIPS/config/Makeinc.common"
+        set LIBS = "${OS_LIB}/gemlib.a ${OS_LIB}/textlib.a ${OS_LIB}/appl.a ${OS_LIB}/syslib.a ${OS_LIB}/cgemlib.a -L${OS_LIB} -lxslt $LIBS -lgfortran"
+      else
+        set nogemstr = `echo $argvsaved | sed 's/-io gempak//'`
+        echo ' '
+        echo "WARNING: GEMPAK library is required for '$CMD' and it is not found in the default"
+        echo "         location '$NAWIPS'. Please install GEMPAK pakcage first, then soure its"
+        echo "         environment as directed in the GEMPAK install instructions"
+        echo " "
+        echo "         For csh/tcsh:"
+        echo "            source GEMPAK_INSTALL_DIRECTORY/Gemenviron"
+        echo " "
+        echo "         For sh/bash/ksk etc:"
+        echo "            . GEMPAK_INSTALL_DIRECTORY/Gemenviron.profile"
+        echo " "
+        echo "         If you do not want to use GEMPAK data format, please try option '-io nogempak'"
+        echo "         For example:"
+        echo "                       ./makearps -io nogempak $nogemstr"
+        echo ' '
+        exit
+      endif
+    endsw
+
+  echo "Support for GEMPAK (using $NAWIPS)."
+else
+  unsetenv GEMLIB
+  set DUMP_str = "$DUMP_str 'GEMDEP=GEMOBJ_OFF'"
+endif
+
+#-----------------------------------------------------------------------
+# Specify LAPACK library
+#-----------------------------------------------------------------------
+
+if ($?lib_lapack) then
+  echo 'Support for LAPACK/BLAS.'
+  switch ("$HOST")
+    case *blacklight*:   # Blacklight
+    case herbie.psc.edu:
+      set LAPACK = "/usr/local/packages/lapack-3.2.2"
+      set LIBS = "$LAPACK/lib/lapack_LINUX.a $LAPACK/lib/blas_LINUX.a $LIBS -lgfortran"
+      breaksw
+    default
+      #set LAPACK = "/usr"
+      if ( "$fort_cmp" == "ifort" ) then
+        set LIBS = "$LIBS -mkl"
+      else
+        set LIBS = "$LIBS -llapack -lblas"
+      endif
+      breaksw
+  endsw
+endif
+
+#-----------------------------------------------------------------------
+# Specify LIBBZ2 library
+#-----------------------------------------------------------------------
+
+if ($?lib_bz2) then
+
+   switch ("$HOST")    # set location for bzip2 library
+
+    case dawson.local:
+      set CFLAGS0 = "$CFLAGS0 -I/usr/include -I/usr/include/malloc"
+      set LIBS    = "$LIBS -L/usr/lib -lbz2"
+      breaksw
+
+    case darter*:
+      set LIBS    = "$LIBS -L/opt/xc-sysroot/5.0.15/lib64 -lbz2"
+      breaksw
+
+    default:
+      if (! $?BZ2PATH ) setenv BZ2PATH "/usr"
+
+      #if( $?obj_64 ) then
+        set bz2lib = "$BZ2PATH/lib64"
+      #else
+      #  set bz2lib = "$BZ2PATH/lib"
+      #endif
+
+      if ( -r $bz2lib/libbz2.a || -r $bz2lib/libbz2.so ) then
+        set CFLAGS0="$CFLAGS0 -I$BZ2PATH/include"
+        set LIBS = "$LIBS -L$bz2lib -lbz2"
+      else
+        echo ' '
+        echo "WARNING: BZ2 library is required for '$CMD' and it is not found in the default"
+        echo "         location 'BZ2PATH = $BZ2PATH' and 'bz2lib = $bz2lib'. Please install "
+        echo "         BZ2 package, define environment variable 'BZ2PATH' to be the top "
+        echo "         directory of the installed BZ2 package and try again."
+        echo ' '
+        exit
+      endif
+      breaksw
+   endsw
+endif
+
+#-----------------------------------------------------------------------
+# Specify CRTM library
+#-----------------------------------------------------------------------
+
+if ($?lib_crtm) then
+  echo 'Support for CRTM output.'
+
+  set CRTM_str = 'CRTMDEP=CRTM_ON'
+  set DUMP_str = "$DUMP_str '$CRTM_str'"
+
+  if ( ! $?CRTM_PATH ) then
+    switch ("$HOST")
+      case kraken*:   # kraken
+        set CRTM_PATH = "/nics/a/proj/caps/fykong/kraken/CRTM_2.0.5_pgi"
+        breaksw
+      case darter*:
+        set CRTM_PATH = "/nics/a/proj/caps/ywang/CRTM_2.0.5_intel"
+        breaksw
+      case boomer*:
+        set CRTM_PATH = "/home/ywang/CRTM_2.0.5_$fort_cmp"
+        breaksw
+      case stratus.caps.ou.edu:
+      case cirrus.caps.ou.edu:
+      case vortex.caps.ou.edu:
+        # PGI version 6.1 by Michael Hernandez
+        #set CRTM_PATH = "/data6/mhern/CRTM/REL-2.0.4-p1"
+
+        # PGI version 11.8 by Y. Wang.
+        set CRTM_PATH = "/data3/ywang/CRTM_2.0.5_pgi"
+        breaksw
+      default
+        echo ' '
+        echo "WARNING: CRTM library is required for '$CMD'."
+        echo '         makearps cannot find libCRTM.a on $HOST.'
+        exit
+        breaksw
+    endsw
+  endif
+
+  set FFLAGS0 = "$FFLAGS0 -I${CRTM_PATH}/include"
+  set LIBS    = "$LIBS -L${CRTM_PATH}/lib -lCRTM"
+
+endif
+
+#-----------------------------------------------------------------------
+# Specify CITM library
+#-----------------------------------------------------------------------
+
+if ($?lib_citm) then
+  echo 'Support for CITM output.'
+
+  set CITM_str = 'CITMDEP=CITM_ON'
+  set DUMP_str = "$DUMP_str '$CITM_str'"
+
+  if ( ! $?CITM_PATH ) then
+    switch ("$HOST")
+      case kraken*:   # kraken
+        set CITM_PATH = '/nics/a/proj/caps/fykong/kraken'
+        breaksw
+      default
+        echo ' '
+        echo "WARNING: CITM library is only supported on Kraken at present."
+        exit
+        breaksw
+    endsw
+  endif
+
+  set LIBS    = "$LIBS -L${CITM_PATH}/lib -lcirartm"
+
+endif
+
+#-----------------------------------------------------------------------
+# set up MPI support
+#-----------------------------------------------------------------------
+
+if ( $?mp_opt ) then
+
+  echo Setting mpi inc and lib options
+
+  switch ("$HOST") # Specify MPI include file and library
+                   # locations based on host
+
+#      case h2:     # Mac OS X Va Tech System X cluster
+#        set mpi_inc = /nfs/compilers/mpich-1.2.5/include
+#        set mpi_lib = /nfs/compilers/mpich-1.2.5/lib
+#        breaksw
+
+      case *ecas*: # The following sets are based on ECAS workstations setup
+
+        set mpi_inc = /usr/local/mpp/include
+        set mpi_lib = /usr/local/mpp/lib
+        breaksw
+
+      case *nec*:  # The following sets are based on NEC Super Computer setup
+
+        set mpi_inc = /usr/include
+        set mpi_lib = /usr/opt/mpisx/r91/usr/lib0/mpi
+        breaksw
+
+      case squall*: # WDT 1450 4 proc Linux cluster
+
+        # compile with mpich_1223
+        set mpi_inc = /usr/local/mpich_1223/include
+        set mpi_lib = /usr/local/mpich_1223/lib
+        breaksw
+
+      case some_machine:
+
+        set mpi_inc = /usr/local/mpich/include
+        set mpi_lib = /usr/local/mpich/lib
+        breaksw
+
+      case *tasc*:      # From Eric Kemp on Compaq Alpha server with
+                        # LAM 6.5.6/MPI implementation at TASC
+        set mpi_lib = /usr/local/lam/lib
+        set mpi_lib = "$mpi_lib -llammpi++ -llampio -lpmpi -llamf77mpi -lmpi -llam"
+        breaksw
+
+      case chaos*: # WDT chaos Linux cluster
+        set mpi_inc = /usr/include
+        set mpi_lib = /usr/lib
+        breaksw
+
+      default:
+        unset mpi_inc
+        unset mpi_lib
+        breaksw
+
+    endsw
+
+    set MPI_str = 'MPIDEP=MPIOBJ_ON'
+    set MP_str  = "$MP_str '$MPI_str'"
+
+    if ( $?mpi_inc ) then
+      set mp_inc = "$mpi_inc"
+    endif
+
+    if ( $?mpi_lib ) then
+      set mp_lib = "$mpi_lib"
+    endif
+
+endif
+
+#-----------------------------------------------------------------------
+# GrADS is automatically supported
+#-----------------------------------------------------------------------
+
+echo Support for IEEE 32-bit I/O.
+echo Support for GrADS I/O.
+
+echo " "
+
+#-----------------------------------------------------------------------
+# Machine-dependent interpretation
+#-----------------------------------------------------------------------
+
+set MACH_str = 'MACHDEPLIB=GENLIBOBJ'
+
+#}
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+#= Section 4: Settings based on architecture and compiler
+#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#{
+
+#----------------------------------------------------------------------
+#
+# Automatically recognize processor type for Linux machine if proc_type
+# is not specified.
+#
+#----------------------------------------------------------------------
+
+if ($mach == linux && (! $?proc_type)) then
+
+  switch ($HOST)
+  case kraken*:
+  case darter*:
+    set fort_cmp_wrapper = "ftn"
+    set proc_type = "-target=linux"
+    set obj_64
+    breaksw
+  case sooner.oscer*:
+    set proc_type = "core2"
+    set obj_64
+    breaksw
+
+  default:           # Do not know host type, try to read file /proc/cpuinfo
+
+    set archname = `awk -F: '/arch/{print $2;exit}' /proc/cpuinfo`
+
+    switch ("$archname")
+    case *IA-64*:
+      if ($fort_cmp == "ifc") set fort_cmp = "efc"
+      set procname = `awk -F: '/family/{print $2;exit}' /proc/cpuinfo`
+      breaksw
+    case *IA-32*:
+      set procname = `awk -F: '/model name/{print $2;exit}' /proc/cpuinfo`
+      breaksw
+    default:
+      set archname = `uname -m`
+      set procname = `awk -F: '/model name/{print $2;exit}' /proc/cpuinfo`
+      breaksw
+    endsw
+
+    #echo "arch = $archname"
+    #echo "proc = $procname"
+
+    switch ("$procname")
+    case *Core(TM)2 Quad*:
+    case *Core(TM)2 Dual*:
+      set obj_64
+      set proc_type = "core2"
+      breaksw
+    case *Xeon*:
+    case *XEON*:
+    case *Celeron*:
+    case "*Pentium(R) 4*":
+      if ($archname == "x86_64") then
+        set obj_64
+        set proc_type =
+      else
+        set proc_type = -xW
+      endif
+      breaksw
+    case *II*:
+    case *III*:
+      set proc_type = -xK
+      breaksw
+    case Itanium:
+      set proc_type = -tpp1
+      set intelopt
+      breaksw
+    case "Itanium 2":
+      set proc_type = -tpp2
+      set intelopt
+      breaksw
+    case "*AMD Opteron*":
+    case "*AMD Athlon*":
+      set proc_type =
+      if ($archname == "x86_64") then   # AMD64
+        set obj_64
+        if ($fort_cmp == pgf90 ) set proc_type = -amd64
+      endif
+      #set intelopt
+      breaksw
+    default:
+      set  proc_type =
+      breaksw
+    endsw
+
+    breaksw
+  endsw      # switch ($HOST)
+
+else if ($mach == "mac" || $mach == "intel-mac") then
+  # Mac with Intel compiler is treated the same as Linux platform
+  if ($fort_cmp == "ifort") then
+    set mach = linux
+    set proc_type = "-WI,-stack_size -WI,0x40000000"
+  endif
+endif
+
+# Set C-compiler and flags for dawson (local Mac Pro)
+if ($HOST == dawson.local) then
+  set c_cmp = /usr/bin/gcc-4.2
+  set CFLAGS0 = "-m64"
+  if ($fort_cmp == "ifort") then
+    set FFLAGS0 = "-m64 -xS -heap-arrays $FFLAGS0"
+    set LDFLAGS = "-m64 -xS $LDFLAGS"
+  else
+    set FFLAGS0 = "-m64 $FFLAGS0"
+    set LDFLAGS = "-m64 $LDFLAGS"
+  endif
+  set proc_type =
+  #set ARFLAG_str   = "'ARFLAG=-s'"
+endif
+
+#-----------------------------------------------------------------------
+#
+#  Options for IBM RS/6000 machines.
+#
+#-----------------------------------------------------------------------
+
+if ($mach == rs6000) then
+
+  # http://www.rs6000.ibm.com/resource/technology/MASS/
+  # See also -lmassvp[234]
+  # On p680, no advantage for -lmassvp[23] vs -lmassv. RLC 2001/12/10
+  #set mass_str = "-lmass -lmassv $LDFLAGS"
+  #set mass_str = "-L/usr/lpp/mass -lmass -lmassv"
+
+  switch ($HOST)
+  #case sooner*:
+  #  set mass_str = ""                  # WYH, no mass library on sooner?
+  #  breaksw
+  case ds*:
+    set mass_str = "-L/usr/local/apps/mass -lmass"
+    setenv OBJCECT_MODE 64             # Forece to use 64 bit mode
+    set obj_64
+    set thread_safe
+    breaksw
+  default:
+    set mass_str = "-L/usr/local/apps/mass -lmass"
+    breaksw
+  endsw
+
+  set FIXFLAG_str  = "-qsuffix=f=f -qfixed "
+  set FREEFLAG_str = "-qsuffix=f=f90 "
+
+  if ($CMD == "adas") then          # ADAS has huge radar array
+    set LDFLAGS = "$LDFLAGS -bmaxdata:0x80000000 -bmaxstack:0x80000000"
+  else if ($CMD == "arpsadj") then  # arpsadj use larger memeory
+    set LDFLAGS = "$LDFLAGS -bmaxdata:3000000000 -bmaxstack:2000000000"
+  else                              # arps, ext2arps, arpsintrp
+    set LDFLAGS = "$LDFLAGS -bmaxdata:0x50000000 -bmaxstack:0x50000000"
+  endif
+
+  if ($?openmp) then
+    set FFLAGS0 = "$FFLAGS0 -qsmp=noauto:omp"
+    set CFLAGS0 = "$CFLAGS0 -qsmp=noauto:omp"
+    set LDFLAGS = "$LDFLAGS -qsmp=noauto:omp"
+    set thread_safe
+  endif
+
+  # ADAS SMP:
+  # Do normal compile for adas
+  # (cd src/adas ; rm adas.o adjuvw3d.o anxiter.o anxlib3d.o mthermo.o thermo3d.o)
+  # Recompile with -p
+  # setenv XLSMPOPTS parthds=2:stack=100000000:spins=0:yields=0:schedule=affinity
+
+  set FFLAGS0 = "$FFLAGS0 -qextname=etime:lnblnk:flush"
+  if ($?par) then
+    set FFLAGS0 = "$FFLAGS0 -qsmp"
+    set CFLAGS0 = "$CFLAGS0 -qsmp"
+    set LDFLAGS = "$LDFLAGS -qsmp"
+    set thread_safe
+  endif
+
+  if ($?thread_safe && $fort_cmp !~ *_r) then  # Use thread-safe compilers
+    set fort_cmp = "${fort_cmp}_r"
+    set c_cmp   = "${c_cmp}_r"
+  endif
+
+  setenv FC $fort_cmp
+  set LDR_str = "'ARPS_LD = $fort_cmp'"
+  set FTN_str = "'FTN = $fort_cmp'"
+  set C_str   = "'CC = $c_cmp'"
+
+  set MACH_str = 'MACHDEPLIB=IBMLIBOBJ'
+  set GEMINC  = "'GEMINC=GEMPRM.AIX'"
+
+  set flttrap_dbg = "-qflttrap=ov:zero:inv:en -qsigtrap=arpssighandle"
+  set flttrap_opt = "-qflttrap=ov:zero:inv:en:imp -qsigtrap=arpssighandle"
+
+  set tune = "-qarch=auto"
+
+  #set ipa = "-qipa=inline=aamult:avg.:avg..:dif.:dif..:f_.*"
+
+  #set in_oper1 = "aamult,avgx,avg2x,avgy,avg2y,avgz,avg2z,difx,dif2x,dify"
+  #set in_oper2 = "dif2y,difz,dif2z,difxx,difyy,difzz,avgsu,avgsv,avgsw"
+  #set in_rad = "terp1,search,interp,expmn,deledd,sagpol"
+  #set in_therm1 = "f_desdt,f_desdti,f_desdtl,f_es,f_esi,f_esl,f_mrsat"
+  #set in_therm2 = "f_pt2pte,f_qvsat,f_qvsati,f_qvsatl,f_tdew,f_tdewi"
+  #set in_therm3 = "f_tdewl,f_tmr"
+
+  set ipa = "-Q -qipa=inline=aamult:avgx:avg2x:avgy:avg2y:avgz:avg2z:difx:dif2x:dify:dif2y:difz:dif2z:difxx:difyy:difzz:avgsu:avgsv:avgsw:terp1:search:interp:expmn:deledd:sagpol:f_desdt:f_desdti:f_desdtl:f_es:f_esi:f_esl:f_mrsat:f_pt2pte:f_qvsat:f_qvsati:f_qvsatl:f_tdew:f_tdewi:f_tdewl:f_tmr"
+
+  if ($opt == 1) then
+    set OPT_str = "-O1 $flttrap_opt"
+  else if ($opt == 2) then
+    set OPT_str = "-O2 -qmaxmem=-1"
+
+  else if ($opt == 3) then
+    set OPT_str = "-O3"
+    set LDFLAGS = "$mass_str $LDFLAGS"
+  else if ($opt == 13) then         # with -qstrict $flttrap_opt
+    set OPT_str = "-O3 -qstrict $flttrap_opt"
+    set LDFLAGS = "$mass_str $LDFLAGS"
+  else if ($opt == 23) then         # with $flttrap_opt only
+    set OPT_str = "-O3 $flttrap_opt"
+    set LDFLAGS = "$mass_str $LDFLAGS"
+  else if ($opt == 33) then         # with -qstrict only
+    set OPT_str = "-O3 -qstrict"
+
+  else if ($opt == 4) then          # object optimized for the POWER4 hardware platforms
+    set OPT_str = "-O3 -qtune=pwr4 -qarch=pwr4"
+    set LDFLAGS = "$mass_str $LDFLAGS "
+  else if ($opt == 14) then         # plus fltrap_opt only
+    set OPT_str = "-O3 -qtune=pwr4 -qarch=pwr4 $flttrap_opt"
+    set LDFLAGS = "$mass_str $LDFLAGS"
+  else if ($opt == 24) then         # Inlined functions
+    set OPT_str = "-O3 -qtune=pwr4 -qarch=pwr4 $ipa $flttrap_opt"
+    set LDFLAGS = "$mass_str $LDFLAGS"
+
+  else if ($opt == 5) then
+    set OPT_str = "-O4 -Q -noqipa $flttrap_opt "
+    set LDFLAGS = "$mass_str $LDFLAGS "
+  else if ($opt == 15) then
+    set OPT_str = "-O4 -Q -noqipa"
+    set LDFLAGS = "$mass_str $LDFLAGS"
+  endif
+
+  set OPT_str = "$OPT_str -qspillsize=32704"
+
+  set LDFLAGS = "$LDFLAGS $OPT_str"
+
+  set OPT_main_str = "$OPT_str"
+  if ($?nomainopt) then
+    set OPT_main_str = "-O0 -qspillsize=32704"
+  else if ( $opt >= 3 && ($CMD == "arps2wrf") ) then
+    set OPT_main_str = "$OPT_str -qmaxmem=8192"
+  endif
+
+  #
+  # Generate 64 bit object on AIX 5.0 and above
+  #
+  if ($?obj_64) then
+    set CFLAGS0 = "$CFLAGS0 -q64"
+    set LDFLAGS = "$LDFLAGS -q64=largetype"
+    set FIXFLAG_str  = "$FIXFLAG_str -q64=largetype "
+    set FREEFLAG_str = "$FREEFLAG_str -q64=largetype "
+    set ARFLAG_str   = "'ARFLAG=-X64'"
+  endif
+
+  if ($?dbl) then
+    set CFLAGS0 = "$CFLAGS0 -qrealsize=8"
+    set LDFLAGS = "$LDFLAGS -qrealsize=8"
+    set CPPFLAG  = "$CPPFLAG -DDOUBLE"
+    set FIXFLAG_str  = "$FIXFLAG_str -qrealsize=8 "
+    set FREEFLAG_str = "$FREEFLAG_str -qrealsize=8 "
+  endif
+
+  if ($?dbg) then
+    set DBG_str = "-g -C"
+    set LDFLAGS = "$LDFLAGS"
+    set FIXFLAG_str  = "$FIXFLAG_str  $flttrap_dbg"
+    set FREEFLAG_str = "$FREEFLAG_str $flttrap_dbg"
+  endif
+
+  if ($?perf) then
+    set PERF_str = '-pg'
+    set OPT_str = "$OPT_str $PERF_str"
+    set LDFLAGS = "$LDFLAGS $PERF_str"
+  endif
+
+  if ($?inline) set INLINE_str = -qipa
+
+  if ($?lib_svi) then
+    set LDR_str = "'ARPS_LD = $TOPDIR/scripts/linkxlC'"
+  endif
+
+  set CFLAGS0 = "$CFLAGS0 -DIBM4"
+
+#  if ($CMD == 88d2arps || $CMD == 88d2arps_fake || $CMD == mci2arps ) then
+#    set LDFLAGS = "-nofor_main $LDFLAGS"
+#  endif
+
+#-----------------------------------------------------------------------
+#        Message Passing option
+#-----------------------------------------------------------------------
+  if ($?mp_opt) then
+    set LDR_str = "'ARPS_LD = $fort_cmp'"
+    set FTN_str = "$FTN_str 'FTNMP = $fort_cmp'"
+    if ($?mp_inc) then
+      set FFLAGS0 = "$FFLAGS0 -I$mp_inc "
+    endif
+    if ($?mp_lib) then
+      set LIBS    = "$LIBS -L$mp_lib "
+    endif
+  endif
+
+#-----------------------------------------------------------------------
+#
+#  Options for Mac OS X machines
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == mac) then
+
+  set MACH_str = 'MACHDEPLIB=IBMLIBOBJ'
+
+  set FIXFLAG_str  = "-qsuffix=f=f -qfixed "
+  set FREEFLAG_str = "-qsuffix=f=f90 "
+
+  set FFLAGS0 = "$FFLAGS0 -qrealsize=4 -qtune=auto -qarch=auto -qstrict -qinitauto -qsave -qextname=etime:lnblnk:flush"
+
+  set CFLAGS0 = "-O3 -DNDEBUG -DIBMR2Fortran"
+  set LDFLAGS = "$LDFLAGS"
+  set GEMINC  = "'GEMINC=GEMPRM.MAC'"
+
+  if ($opt == 0) then
+    set OPT_str = '-O0'
+  else if ($opt == 1) then
+    set OPT_str = '-O1'
+  else if ($opt == 2) then
+    set OPT_str = '-O2'
+  else if ($opt == 3) then
+    set OPT_str = '-O4'
+  else if ($opt == 4) then
+    set OPT_str = '-O5'
+  endif
+
+#  set CPPFLAG  = "$CPPFLAG -DRWORDSIZE=4 -DDWORDSIZE=8"   # No support on "-dbl"
+
+  if ($?dbg) then
+    set DBG_str = '-g'
+    set LDFLAGS = "$LDFLAGS $DBG_str"
+  endif
+
+  set OPT_main_str = "$OPT_str"
+  if ($?nomainopt) set OPT_main_str = "-O0"
+
+#-----------------------------------------------------------------------
+# Message Passing option for Mac OS X Va Tech System X cluster
+#-----------------------------------------------------------------------
+  if ($?mp_opt) then
+    set fort_cmp = "mpif90"
+    set LDR_str  = "'ARPS_LD = $fort_cmp'"
+    set FTN_str  = "$FTN_str 'FTNMP = $fort_cmp'"
+  endif
+
+#-----------------------------------------------------------------------
+#
+#  Options for Cray class machines (Cray Y-MP and Cray C90)
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == cray) then
+
+    set FIXFLAG_str  =
+    set FREEFLAG_str =
+
+    set ICEFLAG = '-O aggress'
+    set RADFLAG = '-O inlinefrom=radlib3d.f90,inlinefrom=radtrns3d.f90,inlinefrom=thermolib3d.f90'
+    set THMFLAG = '-O inlinefrom=thermolib3d.f90'
+    set AWK_str = "'AWK = /usr/bin/awk'"
+    set MACH_str = 'MACHDEPLIB=CRAYLIBOBJ'
+
+    if ($?perf) then
+      set PERF_str = '-l pref -ef -r3 '    # Flow trace output, code listing
+#     set PERF_str = '-l pref -ef -r3 -eX' # Flow trace and autoexpert output
+                                           # -eX needs -O3 (auto-parallel option)
+      set LDFLAGS = "$LDFLAGS $PERF_str"
+    endif
+
+    if ($?dbg) then
+      set DBG_str = '-G 1'
+      set LDFLAGS = "$LDFLAGS $DBG_str"
+    endif
+
+    if ($opt > 0) set OPT_str = '-O2'
+
+    if ($?inline) set INLINE_str = '-O inline3 -O inlinefrom=operat3d.f90'
+
+    if ($?par) then
+      set PAR_str = '-O3'
+      set OPT_str = ""
+    endif
+
+    set OPT_main_str = "$OPT_str"
+
+#-----------------------------------------------------------------------
+#
+#   Special case for these programs. They need to load a file to loader
+#   directives.
+#
+#-----------------------------------------------------------------------
+
+  if ($CMD == dir1deg) then
+     set TERN_str = '-Wl"-j $(PWD)/load1deg.file"'
+  endif
+
+  if ($CMD == dir5min) then
+     set TERN_str = '-Wl"-j $(PWD)/load5min.file"'
+  endif
+
+  if ($CMD == dir30sec) then
+     set TERN_str = '-Wl"-j $(PWD)/load30sec.file"'
+  endif
+
+#-----------------------------------------------------------------------
+#
+#  Options for T3E class machines (NOT T3D)
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == t3e) then
+  set FIXFLAG_str  =
+  set FREEFLAG_str =
+
+  set ICEFLAG = '-O aggress'
+  set RADFLAG = '-O inlinefrom=radlib3d.f90,thermolib3d.f90'
+  set THMFLAG = '-O inlinefrom=thermolib3d.f90'
+  set AWK_str = "'AWK = /usr/bin/awk'"
+  set MACH_str = 'MACHDEPLIB=CRAYLIBOBJ'
+
+  if ($?perf) then
+    set PERF_str = '-k s'
+    set LDFLAGS = "$LDFLAGS -k s"
+  endif
+
+  if ($?dbg) then
+    set DBG_str = '-g'
+    set LDFLAGS = "$LDFLAGS $DBG_str"
+  endif
+
+  if ($opt > 0) set OPT_str = '-O2'
+
+  if ($?inline) set INLINE_str = '-O inline3 -O inlinefrom=operat3d.f90'
+
+  if ($?par) then
+    set PAR_str = '-O3'
+    set OPT_str = ""
+  endif
+
+  if ($opt > 0) then
+    set OPT_str = '-O 3,split2,unroll2,pipeline3,recurrence,aggress,msgs,negmsgs -Wl"-Dstreams=on"'
+  endif
+
+  set OPT_main_str = "$OPT_str"
+
+#-----------------------------------------------------------------------
+#
+#  Options for Hitachi HI-UX machines
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == hi-ux) then
+
+  set FIXFLAG_str  =
+  set FREEFLAG_str =
+
+  set MACH_str = 'MACHDEPLIB=HTCHLIBOBJ'
+  set LDR_str = "'ARPS_LD = f90'"
+  set RADFLAG = '-W0"opt(uinline(ext(radlib3d.f90)))"'
+  set THMFLAG = '-W0"opt(uinline(ext(thermolib3d.f90)))"'
+  set FTN_str = "'FTN = f90'"
+  set AWK_str = "'AWK = /usr/bin/awk'"
+
+  set GEMINC  = "'GEMINC=GEMPRM.HPUX'"
+
+  if ($?perf) then
+    set PERF_str = '-k s'
+    set LDFLAGS = "$LDFLAGS -k s"
+  endif
+
+  if ($?dbl) then
+    # other settings needed here for double_precision
+    set CPPFLAG  = "$CPPFLAG -DDOUBLE"
+  endif
+
+  if ($?dbg) then
+    set DBG_str = '-W0"testmode(debug)"'
+    set LDFLAGS = "$LDFLAGS $DBG_str"
+  endif
+
+  if ($opt > 0) then
+
+    set OPT_str = '-W0,"OPT(O(S)))"'
+
+#    set OPT_str = '-W0,"OPT(O(S)),PVEC(DIAG(1),LOOP(128))" +BLTB'
+#    echo "Optimizing with loop size of 107.  For proper optimization"
+#    echo "edit makearps and change LOOP(107) to LOOP(nx)."
+#    echo ""
+
+  endif
+
+  set OPT_main_str = "$OPT_str"
+
+  if ($?inline) set INLINE_str = '-W0"opt(uinline(ext(operat3d.f90)))"'
+
+#-----------------------------------------------------------------------
+#
+#  Options for Sun4 machines
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == sun4) then
+
+  set FIXFLAG_str  =
+  set FREEFLAG_str =
+
+  set MACH_str = 'MACHDEPLIB=SUNLIBOBJ'
+  set FFLAGS0 = "$FFLAGS0 "
+  set LDFLAGS = "$LDFLAGS"
+  set CFLAGS0 = "$CFLAGS0 -DUNDERSCORE"
+
+  set GEMINC  = "'GEMINC=GEMPRM.SunOS'"
+
+  if ($?perf) then
+    set PERF_str = '-pg'
+    set LDFLAGS = "$LDFLAGS $PERF_str"
+  endif
+
+  if ($?par) then
+    unset dbg
+    set PAR_str = '-parallel'
+    set LDFLAGS = "$LDFLAGS $PAR_str"
+    set DBG_str = ' '
+  endif
+
+  if ($?dbl) then
+    # other settings needed here for double_precision
+    set CPPFLAG  = "$CPPFLAG -DDOUBLE"
+  endif
+
+  if ($?dbg) then
+    set DBG_str = '-g -fnonstd'
+    set LDFLAGS = "$LDFLAGS $DBG_str"
+  endif
+
+  if ($opt == 1) then
+    set OPT_str = '-O1'
+  else if ($opt == 2) then
+    set OPT_str = '-O2'
+  else if ($opt == 3) then
+    set OPT_str = '-fast -O3'
+    set LDFLAGS = "$LDFLAGS -fast"
+  else if ($opt == 4) then
+    set OPT_str = '-fast -O4'
+    set LDFLAGS = "$LDFLAGS -fast"
+  endif
+
+  set OPT_main_str = "$OPT_str"
+
+#-----------------------------------------------------------------------
+#
+#  Options for DEC Alpha machines
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == alpha) then
+  set FIXFLAG_str  =
+  set FREEFLAG_str =
+
+  set MACH_str = 'MACHDEPLIB=TRU64LIBOBJ'
+  set FFLAGS0 = "$FFLAGS0 -convert big_endian -assume byterecl -assume accuracy_sensitive -math_library accurate"
+  set CFLAGS0 = "$CFLAGS0 -DUNDERSCORE -DLITTLE"
+  set GEMINC  = "'GEMINC=GEMPRM.OSF1'"
+
+  if ($?perf) then
+    set PERF_str = '-p'
+    set LDFLAGS  = "$LDFLAGS $PERF_str"
+  endif
+
+  if ($?dbg) then
+    set DBG_str = '-g2 -C -check_bounds'
+    set LDFLAGS = "$DBG_str"
+    set CFLAGS0 = "$CFLAGS0 $DBG_str"
+  endif
+
+  if ($opt == 0) then
+    set OPT_str = '-O0'
+    set OPT_main_str = '-O0'
+  else if ($opt == 1) then
+    set OPT_str = '-O1'
+    set OPT_main_str = '-O1'
+  else if ($opt == 2) then
+    set OPT_str = '-O3'
+    set OPT_main_str = '-O2'
+  else if ($opt == 3) then
+    set OPT_str = '-O4 -fast'
+    set OPT_main_str = '-O4 -fast'
+  else if ($opt == 4) then
+    set OPT_str      = '-O5 -tune host -fast'
+    set OPT_main_str = '-O5 -tune host -fast'
+    #set OPT_str      = '-O5 -fast -tune ev7 -arch ev7'  # on Rachel.psc.edu
+    #set OPT_main_str = '-O5 -fast -tune ev7 -arch ev7'  # on Rachel.psc.edu
+  endif
+
+  if ($?nomainopt) set OPT_main_str = "-O0 -fpe2"
+
+  if ($?openmp) then
+    set FFLAGS0 = "$FFLAGS0 -omp"
+    set LDFLAGS = "$LDFLAGS -omp"
+  endif
+
+  if ($?dbl) then
+    # other settings needed here for double_precision
+    set FFLAGS0 = "$FFLAGS0 -r8"
+    set CPPFLAG = "$CPPFLAG -DDOUBLE"
+  endif
+
+  if ($?par) then
+
+    set FFLAGS0 = "$FFLAGS0 -fkapargs='-so=1' -fkapargs='-conc' -fkapargs='-inline' -fkapargs='-ind=3' -fkapargs=-inc=$TOPDIR/include -fkapargs=-inc=$INC_HDF -fkapargs=-inc=$INC_NET -fkapargs='-nocmp' "
+    set LDFLAGS = "$LDFLAGS -fkapargs='-conc' -fkapargs='-inline'"
+
+    set OPT_str = '-O5 -tune host'
+
+    set RADFLAG = "-fkapargs='-inff=radlib3d.f90,radtrns3d.f90,thermolib3d.f90'"
+    set THMFLAG = "-fkapargs='-inff=thermolib3d.f90'"
+
+    set FTN_str = "'FTN = kf90'"
+    set LDR_str = "'ARPS_LD = kf90'"
+
+  endif
+
+  if ( $?lib_grb2 ) set CFLAGS0 = "$CFLAGS0 -DHP"
+
+  if ( $CMD == mci2arps ) then
+    set LDFLAGS = "-nofor_main $LDFLAGS"
+  endif
+
+#-----------------------------------------------------------------------
+# Message Passing (MPI) option - for alpha Beowulf cluster
+#-----------------------------------------------------------------------
+
+# if ($?mp_opt) then
+#   if ($mp_opt == "mpi") then
+#     set LDR_str = "'ARPS_LD = mpif90'"
+#     set FTN_str = "$FTN_str 'FTNMP = mpif90'"
+#     set FFLAGS0 = "$FFLAGS0 -I$mp_inc "
+#     set LDFLAGS = "$LDFLAGS -L$mp_lib "
+#   else
+#     set FTN_str = "$FTN_str 'FTNMP = $fort_cmp'"
+#   endif
+# endif
+
+#-----------------------------------------------------------------------
+# Message Passing (MPI) option - for Compaq Tru64 Unix cluster
+#-----------------------------------------------------------------------
+
+  if ($?mp_opt) then
+    set FTN_str = "$FTN_str 'FTNMP = $fort_cmp'"
+    if ($?mp_inc) then
+      set FFLAGS0 = "$FFLAGS0 -I$mp_inc "
+    endif
+    if ($?mp_lib) then
+      set LIBS    = "$LIBS -L$mp_lib -lmpi"
+    endif
+  endif
+
+#-----------------------------------------------------------------------
+#
+#  Options for SGI (iris4d) machines
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == iris4d) then
+
+  set FIXFLAG_str  =
+  set FREEFLAG_str =
+
+  setenv SHELL /bin/csh
+
+  set GEMINC  = "'GEMINC=GEMPRM.IRIX'"
+  set MACH_str = 'MACHDEPLIB=IRIXLIBOBJ'
+
+  if (! $?sgi_abi) then
+    set sgi_abi = "-n32"
+  endif
+
+  set mips = "-mips4"
+  if ( "$sgi_abi" == "-o32" ) then
+    set mips = "-mips2"
+    if ($opt > 2) set opt = 2
+  endif
+
+  if ($?obj_64) then
+    set sgi_abi = "-64"
+  endif
+
+  if ($?dbl) then
+    set FFLAGS0 = "$FFLAGS0 -r8"
+    set CFLAGS0 = "$CFLAGS0 -r8"
+    set LDFLAGS = "$LDFLAGS -r8"
+    set CPPFLAG  = "$CPPFLAG -DDOUBLE"
+  endif
+
+  set CFLAGS0 = " $sgi_abi $mips -DUNDERSCORE $CFLAGS0 "
+  set FFLAGS0 = " $sgi_abi $mips -bytereclen $FFLAGS0 "
+  set LDFLAGS = " $sgi_abi $mips -static $LDFLAGS "
+  set FIXFLAG_str = "$sgi_abi"
+
+  set AWK_str = "'AWK = /bin/nawk'"
+
+  if ($?inline) set INLINE_str = "-Wk,-inff=operat3d.f90 "
+
+  if ($?dbg) then
+    set DBG_str = "-g "
+    #set DBG_str = "-g -C -DEBUG:subscript_check=ON:div_check=3:verbose_runtime=ON"
+    set LDFLAGS = "$LDFLAGS $DBG_str"
+    set CFLAGS0 = "$CFLAGS0 $DBG_str"
+  endif
+
+  if ($opt == 1) then
+    set OPT_str = "-O1"
+  else if ($opt == 2) then
+    set OPT_str = "-O2"
+  else if ($opt == 3) then
+    set OPT_str = "-O3"
+  else if ($opt == 4) then
+    if ( $CMD == arpspltncar || $CMD == arpspltpost || $CMD == arpsensbc) then
+# A compiler bug fixed associated with SGI for arpsensbc
+#
+      set OPT_str = "-O3"
+      set LDFLAGS = "$LDFLAGS -O3"
+    else
+      set OPT_str = "-Ofast"
+      set LDFLAGS = "$LDFLAGS -Ofast "
+    endif
+  endif
+
+  if ($opt != 1) then
+    if ( $CMD == arpspltncar || $CMD == arpspltpost ) then
+      set OPT_str = "$OPT_str -OPT:Olimit=2930"
+    else
+      set OPT_str = "$OPT_str -OPT:Olimit=0"
+    endif
+  endif
+
+  set OPT_main_str = "$OPT_str"
+
+  if ($?openmp) then
+    set FFLAGS0 = "$FFLAGS0 -mp -pfa"
+    set LDFLAGS = "$LDFLAGS -mp -pfa"
+  endif
+
+  if ($?par) then
+    set FFLAGS0 = "$FFLAGS0 -pfa"
+    set LDFLAGS = "$LDFLAGS -pfa"
+  endif
+
+  if ($?perf) then
+    set PERF_str = "-p"
+    set LDFLAGS = "$LDFLAGS $PERF_str"
+  endif
+
+  if ( $?lib_grb2 ) set CFLAGS0 = "$CFLAGS0 -DSGI"
+
+  if ($?mp_opt) then
+    set FTN_str = "$FTN_str 'FTNMP = $fort_cmp'"
+    if ( $?mp_inc ) then
+      set FFLAGS0 = "$FFLAGS0 -I$mp_inc "
+    endif
+    if ($?mp_lib) then
+      set LIBS = "$LIBS -L$mp_lib -lmpi"
+    endif
+  endif
+
+#-----------------------------------------------------------------------
+#
+#  Options for Linux machines
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == linux) then
+
+  set RADFLAG =
+  set THMFLAG =
+  set GEMINC  = "'GEMINC=GEMPRM.LINUX'"
+
+  if ($?lib_grb2) set CFLAGS0 = "$CFLAGS0 -D__64BIT__"
+
+  setenv FC "$fort_cmp"
+
+  set LDR_opt = " "
+  switch("$fort_cmp")
+    case ifc*:
+#     set FFLAGS0 = "-quiet $FFLAGS0"
+#     set FIXFLAG_str  = "-quiet"
+#     set FREEFLAG_str = "-quiet"
+    set LDR_opt = "$LDR_opt -Vaxlib"
+    echo
+    echo "WARNING"
+    echo "WARNING: ARPS works in BIG_ENDIAN mode. For Intel compilers before"
+    echo "WARNING: version 8.0, You should set an environment variable for"
+    echo "WARNING: it before compiling."
+    echo "WARNING:"
+    echo "WARNING: csh/tcsh:"
+    echo "WARNING:     setenv F_UFMTENDIAN big"
+    echo "WARNING: bash:"
+    echo "WARNING:     export F_UFMTENDIAN=big"
+    echo "WARNING:"
+    echo "WARNING:  waite 2 seconds to continue or press ctr^C to break."
+    echo "WARNING"
+    echo
+    sleep 2
+    case ifort:
+    case *ifort*:
+    case tau_f90.sh:
+      if ("$proc_type" == "core2") set proc_type = "-march=core2 -mtune=core2 -shared-intel"
+      setenv MPI_COMPILER  intel
+      set LDR_opt = "$LDR_opt $proc_type"
+      set FFLAGS0 = "$proc_type -fp-model source $FFLAGS0"
+      set CFLAGS0 = "$CFLAGS0 -DLINUX"
+      set FIXFLAG_str  = "-FI"
+      set FREEFLAG_str = " "
+      # added "-mp" as Kevin's suggestions. The optimization is reduced (speed impact).
+      set CPPFLAG  = "$CPPFLAG -DINQUIREDIR"
+
+      ###########################################
+      ####         STATIC options            ####
+      ###########################################
+      #
+      # When running on a machine other than that on which the code was compiled,
+      # need to incorporate IFC libraries in /opt/intel/compiler70/ia32/lib.
+      # -static-libcxa works for most, but arps_mpi requires -static.
+      #                                                 RLC 2003-09-19
+      # switch ( "$CMD" )
+      # case *_mpi:
+      #   set LDFLAGS = "-static"
+      #   breaksw
+      # default:
+      #   set LDFLAGS = "-static-libcxa"
+      #   breaksw
+      # endsw
+
+      #set FFLAGS0 = "$proc_type -unroll0 -fno-alias -ipo -ftz -sox -g -zero $FFLAGS0"
+                                          # -ftz will be set for -O3 on Itanium,
+                                          #      it degrades performance on IA-32 and EM64T
+      #set ARFLAG_str = "'AR=xiar'"
+
+      # set FFLAGS0 = "-w95 -cm -vec_report0 $FFLAGS0"     # WDT 2003-12-09
+      set FFLAGS0 = "-convert big_endian $FFLAGS0 -module $TOPDIR/modules"
+      if ($?intelopt && !($?dbg || $?nointel) ) then
+        set FFLAGS0 = "-unroll0 -fno-alias -ipo $FFLAGS0"
+        set LDFLAGS = "-unroll0 -fno-alias -ipo"
+      else                              # Default on IA-32
+        set FFLAGS0 = "-w $FFLAGS0"
+        #set LDFLAGS = ""
+      endif
+
+      switch ($CMD)
+        case "arpssfc":
+        case "wrfstatic":
+        case "dir1deg":
+        case "dir5min":
+        case "dir30sec":
+        case "arpstern":
+        case "nids2arps":
+          set FFLAGS0 = "-assume byterecl $FFLAGS0"
+        breaksw
+      endsw
+
+      if ($?openmp) then
+        set FFLAGS0 = "-openmp -fpp $FFLAGS0"
+        set LDFLAGS = "-openmp $LDFLAGS"
+      endif
+
+      if ($?largearrays) then
+        set FFLAGS0 = "-mcmodel=medium $FFLAGS0"
+        set LDFLAGS = "$LDFLAGS -i-dynamic"
+      endif
+
+      if ($opt == 13) then
+        set OPT_str      = "-fast"
+        set OPT_main_str = "-fast"
+      else if ($opt >= 0) then
+        set OPT_str      = "-O$opt"
+        set OPT_main_str = "-O$opt"
+        set LDFLAGS      = "-O$opt $LDFLAGS"
+      endif
+      if ($?nomainopt) then
+        if ("$HOST" == "dawson.local") then
+          set OPT_main_str = "-m64 -xS -O0"
+        else
+          set OPT_main_str = "-O0"
+        endif
+      endif
+      breaksw
+
+    case pgf90:
+    case pgf95:
+    case pgfortran:
+      setenv MPI_COMPILER pgi
+      set FFLAGS0 = "$FFLAGS0 -module $TOPDIR/modules"
+      set FIXFLAG_str  = "-Mfixed "
+      set FREEFLAG_str = "-Mfree "
+      set CPPFLAG  = "$CPPFLAG -DNOSIZEOF -DCPUTIME=SYSTEMCLOCK"
+      set CFLAGS0 = "$CFLAGS0 -DLINUX"
+
+      set FFLAGS0 = "$FFLAGS0 -byteswapio"
+
+      if ( $opt == 0 ) then
+        set OPT_str = "-O0"
+      else if ( $opt == 1 ) then
+        set OPT_str = "-O1"
+      else if ( $opt == 2 ) then
+        set OPT_str = "-O2 -fast"
+      else if ( $opt == 3 ) then
+        set OPT_str = "-O3 -fast -fastsse"
+      else if ( $opt == 4 ) then
+        set OPT_str = "-O4 -Mnontemporal -fast -fastsse"
+      else if ( $opt == 12 ) then   # old pgf90 default on other platforms
+        set OPT_str = "-O2 -Munroll=c:4,n:4 -Mvect=assoc,cachesize:262144,sse -fast"
+      else if ( $opt == 13 ) then
+        set OPT_str = "-O3 -fast -fastsse -Mflushz -Mbounds -Mchkptr"
+      endif
+
+      if ( $opt > 0 ) set inline      # use PGI compiler "-inline" option by default
+
+      if ( $opt > 0 && "$proc_type" == "core2" ) then
+        set OPT_str = "-fastsse -tp core2-64"
+      endif
+
+      set OPT_main_str = "$OPT_str"
+      if ($?nomainopt) set OPT_main_str = "-O0"
+
+      if ($?openmp) then
+        set FFLAGS0 = "-mp $FFLAGS0"
+        set LDFLAGS = "-mp $LDFLAGS"
+      endif
+
+      if ($?largearrays) then
+        set FFLAGS0 = "-mcmodel=medium $FFLAGS0"
+      endif
+
+      ###########################################
+      ####         STATIC options            ####
+      ###########################################
+      #set LDFLAGS = "-Bstatic $LDFALAGS"
+
+      set proc_type = ""
+      breaksw
+
+    case efc:        # TITAN specific here, though TITAN no longer exists.
+      set FFLAGS0 = "$FFLAGS0 -mp -O -ftz"
+      set LIBS = "$LIBS /usr/lib/gcc-lib/ia64-redhat-linux/2.96/libg2c.a -ldl -lpthread"
+      set proc_type = ""
+      breaksw
+
+    case openf9?:
+      setenv MPI_COMPILER open64
+
+      set FFLAGS0 = "$FFLAGS0 -fno-second-underscore"
+
+      set proc_type = "-march=auto"
+      set LDR_opt = "$LDR_opt $proc_type"
+      set CFLAGS0 = "$CFLAGS0 -DLINUX"
+      set FIXFLAG_str  = "-fixedform"
+      set FREEFLAG_str = "-freeform "
+
+      set FFLAGS0 = "-w -convert big_endian $proc_type $FFLAGS0 -module $TOPDIR/modules"
+
+      if ($?openmp) then
+        set FFLAGS0 = "-openmp $FFLAGS0"
+        set LDFLAGS = "-openmp $LDFLAGS"
+      endif
+
+      if ( $opt == 0 ) then
+        set OPT_str = "-O0"
+      else if ( $opt == 1 ) then
+        set OPT_str = "-O1"
+      else if ( $opt == 2 ) then
+        set OPT_str = "-O2"
+      else if ( $opt == 3 ) then
+        set OPT_str = "-O3"
+      else if ( $opt == 13 ) then
+        set OPT_str = "-O3  -apo -mso"
+      endif
+      set OPT_main_str = "$OPT_str"
+      if ($?nomainopt) set OPT_main_str = "-O0"
+
+      breaksw
+
+    case g95:
+      set FFLAGS0 = "$FFLAGS0 -fendian=big"
+    case gfortran:
+      set MPI_COMPILER gnu
+      if ("$fort_cmp" == "gfortran") then
+        set FFLAGS0 = "$FFLAGS0 -I$TOPDIR/modules -J$TOPDIR/modules"
+        set FFLAGS0 = "$FFLAGS0 -fconvert=big-endian -frecord-marker=4 -fallow-argument-mismatch -fallow-invalid-boz -m64"
+                                    # For compatibility with Intel compiler
+        set CPPFLAG  = "$CPPFLAG -DNOSIZEOF"
+      endif
+
+      set CFLAGS0 = "$CFLAGS0 -DLINUX"
+      set FFLAGS0 = "$FFLAGS0 -fno-second-underscore"
+      set CPPFLAG  = "$CPPFLAG -DNOLNBLNK -DINTLOOP"
+      set FIXFLAG_str  = "-ffixed-form"
+      set FREEFLAG_str = "-ffree-form"
+      set proc_type = ""
+      if ($opt >= 0) then
+        set OPT_str      = "-O$opt"
+        set OPT_main_str = "-O$opt"
+        if ($?nomainopt) set OPT_main_str = "-O0"
+      endif
+      breaksw
+
+     if ($?openmp) then
+       set FFLAGS0 = "-fopenmp $FFLAGS0"
+       set LDFLAGS = "-fopenmp $LDFLAGS"
+     endif
+
+   case pathf95:  # pathScale compiler Suite
+     setenv MPI_COMPILER pathscale
+     set FFLAGS0 = "$FFLAGS0 -I $TOPDIR/modules"
+     set proc_type = ""
+     breaksw
+
+    case f90:        # Absoft
+      setenv MPI_COMPILER $fort_cmp
+      set CFLAGS0 = "$CFLAGS0 -DLINUXF90"
+      set FFLAGS0 = "$FFLAGS0 -YEXT_NAMES=LCS -B108"
+      set CPPFLAG  = "$CPPFLAG -DNOLNBLNK -DNOSYSTEM -DCPUTIME=SECOND"
+      if ( $opt > 0 ) set OPT_str = "-O -B100"
+      set proc_type = ""
+      breaksw
+
+    case xlf*:         # bigred.teragrid.iu.edu
+    case xlf90*:
+    case xlf95*:
+    case blrts_xlf:   # Blue Gene compute nodes
+    case blrts_xlf90:
+    case blrts_xlf95:
+      setenv MPI_COMPILER $fort_cmp
+      set big_nounderscore
+
+      if ( $?lib_grb2 ) set CFLAGS0 = "$CFLAGS0 -DIBM4"
+      set FFLAGS0 = "$FFLAGS0 -qnoextname -qextname=flush"
+      set FIXFLAG_str  = "-qsuffix=f=f -qfixed "
+      set FREEFLAG_str = "-qsuffix=f=f90 "
+      set CPPFLAG  = "$CPPFLAG -DIBM4"
+      set CFLAGS0 = "$CFLAGS0 -DIBM4"
+
+      set proc_type = ""
+      if ($opt >= 0) then
+        set OPT_str      = "-O$opt"
+        set OPT_main_str = "-O$opt"
+        if ($?nomainopt) set OPT_main_str = "-O0"
+      endif
+
+      if ($?obj_64) then
+        set CFLAGS0 = "$CFLAGS0 -q64"
+        set FIXFLAG_str  = "$FIXFLAG_str -q64"
+        set FREEFLAG_str = "$FREEFLAG_str -q64"
+        set LDFLAGS = "$LDFLAGS -q64"
+      endif
+
+      breaksw
+
+    default:
+      setenv MPI_COMPILER $fort_cmp
+      #set FFLAGS0 = "$FFLAGS0 -byteswapio" # Using big endian byte order
+                                      # compatible with Sun, SGI and IBM native format
+      set FFLAGS0 = "$FFLAGS0 -I $TOPDIR/modules"
+      set proc_type = ""
+  endsw
+
+  if (! $?big_nounderscore ) set CFLAGS0 = "$CFLAGS0 -DUNDERSCORE -DLITTLE"
+
+  set MACH_str = 'MACHDEPLIB=LNXLIBOBJ'
+
+  if ($?inline) then       # Portland Group
+    set in_oper1 = "aamult,avgx,avg2x,avgy,avg2y,avgz,avg2z,difx,dif2x,dify"
+    set in_oper2 = "dif2y,difz,dif2z,difxx,difyy,difzz,avgsu,avgsv,avgsw"
+    set in_rad = "terp1,search,interp,expmn,deledd,sagpol"
+    set in_therm1 = "f_desdt,f_desdti,f_desdtl,f_es,f_esi,f_esl,f_mrsat"
+    set in_therm2 = "f_pt2pte,f_qvsat,f_qvsati,f_qvsatl,f_tdew,f_tdewi"
+    set in_therm3 = "f_tdewl,f_tmr"
+    set in_enkf   = "ensmean3ds,kalmangain_ensrf,update_EnSRF"
+    set INLINE_str = "-Minline=$in_rad,$in_therm1,$in_therm2,$in_therm3"
+  endif
+
+#  if ($?inline) set INLINE_str = "-Minline=radlib3d.f90,radtrns3d.f90,thermolib3d.f90,operat3d.f90"
+
+  if ($?dbg) then
+    if ("$fort_cmp" == "pgf90" || "$fort_cmp" == "ftn" ) then    # Portland Group
+      set DBG_str = "-g -Mbounds -traceback"
+      #set DBG_str = "-g -Mbounds -Ktrap=fp,denorm"
+      set CFLAGS0 = "-g $CFLAGS0"
+    else if ("$fort_cmp" == "ifort") then
+      set DBG_str = "-g -fpe0 -check bounds -traceback"
+      #set DBG_str = "-g -check bounds"
+      set CFLAGS0 = "$CFLAGS0 -g"
+    else if ("$fort_cmp" == "gfortran") then
+      set DBG_str = "-g -ffpe-trap=zero,overflow,underflow -fcheck=bounds -fbacktrace"
+      #set DBG_str = "-g -check bounds"
+    else
+      #set DBG_str = "-g -CA -CB -CS -CU -WB -d0"   # not -CV,  WDT 2003-12-09
+      set DBG_str = "-g"
+      set CFLAGS0 = "$CFLAGS0 -g"
+    endif
+  endif
+
+  if ($?dbl) then
+    set FFLAGS0 = "$FFLAGS0 -r8"
+    #set CFLAGS0 = "$CFLAGS0 -r8"
+    set LDFLAGS = "$LDFLAGS -r8"
+    set CPPFLAG = "$CPPFLAG -DDOUBLE"
+  endif
+
+  if ($?perf) then           # Performance flag same for "ifc" and "pgf90"
+    #case *bigben*:       # PSC bigben a Cray XT3 MPP machine
+    #  set PERF_str = "-Mprof=func"
+    #  set FFLAGS0 = "$FFLAGS0 $PERF_str"
+    #  set CFLAGS0 = "$CFLAGS0 $PERF_str"
+    #  set LDFLAGS = "$LDFLAGS $PERF_str"
+    #  breaksw
+    set PERF_str = "-p"
+    set LDFLAGS  = "$LDFLAGS $PERF_str"
+  endif
+
+  if($?par && "$fort_cmp" == "pgf90") then    # parallel
+                                              # should set NCPUS enviroment varaible
+    set FFLAGS0 = "$FFLAGS0 -Mconcur"
+    set LIBS = "$LIBS -Mconcur"
+    #set LINUX_PAR_LIBS = "/usr/pgi/linux86-64/5.2/lib/libpgmp.a /usr/pgi/linux86-64/5.2/lib/libpgthread.a"
+    #set LIBS = "$LIBS $LINUX_PAR_LIBS"
+  else if($?par && "$fort_cmp" == "ifort") then       # parallel
+               # set OMP_NUM_THREADS or use default - all available processors
+    if ($opt >= 2) then
+      set FFLAGS0 = "$FFLAGS0 -parallel"
+      set LDFLAGS = "$LDFLAGS -parallel"
+    endif
+  endif
+
+#
+# For those main program were written in C language
+#
+ if ( $CMD == mci2arps || $CMD == mergesat  || $CMD == sat2arps ) then
+    if ("$fort_cmp" == "pgf90" || "$fort_cmp" == "ftn") then
+      set LDFLAGS = "-Mnomain $LDFLAGS"
+    else if ("$fort_cmp" == "ifort") then
+      set LDFLAGS = "-nofor_main $LDFLAGS"
+    endif
+  else if ($CMD =~ "arpsenkf*" && $?inline) then
+    set INLINE_str = "${INLINE_str},${in_enkf}"
+  endif
+
+  echo "Compiler Suite - '$MPI_COMPILER'."
+
+  if ( $?fort_cmp_wrapper ) then # Fortran compiler wrapper on Cray machines
+    echo "Fortran compiler wrapper - '$fort_cmp_wrapper'."
+    echo " "
+    set mp_opt   = "ftn_mp"      # Same compiler script for MPI code
+    set CPPFLAG  = "$CPPFLAG -DNOSYSTEM"
+    set fort_cmp  = $fort_cmp_wrapper
+
+    # Handle // comment lines for Catamount compiler only
+    if ("$FC" == "pgf90") then
+      if ( $?IOBUF_DIR) then
+        set CFLAGS0 = "-B -I$IOBUF_DIR -I$IOBUF_INC $CFLAGS0"
+      else
+        set CFLAGS0 = "$CFLAGS0 -B"
+      endif
+    endif
+
+    if ($opt > 3) set CFLAGS0 = "$CFLAGS0 -fastsse"
+
+  endif
+
+  set FTN_str = "'FTN = $fort_cmp'"
+  set LDR_str = "'ARPS_LD = $fort_cmp $LDR_opt'"
+
+#-----------------------------------------------------------------------
+#        Message Passing option
+#-----------------------------------------------------------------------
+
+  if ($?mp_opt) then
+    if ($mp_opt == "mpi") then
+      setenv LAMHF77 "$fort_cmp"
+
+      switch ( "$HOST" )
+
+      case "tun*":
+        set LDR_str = "'ARPS_LD = cmpif90c'"
+        set FTN_str = "$FTN_str 'FTNMP = cmpif90c'"
+        breaksw
+
+      case "co-login*":    # Cobalt at NCSA
+      case origin:         # NSSL machine used by Jidong
+      case *blacklight*:   # blacklight
+      case herbie.psc.edu:
+        set FTN_str = "$FTN_str 'FTNMP = $fort_cmp'"
+        set LDR_str = "'ARPS_LD = $fort_cmp'"
+        set LIBS    = "$LIBS -lmpi"
+        breaksw
+
+      default:
+        set LDR_str = "'ARPS_LD = mpif90'"
+        set FTN_str = "$FTN_str 'FTNMP = mpif90'"
+        set C_str = "$C_str 'CCMP = mpicc'"
+      endsw
+
+      if ("$fort_cmp" == "efc" ) then
+        set LDR_str = "'ARPS_LD = $fort_cmp'"
+        set FTN_str = "$FTN_str 'FTNMP = $fort_cmp'"
+        set LIBS = "-L$mp_lib -lmpich -lvmi $LIBS"
+      endif
+
+      set LDFLAGS = "$proc_type $LDFLAGS"
+
+      if ( $?mp_inc ) then
+        set FFLAGS0 = "$FFLAGS0 -I$mp_inc "
+      endif
+      if ( $?mp_lib ) then
+        set LDFLAGS = "$LDFLAGS -L$mp_lib"
+      endif
+    else
+      set FTN_str = "$FTN_str 'FTNMP = $fort_cmp'"
+    endif
+  endif
+
+#-----------------------------------------------------------------------
+#
+#  Options for NEC SX-5 Vector machines
+#
+#-----------------------------------------------------------------------
+
+else if ($mach == nec) then
+
+  set FIXFLAG_str  =
+  set FREEFLAG_str =
+
+  setenv SHELL /bin/csh
+
+# NOTE KMA:
+# Put /home2/arps/ZXPLOT/bin & /UTIL/ncar_4.01/bin in $path (in .cshc file)
+# for plotting.
+
+#set DIR_str = "'TOPDIR=$TOPDIR' 'WRKDIR=$WRKDIR'"
+#set FFLAGS1 = '-Wf"-pvctl noverrchk fullmsg -L fmtlist"'
+
+##set FFLAGS0 = "-I$TOPDIR/include -float0 -dW -C hopt $FFLAGS1"
+##set FFLAGS0 = "-I$TOPDIR/include -ew -C vopt $FFLAGS1"
+##set FFLAGS0 = "-I$TOPDIR/include -ew -C debug $FFLAGS1"
+#set FFLAGS0 = "-I$TOPDIR/include -ew -C hopt $FFLAGS1"
+##set FFLAGS0 = "-I$TOPDIR/include -P auto -C hopt -ew $FFLAGS1"
+#set CFLAGS0 = "-DUNDERSCORE -I$TOPDIR/include"
+
+#set inline_dir = /xtemp/arps/arps450_mpi/src/arps_mp
+#set SXINLINE1 = "-pi nest=2 exp=f_es exp=f_esi exp=f_esl exp=f_qvsat exp=deledd exp=sagpol rexp=expmn expin=${inline_dir}"
+#set SXINLINE2 = "-pi exp=irrad "
+#set FFLAGS1 = '-Wf"-pvctl noverrchk fullmsg -L fmtlist"'
+#set FFLAGS0 = "-I$TOPDIR/include -ftrace -ew -C hopt $SXINLINE $SXINLINE2 $FFLAGS1 -R2"
+#set CFLAGS0 = "-DUNDERSCORE -I$TOPDIR/include"
+
+  set CFLAGS0 = "$CFLAGS0 -DUNDERSCORE"
+
+  if ($opt == 1) then
+    set OPT_str = ""
+  else if ($opt == 2) then
+    set OPT_str = ""
+  else if ($opt == 3) then
+    set OPT_str = "-ew"
+  else if ($opt == 4) then
+    set OPT_str = "-ew -C vopt -pi nest=2 exp=f_es exp=f_esi exp=f_esl exp=f_qvsat exp=deledd exp=sagpol rexp=expmn -pi exp=irrad "'-Wf"-pvctl noverrchk fullmsg -L fmtlist"'" -R2"
+  endif
+
+  set OPT_main_str = "$OPT_str"
+
+  if ($?par) then
+    set FFLAGS0 = "$FFLAGS0 -P auto"
+    set LDFLAGS = "$LDFLAGS -p -P auto"
+  endif
+
+  if ($?perf) then
+# NOTE: must also "setenv F_TRACE yes"
+    set PERF_str = '-ftrace'
+    set LDFLAGS = "$LDFLAGS $PERF_str"
+  endif
+
+  if ($?dbl) then
+    # other settings needed here for double_precision
+    set CPPFLAG  = "$CPPFLAG -DDOUBLE"
+  endif
+
+  if ($?dbg) then
+    set DBG_str = "-C debug"
+    set CFLAGS0 = "$CFLAGS0 $DBG_str"
+  endif
+
+else
+
+  echo "No information for machine type $mach.  Using defaults"
+  echo ""
+
+endif
+
+#}
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+#= Section 5: Collect all settings and pass them to make
+#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#{
+
+#-----------------------------------------------------------------------
+#
+#  Set the compiler (and library) options based on user selections.
+#
+#-----------------------------------------------------------------------
+if($?dbg) then
+  set FIXFLAG_str  = "$FIXFLAG_str $DBG_str"
+  set FREEFLAG_str = "$FREEFLAG_str $DBG_str"
+endif
+
+set FFLAGS_str = "'FFLAGS=$FFLAGS0 $OPT_str $PERF_str $INLINE_str $PAR_str $TERN_str'"
+set FFLAGS_main_str = "'FFLAGS_main=$OPT_main_str $PERF_str $FFLAGS0 $INLINE_str $PAR_str $TERN_str'"
+set FIXFLAGS_str  = "'FIXFLAGS=$FIXFLAG_str'"
+set FREEFLAGS_str = "'FREEFLAGS=$FREEFLAG_str'"
+set CPPFLAG_str   = "'CPPFLAGS=$CPPFLAG'"
+set CFLAGS_str = "'CFLAGS= $PERF_str $CFLAGS0'"
+
+set LDFLAG_str = "'LDFLAGS=$LDFLAGS'"
+set LIB_str = "'LIBS=$LIBS'"
+set ICE_str = "'ICEFLAG=$ICEFLAG'"
+set RAD_str = "'RADFLAG=$RADFLAG'"
+set THM_str = "'THMFLAG=$THMFLAG'"
+
+#-----------------------------------------------------------------------
+#
+#  Issue the make command
+#
+#-----------------------------------------------------------------------
+
+set makecmd = "$MAKE -f $MAKEFILE $FFLAGS_str $FFLAGS_main_str $FIXFLAGS_str $FREEFLAGS_str $CFLAGS_str $LDR_str $FTN_str $C_str $CPP_str $CPPFLAG_str $LDFLAG_str $DUMP_str $LIB_str $ICE_str $RAD_str $THM_str $AWK_str $DIR_str $MP_str $GEMINC '$MACH_str' 'MAKEOPT=$MAKE_opt' 'TAROPT=$TAR_opt'"
+
+if ($?ZXPLOT_str) then
+  set makecmd = "$makecmd '$ZXPLOT_str'"
+endif
+
+if ($?NCARG_str) then
+  set makecmd = "$makecmd '$NCARG_str'"
+endif
+
+if ($?INC_str) then
+  set makecmd = "$makecmd '$INC_str'"
+endif
+
+if ($?ARFLAG_str) then
+  set makecmd = "$makecmd $ARFLAG_str"
+endif
+
+if ($?lib_grb2) then
+  set makecmd = "$makecmd 'LIBG2_DEP=libg2'"
+endif
+
+set makecmd = "$makecmd $CMD"
+
+cat << END
+$makecmd
+
+END
+
+#-----------------------------------------------------------------------
+# must run make in a shell to get quotes to work properly
+#-----------------------------------------------------------------------
+
+/bin/csh -f << END
+$makecmd
+END
+
+if ( $status != 0 ) then
+  exit 1
+else
+
+  if ($mach == cray) then
+
+cat << CF90_WARNING
+
+      ** ARPS WARNING **
+      The CRAY CF90 compiler can not neglect the comment lines between
+      namelist groups. Please type the following command,
+
+             sed "\?^\!?d" arps.input >! arps.input.nc
+
+      to convert arps.input into arps.input.f90 and use the latter as
+      the ARPS input file.
+
+CF90_WARNING
+
+  else if ( $mach == hi-ux ) then
+
+cat << HITACHI_WARNING
+
+      ** ARPS WARNING **
+      The default data format with HI-UX FORTRAN is NOT in 32-bit IEEE
+      standard. To write ARPS data in IEEE standard format, you may
+      have to run arps with the RunTime option. See the example in the
+      following.
+
+             arps -F,'port(stduf)' < arps.input >! arps.output
+
+HITACHI_WARNING
+
+  endif
+endif
+
+#}
+
+exit 0

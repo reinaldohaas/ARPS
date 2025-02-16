@@ -1,0 +1,244 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR PLTGRID IN NAMELIST FORMAT      ######
+!     ######                    ( arps5.3.0 )                     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in namelist format for 
+!  program PLTGRID, which plots the ARPS grid with supplied 
+!  political boundaries. A fine grid is also plotted with parameters
+!  given in namelist &newgrid.
+!
+!  Steps to use this program:
+!  
+!  Step 1: Compile and link using 'makearps [option] pltgrid'
+!  Step 2: Edit input file pltgrid.input (this file)
+!  Step 3: Run job using 'pltgrid < pltgrid.input'.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!
+!   Ming Xue (03/27/1997)
+!
+!   History:
+!   08/06/2008 Fanyou Kong
+!   Add xy_or_ll, ctrlat1, and ctrlon1 in newgrid section to allow
+!   specifying lat/lon central locations of new grids
+!
+!-----------------------------------------------------------------------
+!
+!  nx       Number of grid points in x direction.
+!  ny       Number of grid points in y direction.
+!
+!  dx       Grid spacing in x-direction in computational
+!           and physical space (m).
+!  dy       Grid spacing in y-direction in computational
+!           and physical space (m).
+!
+!  ctrlat   Latitude of the model physical domain center (deg. N).
+!  ctrlon   Longitude of the model physical domain center (deg. E).
+!
+!-----------------------------------------------------------------------
+
+ &grid
+   nx     =  183,
+   ny     =  123,
+   dx     =  4000.000,
+   dy     =  4000.000,
+   ctrlat =   35.0,
+   ctrlon =  -98.0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Projection parameters:
+!
+!  mapproj   Map projection option.
+!          = 0, no map projection;
+!          = 1, polar projection;
+!          = 2, Lambert projection;
+!          = 3, Mercator projection.
+!  trulat1   1st true latitude of map projection.
+!  trulat2   2nd true latitude of map projection (used only by mapproj = 2).
+!  trulon    True longitude of map projection.
+!  sclfct    Map scale factor (default is 1.0).
+!
+!-----------------------------------------------------------------------
+
+ &projection
+   mapproj = 2,
+   trulat1 =  33.0,
+   trulat2 =  37.0,
+   trulon  = -98.0,
+   sclfct  =  1.0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  There are parameters for another grid box grid.
+!
+!  nnwgrd     Number of grid boxes to draw.
+!  nx1(i)     Number of grid points in x-direction for box No. i.
+!  ny1(i)     Number of grid points in y-direction for box No. i.
+!
+!  xy_or_ll   Flag indicating whether x-y or lat-lon will be used to
+!             specify the center of the new grid.
+!          = 1 use xctr1 & yctr1,
+!          = 2 use ctrlat1 & ctrlon1.
+!  xctr1(i)    x-coordinate of the center of new grid for box i (if xy_or_ll=1)
+!  yctr1(i)    y-coordinate of the center of new grid for box i (if xy_or_ll=1)
+!  ctrlat1(i)  the latitude of the center of the new grid for box i (if xy_or_ll=2)
+!  ctrlon1(i)  the longitude of the center of the new grid for box i (if xy_or_ll=2)
+!
+!  dx1(i)     Grid interval of the new grid in x direction for box No. i.
+!  dy1(i)     Grid interval of the new grid in y direction for box No. i.
+!
+!-----------------------------------------------------------------------
+
+ &newgrid
+   nnwgrd = 2,
+   nx1 =903,753,
+   ny1 =675,663,
+   xy_or_ll =2,
+   xctr1(1)  = 1452000.0,
+   yctr1(1)  = 1448000.0,
+   ctrlat1 =  38.0, 39.0,
+   ctrlon1 = -93.0, -97.0,
+   dx1    =  4000.0, 4000.0,
+   dy1    =  4000.0, 4000.0,
+ /
+!
+!-----------------------------------------------------------------------
+!
+!  ovrmap  Option to overlay political map on horizontal plane plots
+!                = 0, no map overlay.
+!                = 1, overlay map on all of the ploted fields.
+!
+!  mapgrid       Grid for latitude and longitude
+!                = 0, no grid draw
+!                = 1, draw grid (default set latgrid=2 and longrid=2)
+!                = 2, draw grid (user specify latgrid and longrid)
+!
+!  latgrid,      longrid (degree)
+!                the grid for latitude and longitude (mapgrid=2)
+!  nmapfile      number of mapfiles ( maximum=2)
+!
+!  mapfile       Mapdata file name.
+!  mapcol        Map color index (>=1)
+!  mapline_style line style of map
+!                = 1 thin dashed lines
+!                = 2 thin full lines
+!                = 3 thick full lines
+!
+!-----------------------------------------------------------------------
+!
+ 
+ &map_plot
+   ovrmap = 1,
+   mapgrid = 0,
+      latgrid = -5., longrid = -5., mapgridcol =10,
+   nmapfile = 1,
+     mapfile(1) = '../data/arpsplt/us_spcounty.mapdata',  mapcol(1)=1, mapline_style(1)=1,
+     mapfile(2) = '../data/arpsplt/us_state.mapdata',     mapcol(2)=2, mapline_style(2)=3,
+     mapfile(3) = '../data/arpsplt/world_coast.mapdata',  mapcol(3)=1, mapline_style(3)=1,
+ /
+
+!
+!-----------------------------------------------------------------------
+!
+!  Options for overlaying station locations and writing the field values at
+!  those locations.
+!
+! ovrstaopt   : Option for overlaying station information (0:off, 1:on).
+! ovrstan     : Overlay station name (0:off, 1:on).
+! ovrstam     : Overlay station symbol (0:off, 1:on).
+! ovrstav     : Overlay interpolated value of the field(s) (0:off, 1:on).
+! wrtstax     : Write station name along axis (for cross-sections) (0:off, 1:on)
+! wrtstad     : the distance (km) for write station name along axis.
+! stacol      : Color for interpolated value and station name along axis. 
+! markprio    : Only plot stations whose priority is <= markprio
+!               (Low numbers has higher priority.)
+! nsta_typ    : Number of station types to plot.
+! sta_marktyp : Symbol type: 1-circle 2-uptriangle 3-downtriangle 4-square
+!               5-diamond, 6-filled_circle 7-filled_uptriangle
+!               8-filled_downtriangle 9-filled_squal 10-filled_diamond
+! sta_typ     : Station type (e.g., 91 ,92).
+! sta_markcol : Symbol color
+! sta_marksz  : Symbol size
+! stalofl     : Station file name
+!
+!              Example of station file: 
+!           #      ST        Site name           Lat      Lon    Elev Type
+!           #.....|..|........................|.......|........|.....|....|
+!           GCK    KS Garden_City_Muni          37.930 -100.730   880  911
+!           BUM    MO Butler/VOR                38.267  -94.483   320  922
+! Type is a two-digit number (91) and a one-digit priority (1)
+!
+!-----------------------------------------------------------------------
+!
+ &plot_sta
+   ovrstaopt = 0,
+   ovrstan = 1,
+   ovrstam = 1,
+   ovrstav = 0,
+   wrtstax = 0,
+   wrtstad = 100.0,
+   stacol=1,
+   markprio = 1,
+   nsta_typ = 3,
+   sta_typ(1) = 91,sta_marktyp(1)=4,sta_markcol(1)=1,sta_marksz(1)=0.004,
+   sta_typ(2) = 92,sta_marktyp(2)=5,sta_markcol(2)=2,sta_marksz(2)=0.004,
+   sta_typ(3) = 93,sta_marktyp(3)=3,sta_markcol(3)=3,sta_marksz(3)=0.004,
+   sta_typ(4) = 94,sta_marktyp(4)=3,sta_markcol(4)=7,sta_marksz(4)=0.004,
+   stalofl='aa-dfw.meta',
+ /
+
+!-----------------------------------------------------------------------
+!
+! Plot radar observation outlines
+!
+!-----------------------------------------------------------------------
+
+ &plot_rad
+   pltradopt=1,
+   nrad=6,
+   radname(1)='KSAO',rngring(1)=40.0E03,
+   radname(2)='KRSP',rngring(2)=40.0E03,
+   radname(3)='KCYR',rngring(3)=40.0E03,
+   radname(4)='KLWE',rngring(4)=40.0E03,
+   radname(5)='KTLX',rngring(5)=60.0E03,
+   radname(6)='KFDR',rngring(6)=60.0E03,
+!-----------------------------------------------------------------------
+!
+! Plot poly-lines by reading data file poly_fname, which lists all
+!  vertices in (lat,lon) or (x,y) (km) format per line with the first
+!  line as 0 or 1 respectively.
+!
+!   useful for plotting tornado path, hurricane track, 
+!   also useful for plotting symbols by setting poly_pltline = 0
+!
+! poly_marktyp : Symbol type: 1-circle 2-uptriangle 3-downtriangle 4-square
+!               5-diamond, 6-filled_circle 7-filled_uptriangle
+!               8-filled_downtriangle 9-filled_squal 10-filled_diamond
+!
+!-----------------------------------------------------------------------
+ &plot_polys
+  nPolys = 2,
+  poly_fname(1) = './path1.txt',
+  poly_color(1)=1, poly_pltline(1)=1, poly_pltmark(1)=0, poly_marksz(1)=0.004, poly_marktyp(1)=6,
+
+  poly_fname(2) = './path2.txt',
+  poly_color(2)=1, poly_pltline(2)=1, poly_pltmark(2)=0, poly_marksz(2)=0.004, poly_marktyp(2)=6,
+ /

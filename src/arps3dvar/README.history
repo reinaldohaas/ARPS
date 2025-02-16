@@ -1,0 +1,12 @@
+Jan 22,2003 by Ming Hu
+Add high order boundary conditions in 1D recursive filter.
+
+Add Vrecur_filt3d_scale.f90 to calculate scale facter of
+   recursive filter. Then change the method in Vderac_scale.f90
+   to get correct factor.
+
+Change nradius from km to number of grid point in Vinit3dvar.f90
+
+Make new innovation in each pass
+
+Use RH as analysis vairable

@@ -1,0 +1,162 @@
+!-----------------------------------------------------------------------
+!
+!  Input file for Mosaic2arps program.
+!  Author: Ming Hu (4/04/2006)
+!
+!  History:
+!    5/15/2007 Fanyou Kong 
+!    Major rewrite to Change the structure to include 2D fields read
+!      - remove runname & mosaicfile
+!      - add mosaicPath, mosaic_opt, and ntiles
+!      - mosaictime & mosaicTile are arrays
+!
+!-----------------------------------------------------------------------
+!  mosaicPath: NetCDF data directory
+!
+!  tversion:   The version of mosaic files:
+!                = 8 the new version, having 8 tiles
+!                = 14 the old verison, having 14 tiles
+!
+!  mosaic_opt: Data type
+!                = 1 3D reflectivity mosaic (mrefl_mosaic)
+!                = 2 2D composite reflectivity mosaic (cref, in dBZ)
+!                = 3 (2D) hourly accumulated precipitation (in inch)
+!  ifcompositeRef: Composite reflectivity calculated (when mosaic_opt=1)
+!                = 0, no composite reflectivity
+!                = 1, dump out composite reflectivity
+!
+!  numvolume:  Number of valumes (times)
+!  mosaictime: Data time
+!
+!  ntiles:     Number of tiles used
+!  mosaicTile: suffics of each tile file (Do not include .gz)
+!-----------------------------------------------------------------------
+ &mosaicpara
+    mosaicPath = '/home/fkong/scratch/radar_product/mosaic_2d/',
+    tversion = 8,
+    mosaic_opt = 2,
+      ifcompositeRef = 1,
+
+    numvolume = 8,
+    mosaictime(1) = '20050514-0000',
+    mosaictime(2) = '20050514-0300',
+    mosaictime(3) = '20050514-0600',
+    mosaictime(4) = '20050514-0900',
+    mosaictime(5) = '20050514-1200',
+    mosaictime(6) = '20050514-1500',
+    mosaictime(7) = '20050514-1800',
+    mosaictime(8) = '20050514-2100',
+
+    ntiles = 8,
+    mosaicTile(1) = '_1_2d.netcdf'
+    mosaicTile(2) = '_2_2d.netcdf'
+    mosaicTile(3) = '_3_2d.netcdf'
+    mosaicTile(4) = '_4_2d.netcdf'
+    mosaicTile(5) = '_5_2d.netcdf'
+    mosaicTile(6) = '_6_2d.netcdf'
+    mosaicTile(7) = '_7_2d.netcdf'
+    mosaicTile(8) = '_8_2d.netcdf'
+ /
+
+!-----------------------------------------------------------------------
+!
+!  grid.
+!
+!  nx, ny:  Dimensions of ARPS computational grid in x and y directions.
+!
+!           Given nx and ny, the domain size will be
+!           xl=(nx-3)*dx by yl=(ny-3)*dy.
+!
+!
+!  dx       Grid spacing in x-direction in computational
+!           and physical space (m).
+!  dy       Grid spacing in y-direction in computational
+!           and physical space (m).
+!
+!  ctrlat   Latitude of the model physical domain center (deg. N).
+!  ctrlon   Longitude of the model physical domain center (deg. E).
+!           Default: 36.00N and -100.00W  (Del City, Oklahoma)
+!
+!-----------------------------------------------------------------------
+
+ &grid
+   nx   = 753,
+   ny   = 663,
+   nz   = 53,
+
+   dx       =   4000.000,
+   dy       =   4000.000,
+   dz       =   425.000,
+   strhopt  = 2,
+     dzmin    =   20.000,
+     zrefsfc  =     0.0,
+     dlayer1  =     0.0,
+     dlayer2  =     1.0e5,
+     strhtune =     0.2,
+   zflat    =     1.0e5,
+
+   ctrlat =   39.0,
+   ctrlon =  -97.0,
+
+ /
+
+!-----------------------------------------------------------------------
+!
+!  projection parameters:
+!
+!  mapproj   Map projection option.
+!          = 0, no map projection;
+!          = 1, North polar projection      (-1 South Pole);
+!          = 2, Northern Lambert projection (-2 Southern);
+!          = 3, Mercator projection.
+!  trulat1   1st true latitude of map projection.
+!  trulat2   2nd true latitude of map projection (used only by mapproj = 2).
+!  trulon    True longitude of map projection.
+!  sclfct    Map scale factor (default is 1.0).
+!
+!-----------------------------------------------------------------------
+
+ &projection
+   mapproj = 2,
+   trulat1 =  32.0,
+   trulat2 =  45.0,
+   trulon  = -97.0,
+   sclfct  =  1.0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Options and parameters related to terrain specification (This
+!  section is only used when mosaic_opt=1, for 3D mosaic data).
+!
+!  ternopt  Model terrain option.
+!         = 0, no terrain, flat ground;
+!         = 1, analytic mountain profile;
+!         = 2, terrain data read in from file terndta (defined lat
+!         The following option is used if ternopt = 2:
+!  terndta  Name of the terrain data file for ternopt=2.
+!
+!  ternfmt  Format of terrain data file.
+!         = 1, Fortran unformatted (default);
+!         = 3, HDF4 (uncompressed).
+!
+!-----------------------------------------------------------------------
+
+ &terrain
+   ternopt = 2,
+   terndta = 'spc4A_3000x2640_4.trnhdf',
+       ternfmt = 3,
+ /
+
+!-----------------------------------------------------------------------
+!
+! OUTPUT options
+!
+!-----------------------------------------------------------------------
+
+ &output
+   dirname = './',
+   dmpfmt  = 1,
+ /
+
+!-----------------------------------------------------------------------

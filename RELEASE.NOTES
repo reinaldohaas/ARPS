@@ -1,0 +1,336 @@
+ARPS Release Notes
+
+Version 5.2.5
+
+   -- On Linux pltform with Intel Fortran compiler, it may need
+      a long time to compile arpsplt.f90 with optimization. It 
+      is recommended to use no optimization on this file.
+
+       $> makearps -nomainopt arpspltncar/arpspltpost
+       
+      The speed impact is ignorable.
+
+Version 5.1.6 
+
+    -- On Linux Platform, in order to count CPU time correctly,
+       user should modify code src/arps/lnxlib3d.f90 as following
+
+         o ifort (Interal compiler version 8.0 and later), the default
+           call (cpu_time) should work.
+         o pgf90 (Portland Group Inc.), comment out "cpu_time" call 
+           and uncomment "etime" call.
+
+    -- To support large (>2gb) NetCDF file. NetCDF version 3.6.0 is
+       required and uncomment those lines associated with "LargeFile"
+       in both src/arps/netio3d.f90 and src/arps2wrf/wrf_ioncd.f90.
+
+Version  5.0.0IHOP3 (09/09/2002)
+
+Some limits of IHOP3 version:
+
+    -- In this version data I/O only supports binary, HDF 4 foramt
+       and GrADS supported only as a history dump format.
+    -- Option "soilinit = 3" (arps.input) is not good since version
+       IHOP_0.
+    -- ARPSINTRP does not compile for any optimization level higher
+       than 2 on both paige (IRIX64) and Linux platform.
+    -- EXT2ARPS executable compiled using optimization level higher
+       than 2 (-opt 3 or higher) on paige does not work properly.
+
+Version: 5.0 merged verion with WDT in March 2002
+
+MP accuracy Note: For bit-for-bit MP accuracy, uncomment a few line in 
+                  micro3d.f90(1220-1221) and init3d.f90(2511-2514, 2522-2523)
+                  These will slow execution down significantly.
+
+Version: 4.5.1
+
+Release date: 2000/02/17
+
+Note: Due to compiler problems on paige, most executables were compiled with 
+"-O2 -static".
+
+arps standard tests:
+
+test            ran     verif   notes (compared to verion 4.5.0 unless stated)
+-------         ---     -----   -----
+
+arpstrn         +       +       Similar output to arpstern.  Note that
+                                terrain no longer follows lake bottom.
+                                Note that the height at i=nx or j=ny is zero.
+
+arpstern        +       +       Only significant difference is in Great Lakes
+                                where terrain no longer follows lake bottom.
+
+ext2arps        +       +       Deep soil moisture different due to bug fix
+				in ETA GRIB conversion.  Features over
+				great lakes different due to updated
+				terrain over the lakes.  (Note that
+				sea-level pressure for 4.5.0 look wierd
+				if plotted using base file for 4.5.1 test
+				case since terrain has changed, i.e.
+				shouldn't use a base file with different
+				terrain than history dump.)
+
+mci2arps        +       +       This validation test just introduced.  The
+                                gif images look reasonable.
+
+nids2arps       +       +       Identical output to files in
+                                /work/std_test/data/data.25may1998/nids2arps.
+
+adas            +       +       Adas text output looks reasonable.  With the
+                                cloud analysis fix a lot more hydrometers are
+                                now added.  Satellite data was included for
+                                the first time in this validation test.
+
+arpssfc         +       +       Only machine round-off differences.
+
+symmetry        +       +       Most fields constant.  Pt & prprt are symmetric
+                                when viewed using grads (gxout grid).
+
+beltrami        +       +       No significant differences with 4.5.0.
+
+density         +       +       No significant differences compared to version
+                                4.5.0 when differencing using grads.
+
+warmbubble      +       +       Similar output.
+
+surface         +       +       Due to the bug correction in soilebm3d.f the
+                                deep soil temperature's diurnal variation is
+                                now double what it was before (e.g. for the
+                                wangara0a test, t2 now varies by 1.5C; tsfc
+                                was changed by as much as 0.5C due to the
+                                bug fix).
+
+realcase        +       +       Similar to agri version.  Similar except over
+                                rockies where 4.5.0 had snow cover.
+                                Changes similar to surface test were seen
+                                with soil temperatures.
+                                Restart produced bit-for-bit the same output.
+
+agri            +       +       g01: surface temperature and dew point over
+                                rockies now not too cold (due to absence of
+                                snowcvr - 4.5.0 eta soilvar file shows snowcvr
+                                in that area (with fixed grads ctl file)).
+                                g02: all quantities very similar to 4.5.0.
+                                Changes similar to surface test were seen
+                                with soil temperatures.
+
+arpsmpi         +       -       History dump differs from non-mpi case in more
+                                than just header section (compared using "od").
+
+testmkarps:  TESTING RESULTS SUMMARY on paige (IRIX64 6.5):
+ compiled without problem:
+   adas  command "makearps  adas"
+   arps  command "makearps  arps"
+   arpsagri  command "makearps  arpsagri"
+   arpsassim  command "makearps  arpsassim"
+   arpscvt  command "makearps  arpscvt"
+   arpsdiff  command "makearps  arpsdiff"
+   arpsens  command "makearps  arpsenscv"
+   arpsens  command "makearps  arpsensbc"
+   arpsens  command "makearps  arpsensic"
+   arpsextsnd  command "makearps  arpsextsnd"
+   arpsintrp  command "makearps  arpsintrp"
+   arpsintrp  command "makearps  arpsintrp_ls"
+   arpsplt  command "makearps -opt 3 arpspltncar"
+   arpsplt  command "makearps -opt 3 arpspltpost"
+   arpsplt  command "makearps  arpspltmax"
+   arpsprt  command "makearps  arpsprt"
+   arpssfc  command "makearps  arpssfc"
+   arpssoil  command "makearps  arpssoil"
+   arpssolver  command "makearps  arpssolver"
+   arpstern  command "makearps  dir1deg"
+   arpstern  command "makearps  dir5min"
+   arpstern  command "makearps  dir30sec"
+   arpstern  command "makearps  arpstern"
+   arpstern  command "makearps  arpstrn"
+   arpstern  command "makearps  mergetrn"
+   arpstintrp  command "makearps  arpstintrp"
+   arps_mp  command "makearps  splitfiles"
+   arps_mp  command "makearps  joinfile"
+   arps_mp  command "makearps  joinfiles"
+   arps_mp  command "makearps  arps_mpi"
+   ext2arps  command "makearps  ext2arps"
+   mci2arps  command "makearps  mci2arps"
+   nids2arps  command "makearps  nids2arps"
+
+ compilation failed - hdf library problem on paige:
+   arps2ncdf  command "makearps  -f90 arps2ncdf"
+
+testmkarps:  TESTING RESULTS SUMMARY on kiowa (Linux 2.2.12-20):
+ compiled without problem:
+   adas  command "makearps  adas"
+   arps  command "makearps  arps"
+   arpsagri  command "makearps  arpsagri"
+   arpsassim  command "makearps  arpsassim"
+   arpscvt  command "makearps  arpscvt"
+   arpsdiff  command "makearps  arpsdiff"
+   arpsens  command "makearps  arpsensbc"
+   arpsens  command "makearps  arpsensic"
+   arpsextsnd  command "makearps  arpsextsnd"
+   arpsintrp  command "makearps  arpsintrp"
+   arpsintrp  command "makearps  arpsintrp_ls"
+   arpsplt  command "makearps -opt 3 arpspltpost"
+   arpsplt  command "makearps  arpspltmax"
+   arpsprt  command "makearps  arpsprt"
+   arpssfc  command "makearps  arpssfc"
+   arpssoil  command "makearps  arpssoil"
+   arpssolver  command "makearps  arpssolver"
+   arpstern  command "makearps  dir1deg"
+   arpstern  command "makearps  dir5min"
+   arpstern  command "makearps  dir30sec"
+   arpstern  command "makearps  arpstern"
+   arpstintrp  command "makearps  arpstintrp"
+   arps_mp  command "makearps  splitfiles"
+   arps_mp  command "makearps  joinfile"
+   arps_mp  command "makearps  joinfiles"
+   ext2arps  command "makearps  ext2arps"
+
+ compilation failed - no hdf library:
+   arps2ncdf  command "makearps  -f90 arps2ncdf"
+   mci2arps  command "makearps  mci2arps"
+
+ compilation failed - no NCAR Graphics:
+   arpsens  command "makearps  arpsenscv"
+   arpsplt  command "makearps -opt 3 arpspltncar"
+   arpstern  command "makearps  arpstrn"
+   arpstern  command "makearps  mergetrn"
+
+ compilation failed - no MPI library:
+   arps_mp  command "makearps  arps_mpi"
+
+ compilation failed - problem with include/cfortran.h:
+   nids2arps  command "makearps  nids2arps"
+
+testmkarps:  TESTING RESULTS SUMMARY on twister (SunOS 5.7):
+ compiled without problem:
+   adas  command "makearps  adas"
+   arps  command "makearps  arps"
+   arpsagri  command "makearps  arpsagri"
+   arpsassim  command "makearps  arpsassim"
+   arpscvt  command "makearps  arpscvt"
+   arpsdiff  command "makearps  arpsdiff"
+   arpsens  command "makearps  arpsenscv"
+   arpsens  command "makearps  arpsensbc"
+   arpsens  command "makearps  arpsensic"
+   arpsextsnd  command "makearps  arpsextsnd"
+   arpsintrp  command "makearps  arpsintrp"
+   arpsintrp  command "makearps  arpsintrp_ls"
+   arpsplt  command "makearps -opt 3 arpspltncar"
+   arpsplt  command "makearps -opt 3 arpspltpost"
+   arpsplt  command "makearps  arpspltmax"
+   arpsprt  command "makearps  arpsprt"
+   arpssfc  command "makearps  arpssfc"
+   arpssoil  command "makearps  arpssoil"
+   arpssolver  command "makearps  arpssolver"
+   arpstern  command "makearps  dir1deg"
+   arpstern  command "makearps  dir5min"
+   arpstern  command "makearps  dir30sec"
+   arpstern  command "makearps  arpstern"
+   arpstern  command "makearps  arpstrn"
+   arpstern  command "makearps  mergetrn"
+   arpstintrp  command "makearps  arpstintrp"
+   arps_mp  command "makearps  splitfiles"
+   arps_mp  command "makearps  joinfile"
+   arps_mp  command "makearps  joinfiles"
+   ext2arps  command "makearps  ext2arps"
+
+ compilation failed - no hdf library:
+   arps2ncdf  command "makearps  -f90 arps2ncdf"
+   mci2arps  command "makearps  mci2arps"
+
+ compilation failed - no MPI library:
+   arps_mp  command "makearps  arps_mpi"
+
+ compilation failed - problem with include/wsi.h:
+   nids2arps  command "makearps  nids2arps"
+
+testmkarps:  TESTING RESULTS SUMMARY on bluesky (AIX 4.3):
+ compiled without problem:
+   adas  command "makearps  adas"
+   arps  command "makearps  arps"
+   arpsagri  command "makearps  arpsagri"
+   arpsassim  command "makearps  arpsassim"
+   arpscvt  command "makearps  arpscvt"
+   arpsdiff  command "makearps  arpsdiff"
+   arpsens  command "makearps  arpsenscv"
+   arpsens  command "makearps  arpsensbc"
+   arpsens  command "makearps  arpsensic"
+   arpsextsnd  command "makearps  arpsextsnd"
+   arpsintrp  command "makearps  arpsintrp"
+   arpsintrp  command "makearps  arpsintrp_ls"
+   arpsplt  command "makearps -opt 3 arpspltpost"
+   arpsplt  command "makearps  arpspltmax"
+   arpsprt  command "makearps  arpsprt"
+   arpssfc  command "makearps  arpssfc"
+   arpssoil  command "makearps  arpssoil"
+   arpssolver  command "makearps  arpssolver"
+   arpstern  command "makearps  dir1deg"
+   arpstern  command "makearps  dir5min"
+   arpstern  command "makearps  dir30sec"
+   arpstern  command "makearps  arpstern"
+   arpstintrp  command "makearps  arpstintrp"
+   arps_mp  command "makearps  splitfiles"
+   arps_mp  command "makearps  joinfile"
+   arps_mp  command "makearps  joinfiles"
+   ext2arps  command "makearps  ext2arps"
+   nids2arps  command "makearps  nids2arps"
+
+ compilation failed - no hdf library:
+   arps2ncdf  command "makearps  -f90 arps2ncdf"
+   mci2arps  command "makearps  mci2arps"
+
+ compilation failed - no NCAR Graphics:
+   arpsplt  command "makearps -opt 3 arpspltncar"
+   arpstern  command "makearps  arpstrn"
+   arpstern  command "makearps  mergetrn"
+
+ compilation failed - no MPI library:
+   arps_mp  command "makearps  arps_mpi"
+
+testmkarps:  TESTING RESULTS SUMMARY on crayj90 (Unicos 10.0.0.):
+ compiled without problem:
+   adas  command "makearps  adas"
+   arps  command "makearps  arps"
+   arpsagri  command "makearps  arpsagri"
+   arpsassim  command "makearps  arpsassim"
+   arpscvt  command "makearps  arpscvt"
+   arpsdiff  command "makearps  arpsdiff"
+   arpsens  command "makearps  arpsenscv"
+   arpsens  command "makearps  arpsensbc"
+   arpsens  command "makearps  arpsensic"
+   arpsextsnd  command "makearps  arpsextsnd"
+   arpsintrp  command "makearps  arpsintrp"
+   arpsintrp  command "makearps  arpsintrp_ls"
+   arpsplt  command "makearps -opt 3 arpspltncar"
+   arpsplt  command "makearps  arpspltmax"
+   arpsprt  command "makearps  arpsprt"
+   arpssfc  command "makearps  arpssfc"
+   arpssolver  command "makearps  arpssolver"
+   arpstern  command "makearps  dir1deg"
+   arpstern  command "makearps  dir5min"
+   arpstern  command "makearps  dir30sec"
+   arpstern  command "makearps  arpstern"
+   arpstern  command "makearps  arpstrn"
+   arpstern  command "makearps  mergetrn"
+   arpstintrp  command "makearps  arpstintrp"
+   arps_mp  command "makearps  splitfiles"
+   arps_mp  command "makearps  joinfile"
+   arps_mp  command "makearps  joinfiles"
+   arps_mp  command "makearps  arps_mpi"
+   ext2arps  command "makearps  ext2arps"
+
+ compilation failed - no hdf library:
+   arps2ncdf  command "makearps  -f90 arps2ncdf"
+   mci2arps  command "makearps  mci2arps"
+
+ compilation failed - problem with /usr/local/zxplot/bin/zxpostf77 on crayj90:
+   arpsplt  command "makearps -opt 3 arpspltpost"
+
+ compilation failed - problem with api read statment:
+   arpssoil  command "makearps  arpssoil"
+
+ compilation failed - problem with include/wsi.h:
+   nids2arps  command "makearps  nids2arps"
+

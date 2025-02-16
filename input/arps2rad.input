@@ -1,0 +1,99 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPS2RAD IN NAMELIST FORMAT     ######
+!     ######               ( ARPS 5.3.2 )                         ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  for program arps2rad.
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+!
+! Yunheng Wang (02/22/2001)
+!
+! Modification history:
+!
+! 02/22/2001 (Yunheng Wang)
+! Converted to namelist format.
+!
+! 08/22/2003 (Keith Brewster)
+! Modified defaults and changed distance units to m to be consistent
+! with rest of ARPS.  Removed grid_dims.  Grid dimensions are now
+! obtained from the history file.
+!
+!-----------------------------------------------------------------------
+!
+!   Get the name of the input data set:
+!
+!   hdmpfmt:       input data format flag value 1/2/3/4
+!
+!   grdbasfn:      the name of the file containing the grid and base state
+!                  information. This is not used if these fields are
+!                  stored in each data file.
+!
+!   filename:      the name of the input data file.
+!
+!-----------------------------------------------------------------------
+
+ &file_name
+   hinfmt=3,
+   grdbasfn='/scratch/kbrews/dec02/55/faaarps.hdfgrdbas',
+   grdbasfn='/scratch/fkong/fw3km_2300.hdfgrdbas',
+   filename='/scratch/kbrews/dec02/55/faaarps.hdf000600',
+   filename='/scratch/fkong/fw3km_2300.hdf000000',
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Input the radar information
+!
+!  This does not have to be an actual radar as the ID and lat,lon
+!  will be stored in the radar data file.
+!
+!  radid:      4-char radar ID for the output data file.
+!  latrad:     lat for the radar.
+!  lonrad:     lon for the radar.
+!  elvrad:     elevation for the radar (m)
+!  vcpnum:     a VCP number, 11,12,31 or 32
+!                   11: Storm mode  14 tilts 0.5-19.5 deg
+!                   12: Precip mode  9 tilts 0.5-19.5 deg
+!                   31: Clear-air    5 tilts 0.5- 4.5 deg
+!                   32: Clear-air    5 tilts 0.5- 4.5 deg
+!  rngmin
+!  rngmax:     a min and maximum range (m)
+!
+!  rfopt       Option for calculating reflectivity field
+!               < 100 ( =mphyopt  Microphysics option. [Refer mphyopt in "arps.input"] )
+!
+!  thref:        Reflectivity threshold (dBZ)
+!  dmpfmt:       Radar dump format: 1: Binary
+!                                   3: HDF
+!  hdf4cmpr:     Compression level in HDF
+!
+!-----------------------------------------------------------------------
+
+ &radar_info
+    radid='KFAK',
+    latrad=32.5731,
+    lonrad=-97.3031,
+    elvrad=232.9,
+    vcpnum=11,
+    rngmin=2.E03,
+    rngmax=230.E03,
+    rfopt=2,
+    thref=45.,
+    dmpfmt=1,
+    hdf4cmpr=1,
+ /

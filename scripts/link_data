@@ -1,0 +1,90 @@
+#!/bin/csh -f
+#
+########################################################################
+#
+# PURPOSE:
+#
+#   Establish symbol links for ARPSTERN and ARPSSFC and data.25may1998 
+#   under data subdirectory and set the environment variables which are 
+#   necessary to run the perl scripts.
+# 
+# Usage:  [source] scripts/link_data [data_directory]
+#   
+#   use "source" (for csh) if you want to set the environments.
+#   "data_directory" is where the data locate. Do not need on PAIGE 
+#   or CIRRUS.
+#    
+# NOTE:
+#
+#   This script should run from ARPS root directory.
+#
+# Author: 
+#
+#   Yunheng Wang  (06/23/2001)
+#
+# HISTORY
+# 
+#   Yunheng Wang (04/09/2002)
+#   Added environment variables settings.
+#
+########################################################################
+
+set hostn = `hostname`
+switch ("${hostn}")
+  case paige*:
+  case cirrus*:
+    set data_source = /work/official
+    breaksw
+  default:
+    set data_source = ~/data           # Linux or AIX
+    breaksw
+endsw
+
+#echo $data_source
+
+if ( $#argv ) then
+  set data_source = $argv[1]
+endif
+
+if ( ! -d "${data_source}/arpstern.data/"    ||                         \
+     ! -d "${data_source}/arpssfc.data/"     ||                         \
+     ! -d "${data_source}/data.25may1998" ) then
+    if ( ! -d "./data/arpstern.data/"    ||                             \
+         ! -d "./data/arpssfc.data/"     ||                             \
+         ! -d "./data/data.25may1998" ) then
+       echo "Data do not exist on " $data_source " Please first copy"   
+       echo "arpstern.data, arpssfc.data and data.25may1998 to your"    
+       echo "local disk from paige:/work/official or ftp.caps.ou.edu/ARPS."
+       exit
+    endif
+endif
+
+set arps =  `echo $cwd:t|cut -c 1-4 -`
+
+if( $arps != "arps" || (! -d "./data/") || (! -d "./scripts/")) then
+	echo "\nAre you running this script from ARPS root directory?"
+	echo "Please named ARPS root directory as something like 'arpsxxxx'"
+        echo "where 'xxxx' is ARPS version number, then cd to that directory\n"
+        echo "Usage: [source] scripts/link_data [data_dir]\n"
+        echo "  [source]  : for csh/tcsh, only if you need to set the "
+        echo "              environments to run the perl scripts"
+        echo "  [data_dir]: the directory of data, not needed on PAIGE or CIRRUS\n"
+else
+	if (! -d data/arpstern.data)               \
+          ln -s ${data_source}/arpstern.data data/arpstern.data
+	if (! -d data/arpssfc.data)                \
+          ln -s ${data_source}/arpssfc.data data/arpssfc.data
+	if (! -d data/data.25may1998)              \
+          ln -s ${data_source}/data.25may1998 data/data.25may1998
+        if (! -d data/data.test) then
+	  mkdir data/data.test
+	  mkdir data/data.test/nids
+	  mkdir data/data.test/nids/nids2arps
+        endif
+
+# Added environment variables
+        setenv ARPSDIR `echo $cwd:h`
+        setenv ARPSVER `echo $cwd:t |cut -c 5- -`
+        setenv GASCRP ${ARPSDIR}/arps${ARPSVER}/scripts/ 
+        setenv PATH   ${PATH}:${ARPSDIR}/arps${ARPSVER}/scripts
+endif

@@ -1,0 +1,462 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######     INPUT FILE FOR ARPSENKFIC IN NAMELIST FORMAT     ######
+!     ######                                                      ######
+!     ######                 ( Version ARPS5.3 )                  ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  for ARPSENKFIC
+!
+!  The parameters in arps.input &initialization need to be specified
+!  first in order to determine how the first guess is obtained
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+!
+! Mingjing Tong (09/20/2006)
+!
+! Modification:
+!     02-xx-2009  G.ZHAO  added the options for Recursive Filter
+!     08-28-2009  Q.Wang  Add option to perturb tsoil/qsoil (soilprtopt)
+!
+!-----------------------------------------------------------------------
+
+!-----------------------------------------------------------------------
+!  EnKF model state initialization
+!
+!
+!  arpsinputfn The name of arps input file
+!              The parameters under &initialization will be used by
+!              arpsenkfic.f90. Make sure if initopt = 3, 'inifile' and
+!              'inigbf' should be set correctly.
+!              So, if the ensemble is initialized from different initial
+!              guesses, different 'arps.input', in which 'inifile' and
+!              'inigbf' are different, can be used for each member.
+!
+!  iniprtopt  Initial perturbation option (To generate initial ensemble)
+!           = 0, no perturbation
+!           = 1, add Gaussian random perturbations
+!           = 2, add smoothed Gaussian random pertrubation (SM)
+!           = 3, add 2D recursive-filtered Gaussian random perturbations (RF)
+!           = 4, add bubble perturbations (not available now)
+!    iniprt_ptprt  Option to add smoothed perturbation for ptprt
+!           = 0, no perturbation
+!           = 1, add Gaussian random perturbations
+!           = 2, add smoothed Gaussian random pertrubation
+!           = 3, add 2D recursive-filtered Gaussian random perturbations
+!           = 4, same as 1 but add positive perturbations only
+!           = 5, same as 2 but add positive perturbations only
+!           = 6, same as 3 but add positive perturbations only
+!           = 7, add bubble perturbations (not available now)
+!    iniprt_qv     Option to add smoothed perturbation for qv
+!           = 0, no perturbation
+!           = 1, add Gaussian random perturbations
+!           = 2, add smoothed Gaussian random pertrubation
+!           = 3, add 2D recursive-filtered Gaussian random perturbations
+!           = 4, add bubble perturbations (not available now)
+!    flip_qcrish   Option to convert negative perturbations to positive
+!           = 0, negative perturbations are added to mixing ratios first and
+!                set the negative mixing ratio is set to 0
+!           = 1, negative perturbations are converted to positive
+!
+!    smoothopt Option for smoothed initial perturbations
+!              (when iniprtopt = 2)
+!            = 1, yes depend on 3D distance lhor
+!            = 2, yes smoothing length scale can be different
+!                     in horizontal and vertical
+!            = 3, read smoothed random perturbation
+!    lhor  Horizontal correlation length scale used in smoothing function
+!          (lhor also used in recursive filter)
+!          NOTE> To get the corresponding lenth scale of RF to that of SM,
+!                use this relationship: L(RF) ~ L(SM)/1.82
+!    lver  Vertical correlation length scale used in smoothing function
+!
+!  prtrgn_uv  Options to confine perturbation region for u and v
+!           = 0 perturbation region is defined by prtbgn and prtend
+!           = 1 perturbation region is confined by radar echo
+!  prtrgn_w       for w
+!  prtrgn_ptprt   for ptprt
+!  prtrgn_pprt    for pprt
+!  prtrgn_qv      for qv
+!  prtrgn_qli     for hydormeteor mixing ratio qc, qr, qi, qs, qg, qh
+!
+!  prtibgn  Starting grid point of perturbed region in x direction
+!  prtiend  Ending grid point of perturbed region in x direction
+!  prtjbgn  Starting grid point of perturbed region in y direction
+!  prtjend  Ending grid point of perturbed region in y direction
+!  prtkbgn  Starting grid point of perturbed region in vertical direction
+!  prtkend  Ending grid point of perturbed region in vertical direction
+!  prtibgnu Same as prtibgn, but for u
+!  prtiendu Same as prtiend, but for u
+!  prtjbgnv Same as prtjbgn, but for v
+!  prtjendv Same as prtjend, but for v
+!  prtkbgnw Same as prtkbgn, but for w
+!  prtkendw Same as prtkend, but for w
+!
+!  rdrdtadir Directory radar data are read from
+!  rdrdatype Spatial distribution of radar data
+!            = 1, on scalar grid
+!            = 2, on elevation angle level
+!  ntiltmax  The maximum number of radar tilts (rdrdatype = 2)
+!  radarnum  Number of radar data
+!  rdrdtanam Radar data file name
+!  rdrfmt    Observation data format
+!            = 0, observation is on the same as the model grid
+!                 (observations at all grid points)
+!            = 1, observations only at non-missing points
+!                 (column-tilt format, rdrdatype = 2)
+!
+!  flgwrtopt Option to dump grid flag file based on observed echo.
+!            = 0,  do not dump
+!            = 1,  dump output
+!            = 2,  read in pre-flaged output
+!
+!  z0_uv     The threshold of reflectivity used to confine perturbations
+!            for u and v. Perturbations are only added to regions where
+!            reflectivity >= z0_uv.
+!  z0_w      The threshold of reflectivity for w
+!  z0_ptprt  The threshold of reflectivity for ptprt
+!  z0_pprt   The threshold of reflectivity for pprt
+!  z0_qv     The threshold of reflectivity for qv
+!  z0_qli    The threshold of reflectivity for qc, qr, qi, qs, qg, qh
+!
+!  r0h_uv    When a data point at which reflectivity > z0_uv is found,
+!            perturbations for u and v will be added to the region centered
+!            at the data point and extended by r0h_uv in horizontal and r0v_uv
+!            in vertical directions
+!  r0v_uv
+!  r0h_w     for w
+!  r0v_w
+!  r0h_ptprt for perturbation potential temperature
+!  r0v_ptprt
+!  r0h_pprt  for perturbation pressure
+!  r0v_pprt
+!  r0h_qv    for qv
+!  r0v_qv
+!  r0h_qli   for qc, qr, qi, qs, qg, qh
+!  r0v_qli
+!
+!  uvzbgn   The lowest level the perturbations will be added for u and v (in meters)
+!  uvzend   The highest level the perturbations will be added for u and v (in meters)
+!  wzbgn    The lowest level the perturbations will be added for w (in meters)
+!  wzend    The highest level the perturbations will be added for w (in meters)
+!  ptprtzbgn The lowest level the perturbations will be added for ptprt (in meters)
+!  ptprtzend The highest level the perturbations will be added for ptprt (in meters)
+!  pprtzbgn The lowest level the perturbations will be added for pprt (in meters)
+!  pprtzend The highest level the perturbations will be added for pprt (in meters)
+!  qvzbgn   The lowest level the perturbations will be added for qv (in meters)
+!  qvzend   The highest level the perturbations will be added for qv (in meters)
+!  qczbgn   The lowest level the perturbations will be added for qc (in meters)
+!  qczend   The highest level the perturbations will be added for qc (in meters)
+!  qrzbgn   The lowest level the perturbations will be added for qr (in meters)
+!  qrzend   The highest level the perturbations will be added for qr (in meters)
+!  qizbgn   The lowest level the perturbations will be added for qi (in meters)
+!  qizend   The highest level the perturbations will be added for qi (in meters)
+!  qszbgn   The lowest level the perturbations will be added for qs (in meters)
+!  qszend   The highest level the perturbations will be added for qs (in meters)
+!  qgzbgn   The lowest level the perturbations will be added for qg (in meters)
+!  qgzend   The highest level the perturbations will be added for qg (in meters)
+!  qhzbgn   The lowest level the perturbations will be added for qh (in meters)
+!  qhzend   The highest level the perturbations will be added for qh (in meters)
+!
+!  seeds  Seed for gasdev.f90 (generate random perturbations for model state)
+!         Note> use negative integer
+!
+!  stdu  Standard deviation of Gaussion random perturbations for u (m/s)
+!  stdv  Stdev of Gaussion random perturbations for v (m/s)
+!  stdw  Stdev of Gaussion random perturbations for w (m/s)
+!  stdptprt Stdev of Gaussion random perturbations for ptprt (K)
+!  stdpprt Stdev of Gaussion random perturbations for pprt (Pa)
+!  stdqv Stdev of Gaussion random perturbations for qv (kg/kg)
+!  stdqc Stdev of Gaussion random perturbations for qc (kg/kg)
+!  stdqr Stdev of Gaussion random perturbations for qr (kg/kg)
+!  stdqi Stdev of Gaussion random perturbations for qi (kg/kg)
+!  stdqs Stdev of Gaussion random perturbations for qs (kg/kg)
+!  stdqg Stdev of Gaussion random perturbations for qg (kg/kg)
+!  stdqh Stdev of Gaussion random perturbations for qh (kg/kg)
+!
+!  soilprtopt Option to perturb tsoil/qsoil
+!        = 0, no
+!        = 1, yes, use the same perturbation method as indicated by iniprtopt
+!  stdtsoilsfc   Stdev of Gaussion random perturbations for tsoilsfc (K)
+!  stdtsoildp    Stdev of Gaussion random perturbations for tsoildp (K)
+!  stdqsoilsfc   Stdev of Gaussion random perturbations for qsoilsfc (m^3/m^3)
+!  stdqsoildp    Stdev of Gaussion random perturbations for qsoildp (m^3/m^3)
+!
+!  stdqrelative  If > 0.0, rescale the random perturbations of qv/qc/qr/qi/qs/qg/qh/qsoil
+!                          to a relative value, between 0 and 1, 0.1 recommanded
+!                If = 0.0, not rescale the the random perturbations (default)
+!
+!  hydroadj    Option for adjusting pressure to balance gravity
+!                and buoyancy to force dw/dt=0 after adding perturbations.
+!                = 0    no correction
+!                = 1    correction applied beginning at surface
+!                = 2    correction applied beginning at top
+!                = 3    hydrostatic equation integrated from
+!                       surface for total-p, pbar subtracted.
+!                hydroadj=0 suggested
+!
+!  rndprtdmp Option to dump random perturbations
+!       = 0, (default)
+!       = 1,
+!
+!  modelopt    Option for adding WRF model
+!             = 1, ARPS model
+!             = 2, WRF model
+!-----------------------------------------------------------------------
+
+ &enkf_stateinit
+
+   iniprtopt = 2,
+     iniprt_ptprt = 2,
+     iniprt_qv = 2,
+     flip_qcrish = 0,
+
+   smoothopt = 1,
+   lhor = 6000.0,
+   lver = 6000.0,
+
+   prtrgn_uv = 0,
+   prtrgn_w = 0,
+   prtrgn_ptprt = 0,
+   prtrgn_pprt = 0,
+   prtrgn_qv = 0,
+   prtrgn_qli = 1,
+
+   prtibgn = 3,
+   prtiend = 32,
+   prtjbgn = 3,
+   prtjend = 32,
+   prtkbgn = 3,
+   prtkend = 33,
+   prtibgnu = 3,
+   prtiendu = 33,
+   prtjbgnv = 3,
+   prtjendv = 33,
+   prtkbgnw = 3,
+   prtkendw = 33,
+
+   rdrdtadir = '/home/yjung/simulation/may20',
+   rdrdatype = 2,
+     ntiltmax = 14,
+   radarnum = 1,
+     rdrdtanam(1) = 'KTLX_may20_001500',
+   rdrfmt = 1,
+
+   flgwrtopt = 0,
+
+   z0_uv = 0.0,
+   z0_w = 0.0,
+   z0_ptprt = 0.0,
+   z0_pprt = 0.0,
+   z0_qv = 0.0,
+   z0_qli = 10.0,
+
+   r0h_uv = 6000.0,
+   r0v_uv = 3000.0,
+   r0h_w = 6000.0,
+   r0v_w = 3000.0,
+   r0h_ptprt = 6000.0,
+   r0v_ptprt = 3000.0,
+   r0h_pprt = 6000.0,
+   r0v_pprt = 3000.0,
+   r0h_qv = 6000.0,
+   r0v_qv = 3000.0,
+   r0h_qli = 6000.0,
+   r0v_qli = 3000.0,
+
+   uvzbgn = 0.0,
+   uvzend = 16000.0,
+   wzbgn = 0.0,
+   wzend = 16000.0,
+   ptprtzbgn = 0.0,
+   ptprtzend = 16000.0,
+   pprtzbgn = 0.0,
+   pprtzend = 16000.0,
+   qvzbgn = 0.0,
+   qvzend = 6000.0,
+   qczbgn = 1000.0,
+   qczend = 9000.0,
+   qrzbgn = 0.0,
+   qrzend = 5000.0,
+   qizbgn = 5000.0,
+   qizend = 14000.0,
+   qszbgn = 4000.0,
+   qszend = 13000.0,
+   qgzbgn = 0.0,
+   qgzend = 13000.0,
+   qhzbgn = 0.0,
+   qhzend = 12000.0,
+
+   seeds = 0,
+
+   stdu = 2.0,
+   stdv = 2.0,
+   stdw = 2.0,
+   stdptprt = 2.0,
+   stdpprt = 0.0,
+   stdqv = 0.0006,
+   stdqc = 0.0006,
+   stdqr = 0.0006,
+   stdqi = 0.0006,
+   stdqs = 0.0006,
+   stdqg = 0.0006,
+   stdqh = 0.0006,
+
+   soilprtopt = 0,
+     stdtsoilsfc = 2.0,
+     stdtsoildp  = 1.0,
+     stdqsoilsfc = 0.015,
+     stdqsoildp  = 0.0175,
+
+   stdqrelative = 0.0,
+
+   hydroadj = 0,
+
+   rndprtdmp = 0,
+
+/
+
+!-----------------------------------------------------------------------
+!  Parameter initialization for parameter retrieval:
+!
+!  paraperturb    Option to perturb the initial guess of parameters
+!                 used in ice microphysics scheme
+!                 = 0 no
+!                 = 1 yes
+!
+!  nen            Number of ensemble members
+!  paranum        Number of estimated parameters
+!  readparaopt    the option to readin parameters used in ice
+!                 microphysics scheme
+!                 = 0 use original parameters in ARPS
+!                 = 1 read from microparaname
+!  seedp          Seed to generate parameter perturbations
+!  dirnamp        Name of directory to which parameter perturbations
+!                 are writen
+!  microparafn    the name of the file that contains the parameters
+!                 used in micro_ice3d.f90
+!
+!  initn0w        initial value of intercept parameter for rain DSD (1/m**4)
+!  initn0s        initial value of intercept parameter for snow DSD (1/m**4)
+!  initn0g        initial value of intercept parameter for hail DSD (1/m**4)
+!  initroqs       initial value of snow density ( kg/m**3 )
+!  initroqg       initial value of hail density ( kg/m**3 )
+!
+!  stdn0w   standard deviation of perturbation added to n0w (default 1.0 in log)
+!  stdn0s   standard deviation of perturbation added to n0s (default 1.0)
+!  stdn0g   standard deviation of perturbation added to n0g (default 1.0)
+!  stdroqs  standard deviation of perturbation added to roqs (default 0.5)
+!  stdroqg  standard deviation of perturbation added to roqg (default 0.5)
+!
+!  lgn0w   Option to use 10*log(x) as control variable for N0r
+!           = 0 no
+!           = 1 yes
+!  lgn0s   Option to use 10*log(x) as control variable for N0s
+!  lgn0g   Option to use 10*log(x) as control variable for N0g
+!  lgroqs   Option to use 10*log(x) as control variable for roqs
+!  lgroqg   Option to use 10*log(x) as control variable for roqg
+!
+!-----------------------------------------------------------------------
+
+ &enkf_parainit
+
+   paraperturb = 0,
+
+   nen = 40,
+   paranum = 5,
+   seedp = -6,
+   dirnamp = './',
+   microparafn = '.',
+
+   initn0w = 8.0E+6,
+   initn0s = 3.0E+6,
+   initn0g = 4.0E+4,
+   initroqs = 100.,
+   initroqg = 913.,
+
+   stdn0w = 0.0,
+   stdn0s = 0.0,
+   stdn0g = 0.0,
+   stdroqs = 0.0,
+   stdroqg = 0.0,
+
+   lgn0w = 0,
+   lgn0s = 0,
+   lgn0g = 0,
+   lgroqs = 0,
+   lgroqg = 0,
+
+ /
+
+!--------------------------------------------------------------------
+! Change environment (generate ensemble environment)
+!
+! envprtopt Option to perturb environment to get ensemble
+!           environment and external boundary condition
+!           = 0, no
+!           = 1, yes
+! prttop    The level below which temperature and moisture fields are
+!           perturbed (in meters)
+! lev1      The first level below which the perturbation added to
+!           qv and ptprt are constant (in meters)
+! seede     Seed to generate random number
+! direprt   Name of directory to which perturbations
+!           are writen
+! envprtnam Name of data containing perturbations
+! temmstopt variables to be perturbed
+!           = 0, perturb ptprt and qv
+!           = 1, perturb T and Td
+! stdtem    Standard deviation for T or ptprt perturbation (K)
+! stdmst    Standard deviation for qv (kg/kg) or Td (K) perturbation
+!--------------------------------------------------------------------
+
+ &envinit
+
+   envprtopt = 0,
+   prttop = 2000.0,
+   lev1 = 1000.0,
+   seede = 0,
+   direprt = '.',
+   envprtnam = 'envprt.dat',
+   temmstopt = 1,
+   stdtem = 0.5,
+   stdmst = 0.0005,
+
+ /
+
+!--------------------------------------------------------------------
+! output control parameters.
+!  outdumpdir  Output directory
+!  outname     Output history file name header (not including '.' at the end),
+!              and corresponding to runname e.g., outname='may20'.
+!
+!  tfgs        The model time of the initial ensemble generated by
+!              arpsenkfic, if initopt = 1 in arps.input
+!--------------------------------------------------------------------
+
+ &output_data
+   outdumpdir = './',
+   outname = '.',
+   tfgs = 1200.0,
+
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of input file
+!
+!-----------------------------------------------------------------------
+

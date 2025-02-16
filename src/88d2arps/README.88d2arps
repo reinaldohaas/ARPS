@@ -1,0 +1,9 @@
+
+
+This directory contains programs for remapping WSR88D and NIDS radar data
+to a Cartesian grid.
+
+The commands for compiling and linking these programs are
+'makearps 88d2arps' and 'makearps nids2arps'. They should be entered from the 
+ARPS root directory. A compiler is also needed.
+

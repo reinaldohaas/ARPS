@@ -1,0 +1,164 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ENS_ANA IN NAMELIST FORMAT      ######
+!     ######                 ( Version ARPS5.3 )                  ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+! Namelist for ENS_ANA
+!
+!   AUTHOR:
+!
+!   Fanyou Kong, CAPS
+!   4/10/2007
+!
+!-----------------------------------------------------------------------
+!
+!   MODIFICATION HISTORY
+!
+!  04/5/2010 (Fanyou Kong)
+!     Major upgrade in support of HWT 2010 Spring experiment to include
+!       - Broader range of ensemble products requested by SPC/NSSL,
+!         including ensemble mean, ensemble maximum, probability,
+!         neighborhood probability with Gaussian smoothing, and
+!         probability matching mean
+!       - Option to write out GEMPAK file over full or sub-domain
+!  04/6/2011 (Fanyou Kong)
+!       - Add option switch ilite1 for a lite set of ensemble product
+!  03/22/2012 (Aaron Johnson & Fanyou Kong)
+!       - Major revision to add bias correction for individual members
+!         and logistic regression calibration for ensemble probability
+!
+!-----------------------------------------------------------------------
+!  This namelist block sets the input data info
+!
+!  ensdir:       Input ensemble data directory
+!
+!  nmember:      Number of ensemble members to be analyzed
+!
+!  memberheader: Ensemble data file header
+!
+!  nf:           Nubmer of data times
+!  tlevel:       Time of data (sec)
+!
+!  anaopt:       Option to conduct ensemble error analysis (0: not;1: yes)
+!  anaheader:    Analysis data header (as verification data when anaopt=1)
+!
+!  finfmt:       input format. 1 - binary; 3 - HDF4
+!
+! forecastday:   in form of yyyymmddhh (e.g., 2009051300)
+!                (memberheader()//forecastday forms the full ARPS header)
+!
+! trainingperiod: number of training dates (=0 for normal ens_ana only without
+!                 calibration; >0 for Calibration only (no mix use) )
+! ilogireg:      =1 LR calibration; =0 no LR calibration (default)
+! ibias:         =1 BIAS correction; =0 no BIAS correction (default)
+! i1,i2,j1,j2:   set sub-domain for calibration (<=0 default)
+!                (!!! should not set to less than radius+1 closer to edge)
+!
+!-----------------------------------------------------------------------
+!
+&input_data
+   ensdir = '/home/fkong/data6/test_calibration/',
+   nmember = 1,
+   memberheader(1) = 'data_QPF/ar',
+
+   memname(1) = '',
+
+   tintv_dmpin = 3600,
+   tbgn_dmpin  = 003600,
+   tend_dmpin  = 172800,
+
+   anaopt = 0,
+   anaheader = 'ana/em2005062900',
+
+   finfmt = 3,
+   mapfile = 'mapprojection.map-SE13',
+
+ !!added for ens_cal.f90:
+        trainingperiod = 0,
+        ilogireg = 0,
+        ibias = 1,
+        trainday(1) = '2010060300',
+        trainday(2) = '2010060400',
+        trainday(3) = '2010060700',
+        trainday(4) = '2010060900',
+        trainday(5) = '2010061000',
+        trainday(6) = '2010061100',
+        trainday(7) = '2010061400',
+        trainday(8) = '2010061500',
+        trainday(9) = '2010061600',
+        trainday(10) = '2010061700',
+        obsheader = 'data_QPE/ar',
+        forecastday = '2010061800'
+        radius = 12,        ! for LR (radius in gridpoints)
+        varid = 'acc03_',
+        obsid = 'acc03_',
+        thresh = 2.54,     ! mm
+
+!!! set a sub-domain (<=0 default for full domain)
+        i1=0,
+        i2=0,
+        j1=0,
+        j2=0,
+/
+
+!-----------------------------------------------------------------------
+!  This namelist block sets the output data info
+!
+!  outdir:     Ensemble statistics (output) directory
+!  outheader:  Ensemble statistics (output) file header
+!  foutfmt:    output format. 1 - binary; 3 - HDF4
+!
+!  neighbor_scale: Scale length (ROI - km) for neighborhood probability
+!                  (no neighborhood probability if neighbor_scale = 0)
+!  smoother_scale: sigma value for smmothing neighborhood probability 
+!                  (grid number)
+!
+!  igempak:        Write out GEMPAK format output (for SPC)
+!
+!                  NOTE: code should be recompiled with "-io gempak" option.
+!  ilite1:         Light version (1); full version (0)
+!  icrtm:          CRTM variables (on - 1; off - 0)
+!  icitm:          CIRA variables (on - 1; off - 0)
+!
+!  The following parameters are used if igempak=1
+!  gemoutheader:   Header of output GEMPAK file name
+!  ibeg_offset:    Offset for writing out sub-domain GEMPAK file (default: 0)
+!  iend_offset:
+!  jbeg_offset:
+!  jend_offset:
+!
+!  calibsoutfile: directory storing LR & BIAS training parameters
+!
+!-----------------------------------------------------------------------
+!
+&output_data
+   outdir    = '/home/fkong/data6/test_calibration/data2d',
+   outheader = 'ar2010061800',
+   foutfmt   = 3,
+
+   neighbor_scale = 0, 40, 0,
+   smoother_scale = 30, 10, 5,
+
+   igempak = 0,
+   ilite1 = 0,
+   icrtm = 0,
+   icitm = 0,
+    gemoutheader = 'ens-2009051300/ssef_ens_2009051300',
+    ibeg_offset = 300,
+    iend_offset = 0,
+    jbeg_offset = 0,
+    jend_offset = 30,
+
+   caliboutdir = '/home/fkong/data6/test_calibration/calib'
+/

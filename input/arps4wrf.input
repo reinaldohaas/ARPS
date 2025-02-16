@@ -1,0 +1,223 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR ARPS4WRF IN NAMELIST FORMAT      ######
+!     ######                 ( Version ARPS5.3 )                  ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!   AUTHOR:
+!
+!   Yunheng Wang, CAPS
+!   10/29/08
+!
+!-----------------------------------------------------------------------
+!
+!   MODIFICATION HISTORY
+!
+*-----------------------------------------------------------------------
+!
+!  Message passing namelist
+!
+!  nproc_x     : processor number in X direction
+!  nproc_y     : processor number in Y direction
+!
+!  nprocx_in   : Valid only when readsplit = 0. processor number when
+!                the data to be read was dumped.
+!                It must be a multiple of nproc_x.
+!  nprocy_in   : Same as nprocx_in but in Y direction. It must be
+!                a multiple of nproc_y
+!
+!---------------------------------------------------------------------=*
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+   max_fopen = 8,
+   nprocx_in = 1,
+   nprocy_in = 1,
+ /
+
+*-----------------------------------------------------------------------
+!
+! domains     Instruct arps2wrf to generate wrfinput_dxx for multiple
+!             nested domains.
+!
+! wrf_core    'ARW' or 'NMM'
+!
+! max_dom     The number of nested domains to be precessed. You can specify
+!             up to 100 domains.
+!
+!----------------------------------------------------------------------=*
+
+ &domains
+   wrf_core  = 'ARW'
+   max_dom   = 1,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  history_data  ARPS history files to be converted
+!
+!  hinfmt   The format flag of the input history data.
+!          = 0, Do not convert history data;
+!          = 1, unformatted binary data dump
+!          = 2, formatted ascii data dump
+!          = 3, NCSA HDF4 format data dump
+!          = 4, Packed binary data dump
+!          = 5, dump for Savi3D visualization package
+!          = 6, binary allowing data point skip
+!          = 7, NetCDF format
+!          = 8, NetCDF in one file
+!          = 9, GrADS data dump
+!          = 10, GRIB data dump.
+!
+!  hdmpinopt = Indicate the way history data files are specified.
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed.
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!
+!  grdbasfn Base-state and grid data file name (hdmpinopt=2).
+!  nhisfile The number of time-dependent history files to be converted
+!           (hdmpinopt=2).
+!  hisfile  History data files to be converted (hdmpinopt=2).
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!----------------------------------------------------------------------=*
+!
+ &history_data
+   hinfmt = 3,
+   hdmpinopt    = 2,
+
+     hdmpfheader = './may20',
+     hdmpftrailer= '',
+     tintv_dmpin = 300.0,
+     tbgn_dmpin  = 0.0,
+     tend_dmpin  = 300.0,
+
+     grdbasfn = 'may20.hdfgrdbas',
+     nhisfile = 3,
+     hisfile(1,1) = 'may20.hdf000000',
+     hisfile(2,1) = 'may20.hdf003600',
+     hisfile(3,1) = 'may20.hdf007200',
+ /
+
+*-----------------------------------------------------------------------
+!
+!  INTERP_OPT Option for interpolation
+!
+!  intrp_opt Interpolation option for most atmospheric field
+!             See constant definition in module module_constants.f90
+!           = 1 Nearest neighbor (for category variable specifically)
+!           = 2 WPS 4 point weight average
+!           = 3 WPS 16 point weight average (to be implemented)
+!           = 4 Traditional ARPS bilinear interpolation
+!           = 5 Traditional ARPS quadratic interpolation
+!
+!           > 100 Turn off automatic coping, but do interpoation explicitly.
+!
+!           Since both horizontal grids of ARW and ARPS are defined on C grid
+!           By default, the program will check whether these two grids are
+!           exactly the same. If so, the program will do no interpolation, but
+!           just copy fileds from the ARPS physical domain to the ARW domain.
+!           It is the user's responsibility to generate static file ("geofile" below)
+!           using geogrid.exe that matches the ARPS grid. User can check the
+!           standard output and search for "grid_match" to see whether this
+!           feature is turn on or not. However, if the intrp_opt > 100, the
+!           program will always do interpolation (using MOD(interp_opt,100))
+!           even the horizontal grids are matched.
+!
+!  soilopt  The option for soil variables in the ARPS history file
+!           = 1 Traditional ARPS soil layers
+!           = 2 OU-soil with multiple layers
+!           = 3 The NAM or GFS soil layers are kept in the ARPS history file
+!               NOTE: it need special processing in EXT2ARPS, see option
+!               "soilstrhopt" for EXT2ARPS.
+!
+!  wtrnopt   Option for terrain data
+!            = 0, Use that in ARPS(ADAS) data file,
+!            = 1, Use that in WPS static file.
+!
+!---------------------------------------------------------------------=*
+
+ &interp_opt
+   intrp_opt = 2,
+   soilopt   = 3,
+   wtrnopt   = 1,
+ /
+*-----------------------------------------------------------------------
+!
+!  GEO_DATA  Option to initialize surface characteristics
+!              (Vegetation type, Soil type, land mask etc.)
+!
+!  geofile   Data file containing the surface characteristics
+!            (Should be generated with "geogrid.exe" in WPS package).
+!
+!  io_form_input    Format of data file containing surface characteristics.
+!          = 1, Fortran unformatted;
+!          = 2, NetCDF 3.0 format.
+!
+!---------------------------------------------------------------------=*
+
+ &geo_data
+   geofile       = 'wrfstatic_d01','wrfstatic_d02',
+   io_form_input = 2,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  Data output control parameters.
+!
+!  output_path   Name of directory into which output files are written.
+!
+!  io_form_output   Output WRF file format,
+!          = 1,  WRF internal binary format
+!          = 2,  NetCDF format,
+!
+!  magnitude_processor Magnitude of the number processors for split output
+!                files. The parameter was added for CAPS spring 2010
+!                experiments where we had used 14,400 processors on Athena
+!                for 1km experiments, which is larger than 10,000 - the maximum
+!                allowable in the WRF system. So the file appendix must be
+!                5 digits in length instead of the default 4.
+!          = 4, (default)
+!          = 5, for 5 digits appendix with WRF/METO split files
+!
+!---------------------------------------------------------------------=*
+
+ &output
+   output_path    = './',
+   io_form_output = 2,
+   magnitude_processor = 4,
+   lvldbg         = 0,
+/
+
+!---------------------------------------------------------------------
+!
+! END of Input file
+!
+!----------------------------------------------------------------------

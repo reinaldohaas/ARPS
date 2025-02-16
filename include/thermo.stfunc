@@ -1,0 +1,108 @@
+!
+!
+!   ########################################################################
+!   ########################################################################
+!   ####                                                                ####
+!   ####                                                                ####
+!   ####                          thermo.stfunc                         ####
+!   ####                                                                ####
+!   ####                THERMODYNAMIC STATEMENT FUNCTIONS               ####
+!   ####                                                                ####
+!   ####                                                                ####
+!   ########################################################################
+!   ########################################################################
+!
+!
+!  AUTHOR:  Richard Carpenter, Univ. of Oklahoma
+!           (rcarpent@uoknor.edu)
+!
+!  HISTORY:
+!       09/01/92  First written
+!       12/30/93  Declarations of statement functions and dummy arguments moved
+!                 to thermo.consts.
+!
+!  USAGE:
+!       1. Put the statement  INCLUDE 'thermo.consts'  just below any
+!          PROGRAM, SUBROUTINE, FUNCTION, or IMPLICIT NONE statements.
+!       2. Put the statement  INCLUDE 'thermo.stfunc'  after your last
+!          declaration but before your first executable statement.
+!
+!  OTHER INFORMATION:
+!    Ftvirt and Ftvirtwl are identical. Technically, Tv should be computed
+!    without water loading.  This is available in Ftvirtnowl. (09/28/93)
+!    With very few exceptions, all functions and their arguements are in SI
+!       units.  The exceptions are clearly indicated (e.g., Ftdewc is dew point
+!       in deg C).
+!
+!  FUNCTIONS:
+!
+!  Ftvirt(t_,qv_,ql_)   = Virtual temperature [K]
+!  Fmixrat(p_,e_)       = Mixing ratio [g/kg]
+!  Fsvpres(t_)          = Saturation vapor pressure [Pa]
+!  Ftdewc(e_)           = Dew point [C]
+!  Fvpres(p_,qv_)       = Vapor pressure [Pa]
+!
+!
+!  DUMMY ARGUMENTS:
+!
+!  t_   = Temperature [K]
+!  tc_  = Temperature [C]
+!  qv_  = Water vapor mixing ratio [kg/kg]
+!  ql_  = Liquid water mixing ratio [kg/kg]
+!  q_   = Total water mixing ratio [kg/kg]
+!  p_   = Total Pressure [Pa]
+!  e_   = Vapor Pressure [Pa]
+!
+!
+!  REFERENCES:
+!       Bolton (1980,MWR,p.1046), Davies-Jones (1993), Betts' course notes (Dec 1990)
+!
+!-----------------------------------------------------------------------
+!
+
+! Potential Temp
+
+      Ftheta(p_,t_)     = t_ * (p00/p_) ** rcp
+      FthetaD(p_,e_,t_) = t_ * (p00/(p_-e_)) ** 0.2854          !Bolton 23
+      FthetaDL(p_,e_,t_,tlcl_,q_) = t_ * (p00/(p_-e_)) ** 0.2854        &
+     &                    * (t_/tlcl_) ** (0.28*q_)             !Bolton 24
+      FthetaM(p_,t_,qv_)= t_ * (p00/p_) ** (0.2854*(1.-0.28*qv_)) !Bolton 7
+
+! Virtual Temp
+
+!     Ftvirt(t_,qv_,ql_)= t_ * (1. + cp608 * qv_ - ql_)
+      Ftvirt(t_,qv_,ql_)= t_ * ((1.+cp622inv*qv_)/(1.+qv_) - ql_)
+      Ftvirtnowl(t_,qv_)= t_ * ((1.+cp622inv*qv_)/(1.+qv_))
+      Ftvirtwl(t_,qv_,ql_)= t_ * ((1.+cp622inv*qv_)/(1.+qv_) - ql_)
+
+! General
+
+      Fdens(p_,t_)      = p_ * rdi / t_
+      Fmixrat(p_,e_)    = cp622 * e_ / (p_ - e_)
+      Frh(e_,es_)       = e_ / es_
+      Frh_q(qv_,qs_)    = qv_ / qs_ * (qs_ + cp622) / (qv_ + cp622)
+      Fsvpres(tc_)      = 611.2 * Exp(17.67*tc_/(tc_+243.5))
+      Ftdewc(e_)        = 243.5 / (17.67/Log(e_/611.2) - 1.)
+      Fvpres(p_,qv_)    = p_ * qv_ / (cp622 + qv_)
+
+! LCL
+
+      Ftlcl(t_,td_)     = 1./(1./(td_-56.)+Log(t_/td_)/800.)+56.
+      Ftlcl2(t_,e_)     = 2840./ (3.5*Log(t_)-Log(e_*1.E-2)-4.805) + 55.
+      Fplcl(p_,t_,tlcl_,q_) = p_*(tlcl_/t_)**(1./(rcp*(1.-0.28*q_)))
+      Fzlcl(t_,tlcl_,q_) = (t_-tlcl_)*cp*(1.+0.887*q_)/grav
+
+! Special Potential Temp
+
+      FthetaE(p_,t_,tlcl_,q_) = FthetaM(p_,t_,q_) *                     & !Bolton 38,43
+     &         Exp ((3.376/tlcl_-0.00254) * 1000.*q_*(1.+0.81*q_))
+      FthetaE38(thetaM_,tlcl_,q_) = thetaM_ *                           & !Bolton 38
+     &         Exp ((3.376/tlcl_-0.00254) * 1000.*q_*(1.+0.81*q_))
+      FthetaE39(thetaDL_,tlcl_,q_) = thetaDL_ *                         & !Bolton 39
+     &         Exp ((3.036/tlcl_-0.00178) * 1000.*q_*(1.+0.448*q_))
+      Fthq_cwcptrm(q_) = 1. / (1. + cwcp * q_)
+      FthetaQ(p_,t_,qv_,cwcptrm_) =                                     &
+     &            t_*(p00/(p_-Fvpres(p_,qv_))) ** (rcp*cwcptrm_) *      &
+     &            Exp(qv_*elv*cwcptrm_/(cp*t_))                         
+
+! (end of thermo.stfunc)

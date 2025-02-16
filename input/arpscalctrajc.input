@@ -1,0 +1,147 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######    INPUT FILE FOR ARPSCALCTRAJC IN NAMELIST FORMAT   ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters  for program ARPSCALCTRAJC
+!
+!  Steps to use this program:
+!  Step 1: Compile and link using 'makearps arpstrajc'
+!  Step 2: Edit input file input/arpscalctrajc.input
+!  Step 3: Run job using 'bin/arpscalctrajc< input/arpscalctrajc.input'.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!   Ming Xue (12/1/2003)
+!   Modification history:
+!
+!-----------------------------------------------------------------------
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  trajc_fn_in Name of trajectory file to be read to initialized the trajectories.
+!              Used when initrajc = 4.
+!-----------------------------------------------------------------------
+!
+
+ &input
+   hdmpfheader = '/home/ddawson/torcases/may0399/idealized/500m_new/500mMY1',
+   hdmpftrailer= '',
+
+   mphyopt = 8,
+   dirname = '/home/ddawson/torcases/may0399/idealized/500m_new/extra_data',
+
+   tstart_calc = 900,
+   tend_calc   = 2700,
+   tinc_data = 30.0
+   tinc_calc = 30.0,
+
+   ntimes = 1,
+   reftime = 2700,
+
+   trajc_fn_in(1) ='500mMY1.trajc_000900-002700_002700',
+   trajc_fn_in(2) ='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME2',
+   trajc_fn_in(3) ='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME3',
+   trajc_fn_in(4) ='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME4',
+   trajc_fn_in(5) ='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME5',
+   trajc_fn_in(6) ='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME6',
+   trajc_fn_in(7) ='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME7',
+   trajc_fn_in(8) ='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME8',
+   trajc_fn_in(9) ='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME9',
+   trajc_fn_in(10)='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME10',
+   trajc_fn_in(11)='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME11',
+   trajc_fn_in(12)='RUNNAME.trajc_0TIME1-0TIME2_0REFTIME12',
+
+ /
+
+!-----------------------------------------------------------------------
+!
+! Options:
+!
+!  do_diagnostics    : Do diagnostics
+!                   = 1, Calculate vorticity, Stretching of vorticity,
+!                        Tilting of vorticity, Wind trajectories and averages,
+!                        Angle/direction of horizontal wind and wind speed
+!                   = 2, Calculate Baroclinic vorticity generation,
+!                        Buoyancy term, mixing term, exchange term
+!                   = 3, Calculate pressure gradient force components
+!                   = 10, All of the above
+!
+!  have_mixing_terms : Whether the mixing terms have been written out to
+!                      separate HDF files (specifically, ".hdfmix_u",
+!                      ".hdfmix_v" and ".hdfmix_w" files).
+!                    = 1, Yes. Horizontal vorticity mixing terms will be computed.
+!                    = 0, The mixing terms will be ignored.
+!
+!  avg_trajc_flag    : Perform averaging on multiple trajectories
+!
+!  therm_intg_flag   : Integrate thermodynamic energy equation
+!                      along trajectories (requires certain special
+!                      arrays containing mixing and microphysical
+!                      heating/cooling terms)
+!
+!  mprate_flag       : Calculate various microphysics rates along trajectories
+!
+!      NOTE : mprate_flag will be automatically turned on if therm_intg_flag = 1
+!
+!  DSD_flag          : Calculate various DSD parameters along trajectories
+!
+!  misc_fields_flag  : Calculate various miscellaneous fields along trajectories
+!
+!-----------------------------------------------------------------------
+
+ &options
+   do_diagnostics    = 10,
+   have_mixing_terms = 0,
+
+   avg_trajc_flag    = 0,
+   therm_intg_flag   = 0,
+   mprate_flag       = 0,
+   DSD_flag          = 0,
+   misc_fields_flag  = 0,
+ /
+
+!-----------------------------------------------------------------------
+!
+! Microphysic options for multimoment schemes
+! (see arps.input for instructions)
+!
+!-----------------------------------------------------------------------
+
+ &microph_param
+   Ntcfix = 1.0e8,
+   N0rfix = 8.0e6,
+   N0sfix = 3.0e6,
+   N0gfix = 4.0e5,
+   N0hfix = 4.0e4,
+   alpharfix = 0.0,
+   alphaifix = 0.0,
+   alphasfix = 0.0,
+   alphagfix = 0.0,
+   alphahfix = 0.0,
+   rhor = 1000.0,
+   rhoi = 500.0,
+   rhos = 100.0,
+   rhog = 400.0,
+   rhoh = 913.0,
+/

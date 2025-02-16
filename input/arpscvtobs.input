@@ -1,0 +1,46 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######     INPUT FILE FOR ARPSCVTOBS IN NAMELIST FORMAT     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+! Input file for program ARPSCVTOBS, which converts LSO surface data
+! files to HDF format.
+!
+! TO DO:  Add ability to convert SND and PRO files to HDF.
+!
+! Eric Kemp
+! CAPS
+! 24 January 2002
+!
+!-----------------------------------------------------------------------
+!
+! blacklistfile : File containing list of stations with variables to be
+!                 set to missing (i.e., "black listed").
+!
+! n_lso_files : Number of LSO files to convert to HDF format.
+!
+! lsoinfile : Name(s) of LSO file(s).
+!
+! lsohdfoutfile : Name(s) of HDF file(s) to be created.
+!
+!-----------------------------------------------------------------------
+
+ &lsoobs
+     blacklistfile='/home/arpscntl/cntl_arps/200003/config/arps/adastab/blacklist.sfc',
+     n_lso_files = 1,
+     lsoinfile(1) = '/work/ekemp/writelso/lso/src/020171200.sao',
+     lsohdfoutfile(1) = '/scratch/ekemp/sao200201171200.hdf',
+/
+
+
+

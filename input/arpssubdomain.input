@@ -1,0 +1,385 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######   INPUT FILE FOR ARPSSUBDOMAIN IN NAMELIST FORMAT    ######
+!     ######               ( Version arps5.3 )                    ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters  for program ARPSSUBDOMAIN.
+!
+!  ARPSSUBDOMAIN writes out a portion of the grid in arps history format,
+!  at the original resolution or at a new resolution specified horizontal
+!  resolution specified as dx1 and dy1. No vertical change of resolution
+!  is supposed. Only linear interpolation is available.
+!  
+!  Steps to use this program:
+!  
+!  Step 1: Compile and link using 'makearps arpssubdomain'
+!  Step 2: Edit input file input/arpssubdomain.input
+!  Step 3: Run job using 'bin/arpssubdomain < input/arpssubdomain.input'.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!
+!   Ming Xue (12/1/2003)
+!   Modification history:
+!
+!-----------------------------------------------------------------------
+!
+!  hinfmt   The format flag of the input history data.
+!          = 3, NCSA HDF4 format data dump - only this format is supported
+!
+!  hdmpinopt = Indicate the way history data files are specified. 
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed. 
+!
+!  hdmpfheader  History data file name header (not including '.' at the end), 
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!
+!  grdbasfn Base-state and grid data file name (hdmpinopt=2).
+!  nhisfile The number of time-dependent history files to be processed
+!           (hdmpinopt=2).
+!  hisfile  Name of history data files (hdmpinopt=2).
+!
+!-----------------------------------------------------------------------
+!
+
+ &history_data
+
+   hinfmt = 3,
+
+   hdmpinopt    = 1,
+
+     hdmpfheader = '/scratcha/mhu/OKC/1km/MdlIP5_OKC1k5m_VrZ_2140',
+     hdmpftrailer= '',
+
+     tintv_dmpin = 60.0,
+     tbgn_dmpin  = 0.0, 
+     tend_dmpin  = 3600.0,
+
+     nhisfile = 1,
+     grdbasfn =   '/scratcha/mhu/OKC/1km/MdlIP5_OKC1k5m_VrZ_2140.hdfgrdbas'
+     hisfile(1) = '',
+
+ /
+
+!-----------------------------------------------------------------------
+!
+!  intrp_opt = 0,
+!
+!    Flag determining if horizontal interpolation is involved.
+!      = 0, in interpolatoin. The subdomain is specified by 
+!           nxbgn,nxend,nybgn,nyend.
+!      = 1, spatial interpolation is performed. The new grid is 
+!           specified by nx1,ny1, xctr1, yctr1, dx1 and dy1.
+!
+!  savespace Parameter determining if u,v, and scalars at k=1 and nx-1
+!           and w at k=1 and nz are set to zero to improve compression
+!           in compressed HDF format output. This should be done only
+!           when the output is for plotting purpose.
+!      = 0  No setting to zero.
+!      = 1  Set to zero.
+!
+!  nx1,ny1 Horizontal and veritcal dimesions of the output grid.
+!
+!  Definitions of other parameters are obvious. 
+!          Some are the same as in arpsintrp.input.
+!
+!  The following parameters are needed for writing into exbc files.
+!  They are not available from history data files, and are therefore
+!  read in here. They should be exactly the same as in the arps
+!  input file that created the history data.
+!
+!  dz       Averaged vertical grid spacing in transformed
+!           computational space (m).
+!
+!  strhopt  Grid stretching option.
+!         = 0, no vertical stretching;
+!         = 1, vertical stretching with f=z**3 function for dz;
+!         = 2, vertical stretching with hyperbolic tangent (see User's Guide).
+!  dzmin    Minimum vertical grid spacing in physical space (m). Used
+!           if strhopt = 1 or 2.
+!  zrefsfc  Reference height of the surface (ground level) (m).
+!
+!  dlayer1  Height (m) of the layer beneath which stretching is not applied.
+!           0.0 =< dlayer1 < (nz-3)*dz
+!
+!  dlayer2  Depth of the mid-layer with stretched vertical spacing (m)
+!           0.0 =< dlayer2 < (nz-3)*dz and 0.0 =< dlayer1+dlayer2 < (nz-3)*dz
+!           For consistency, dlayer2 is reset to: min(dlayer2,ztop-dlayer1).
+!
+!  strhtune Tuning parameter used when strhopt = 2.
+!           A value between 0.2 and 5.0 is recommended. Stretching
+!           becomes more linear as strhtune increases. Default value is 1.0.
+!
+!  zflat    Height at which the grid becomes flat in the
+!           terrain-following coordinate transformation (m).
+!  
+!  ctrlat   Latitude of the model physical domain center (deg. N).
+!  ctrlon   Longitude of the model physical domain center (deg. E).
+!
+!           Parameters ctrlat and ctrlon do not have to be set when
+!           initopt=3, since the values in the header of the input data
+!           file will be used in this case.
+!
+!-----------------------------------------------------------------------
+
+ &output_dims
+
+    intrp_opt = 1,
+    savespace = 0,
+
+    nxbgn =1,
+    nxend =963,
+
+    nybgn =1,
+    nyend =963,
+
+    nx1 = 723,
+    ny1 = 723,
+    xctr1 = 105000.0,
+    yctr1 = 95000.0,
+    dx1 = 100.00,
+    dy1 = 100.00,
+
+    nzbgn =1,
+    nzend =53,
+
+   strhopt  = 2,
+     dz = 400.0,
+     dzmin    =   20.000,
+     zrefsfc  =     0.0,
+     dlayer1  =     0.0,
+     dlayer2  =     1.0e5,
+     strhtune =     0.2,
+   zflat    =     1.0e5,
+ /
+
+
+
+!-----------------------------------------------------------------------
+!
+!  runname_input, a string of up to 80 characters long, is used to identify 
+!  this job and construct the output file names. 
+!
+!  The characters before either a blank space or comma will be used 
+!  as the prefix of the output file names.
+!
+!  The runname string is used only in the optional subsampling of "extra"
+!  data files (see next namelist)
+!
+!-----------------------------------------------------------------------
+
+ &jobname
+   runname_input = 'OKC1kmTo100m_sbdmn'
+ /
+
+!-----------------------------------------------------------------------
+!
+!  subsample_main Option to run arpssubdomain on the main history
+!                 files. The default is 1 (yes)
+!
+!  subsample_extra Option to run arpssubdomain on any additional
+!                  extra files (produced using one of the wrtvar
+!                  subroutines).  The default is 0 (no)
+!
+!  tintv_dmpin,tbgn_dmpin,tend_dmpin As in the history_data namelist
+!
+!  extra_field 6 character name of the extra field
+!
+!  dirname_extra_in Directory name where extra files reside
+!  dirname_extra_out Directory name to output subsampled/interpolated extra_files
+!
+!-----------------------------------------------------------------------
+
+ &extra_files
+   subsample_main = 1,
+   subsample_extra = 0,
+   tintv_dmpin = 60.0,
+   tbgn_dmpin = 4500.0,
+   tend_dmpin = 8100.0,
+   extra_field(1) = 'evapqc',
+   extra_field(2) = 'evapqr',
+   extra_field(3) = 'meltqi',
+   extra_field(4) = 'meltqs',
+   extra_field(5) = 'meltqg',
+   extra_field(6) = 'meltqh',
+   extra_field(7) = 'sublqi',
+   extra_field(8) = 'sublqs',
+   extra_field(9) = 'sublqg',
+   extra_field(10) = 'sublqh',
+   extra_field(11) = 'condqc',
+   extra_field(12) = 'condqr',
+   extra_field(13) = 'frzqci',
+   extra_field(14) = 'frzqrh',
+   extra_field(15) = 'colqci',
+   extra_field(16) = 'colqcs',
+   extra_field(17) = 'colqcg',
+   extra_field(18) = 'colqch',
+   extra_field(19) = 'colqri',
+   extra_field(20) = 'colqrs',
+   extra_field(21) = 'colqrg',
+   extra_field(22) = 'colqrh',
+   extra_field(23) = 'depoqi',
+   extra_field(24) = 'depoqs',
+   extra_field(25) = 'depoqg',
+   extra_field(26) = 'depoqh',
+   extra_field(27) = 'nuclqi',
+   extra_field(28) = 'mptrat',
+   extra_field(29) = 'mix_pt',
+   extra_field(30) = 'mix_qv',
+
+   dirname_extra_in = '/data4/ddawson/torcases/may0399/realdata/250m0503992245_1km3DVARCA223010min90_3km03001hr9/extra_data',
+   dirname_extra_out = '/data4/ddawson/torcases/may0399/realdata/250m0503992245_1km3DVARCA223010min90_3km03001hr9/subdomain/extra_data',
+ /
+
+
+!-----------------------------------------------------------------------
+!
+!  Data output control parameters.
+!
+!  dirname   Name of directory into which output files are written.
+!
+!  hdmpfmt   History data dump format option.
+!          = 3, NCSA HDF4 format data dump; - only this format supported
+!
+!  grbpkbit  Number of bits in packing GRIB data
+!          = 16 (default)
+!
+!  hdfcompr  HDF4 compression option (for hdmpfmt=3).
+!          = 0 (default), no compression;
+!          = 1, fast gzip compression;
+!          = 2, high gzip compression;
+!          = 3, adaptive or skipping Huffman compression;
+!          = 4-7, as above plus mapping reals to 16 bit integers.
+!
+!  filcmprs  Option to compress the history dumping files.
+!          = 0, history files not compressed.
+!          = 1, history files compressed;
+!
+!  readyfl   Flag to writing a _ready file after each history dump file 
+!            is writen
+!          = 0, no _ready file
+!          = 1, write _ready file
+!
+!  grdout    Grid output option.
+!          = 0, no grid array output in time-dependent history files;
+!          = 1, grid arrays written in time-dependent history files.
+!  basout    Base state field output option.
+!          = 0, no base state arrays time-dependent history files;
+!          = 1, base state arrays written in time-dependent history files.
+!  varout    Perturbation fields output option in history dump.
+!          = 0, no perturbation wind, pressure or pot. temperature output;
+!          = 1, perturbation wind, pressure and pot. temperature output.
+!  mstout    Moist variable output option in history dump.
+!          = 0, no moisture variables output;
+!          = 1, qv, qc, qr, qi, qs and qh output.
+!  iceout    Ice variable output option in history dump.
+!          = 0, no ice variables output;
+!          = 1, qi, qs and qh output.
+!  tkeout    TKE output option in history dump.
+!          = 0, no
+!          = 1, yes 
+!  trbout    Turbulence field (km) output option in history dump.
+!          = 0, no km output;
+!          = 1, km output.
+!  rainout   Option for surface accumulated rainfall array output.
+!          = 0, no,
+!          = 1, yes.
+!  prcout    Option to include precipitation rates output in history dump.
+!          = 0, no,
+!          = 1, yes. 
+!
+!  exbcdmp   Flag to dump ARPS external boundary data files.
+!          = 0, no EXBC dumping;
+!          = 2, HDF4 uncompressed;
+!          = 3, HDF4 using compression specified in hdfcompr;
+!          = 4, HDF4 using gzipped 16 bit integer mapping plus inside of
+!               domain (unused portion, determined by ngbrz & zbrdmp)
+!               set to a constant value.
+!  qcexout   Option for qc array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no,  = 1, yes.
+!
+!  qrexout   Option for qr array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no, = 1, yes.
+!
+!  qiexout   Option for qi array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no, = 1, yes.
+!
+!  qsexout   Option for qs array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no, = 1, yes.
+!
+!  qhexout   Option for qh array output in EXBC file dump when exbcdmp.ne.0
+!          = 0, no, = 1, yes.
+!
+!  When exbcdmp =4, data in EXBC files beyond lateral boundary zone of width
+!           ngbrz and for k =< rayklow are set to constant values for
+!           improved compression efficiency.
+!
+!-----------------------------------------------------------------------
+
+ &output
+   dirname  = '/scratcha/mhu/OKC/fnScl/subdomain/',
+
+   hdmpfmt    = 3,
+     grbpkbit   = 16,
+     hdfcompr   = 5,
+
+   filcmprs = 0,
+   readyfl  = 0,
+
+   basout   = 0,
+   grdout   = 1,
+   varout   = 1,
+   mstout   = 1,
+   iceout   = 1,
+   tkeout   = 1,
+   sfcout   = 1,
+   landout  = 1,
+   trbout   = 0,
+   rainout  = 0,
+   prcout   = 0,
+
+   exbcdmp  = 4,
+     qcexout  = 1,
+     qrexout  = 1,
+     qiexout  = 1,
+     qsexout  = 1,
+     qhexout  = 1,
+
+   ngbrz  = 15,
+   rayklow= 3,
+
+   terndmp=3,
+ /
+
+!----------------------------------------------------------------------------
+!
+!  End of input file
+!
+!----------------------------------------------------------------------------

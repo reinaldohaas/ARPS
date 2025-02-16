@@ -1,0 +1,84 @@
+!
+!   ########################################################################
+!   ########################################################################
+!   ####                                                                ####
+!   ####                                                                ####
+!   ####                          thermo.consts                         ####
+!   ####                                                                ####
+!   ####                       PHYSICAL CONSTANTS                       ####
+!   ####                                                                ####
+!   ####       DECLARATIONS OF THERMODYNAMIC STATEMENT FUNCTIONS        ####
+!   ####                                                                ####
+!   ####                                                                ####
+!   ########################################################################
+!   ########################################################################
+!
+!
+!  PURPOSE: INCLUDE file for (1) Physical Constants and
+!                            (2) Thermodynamic Statement Function declarations.
+!
+!  AUTHOR:  Richard Carpenter, Univ. of Oklahoma (rcarpent@uoknor.edu)
+!
+!  HISTORY:
+!       1993/09/01  First written
+!       1993/12/30  Declarations for statement functions moved here
+!       1994/05/11  Changed t0 to tt0.
+!       1994/06/03  Added gamma, gammai.
+!       1994/12/14  Added stefan.
+!
+!  USAGE:  Include this file near the top of the program unit.  If
+!          needed, include the statement function file at the end of the
+!          declarations.
+!
+!-----------------------------------------------------------------------
+!                              PHYSICAL CONSTANTS
+!-----------------------------------------------------------------------
+!
+!     Values of cp, rd, grav here are slightly different than those used in
+!     SAM.
+!
+!     See Iribane & Godson for many of the physical parameters.
+!
+!     aw,bw,p38 = Saturation vapor factors (Teten's eq.)
+!     eld/v/f/s = Latent heat coefs
+!
+      REAL                                                              &
+     &  aw    , bw    , p38   , p00mb , e0    , e0mb  , cp622 , cp608 , &
+     &  cp    , cv    , rd    , rv    , grav  , cw    , cwcp  , p00inv, &
+     &  cpi   , cvi   , rdi   , cpr   , gcp   , p00   , rcp   ,         &
+     &  eld   , elv   , elf   , els   , tfrz  , tt0   ,cp622inv,        &
+     &  gamma , gammai, sbcst
+
+      PARAMETER (                                                       &
+     &  aw=17.2693882 , bw=35.8       , p38=380.0     , p00mb=1000.   , &
+     &  p00=p00mb*100., p00inv=1./p00 ,                                 &
+     &  cp=1005.0     , cv=717.0      , rd=287.05     , rv=461.51     , &
+     &  cpi=1./cp     , cvi=1./cv     , rdi=1./rd     ,                 &
+     &  grav=9.807    , eld=2369.276  , gamma=cp*cvi  , gammai=cv*cpi , &
+     &  cpr=cp/rd     , gcp=grav/cp   , rcp=rd/cp     ,                 &
+     &  elv=2.5007e6  , elf=0.335717e6, els=elv+elf   , tfrz=273.15   , &
+     &  tt0=273.16    , cw=4218.      , cwcp=cw/cp    ,                 &
+     &  cp622=rd/rv   , cp622inv=rv/rd, cp608=28.964/18.015-1.        , &
+     &  e0mb=6.11     , e0=e0mb*100.  , sbcst=5.67E-8)
+!
+!
+!-----------------------------------------------------------------------
+!                      STATEMENT FUNCTION DECLARATIONS
+!-----------------------------------------------------------------------
+!
+!       Note that statement functions begin with  F,  and dummy
+!       arguments end with  _,  to avoid confusion.  See the 
+!       file  thermo.stfunc  for further information.
+
+      REAL                                                              &
+     & Fdens    , Fmixrat  , Fplcl    , Frh      , Frh_q    , Fsvpres  ,&
+     & Ftdewc   , Ftheta   , FthetaD  , FthetaDL , FthetaE  , FthetaE38,&
+     & FthetaE39, FthetaM  , FthetaQ  , Fthq_cwcptrm        , Ftlcl    ,&
+     & Ftlcl2   , Ftvirt   ,Ftvirtnowl, Ftvirtwl , Fvpres   , Fzlcl    
+
+      REAL                                                              &
+     & cwcptrm_ , e_       , es_      , p_       , q_       , qv_      ,&
+     & ql_      , qs_      , t_       , tc_      , td_      , thetam_  ,&
+     & thetadl_ , tlcl_    
+
+! (end of thermo.consts)

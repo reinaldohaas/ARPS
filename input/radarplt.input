@@ -1,0 +1,214 @@
+!-----------------------------------------------------------------------
+!  Input file for program RADARPLTNCAR or RADARPLTPOST, which plots 
+!  radar reflectivity and radial velocity fields for individual elevations.
+!
+!  The source code is src/88d2arps/pltradarscan.f90
+!
+!  Steps to use this program:
+!  
+!  Step 1: Compile and link using 'makearps radarpltncar/radarpltpost'
+!  Step 2: Edit input file radarplt.input
+!  Step 3: Run job using 'bin/radarpltncar < radarplt.input'.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!   Ming Xue (03/01/2002)
+!
+!   Yunheng Wang (06/08/2005)
+!   Incorporated into ARPS distribution.
+!
+!-----------------------------------------------------------------------
+!
+! &input_data
+!     filepath : the directory saving radar data
+!     filetitle: the name added to the name of ps file( no for gmeta file)
+!     radfmt   : 1=original binary, 2=emulator binary, 4=NetRAD NetCDF
+!     numfiles : the  number of radar data files
+!     files    : the name of radar data files
+!-----------------------------------------------------------------------
+
+ &input_data
+     filepath='./',
+     radfmt=1,
+     numfiles = 1,
+     files(1) = 'KTLX.070509.0059.tilts',
+     files(2) = 'KTLX.070509.0059.tilts',
+ /
+
+
+!-----------------------------------------------------------------------
+! &radar_index
+!   radar_symbol : the name of radar of which data are plotted , like  'KTLX',
+!-----------------------------------------------------------------------
+
+ &radar_index
+   radar_symbol='KTLX',
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Projection parameters:
+!
+!  mapproj   Map projection option.
+!          = 0, no map projection;
+!          = 1, polar projection;
+!          = 2, Lambert projection;
+!          = 3, Mercator projection.
+!  trulat1   1st true latitude of map projection.
+!  trulat2   2nd true latitude of map projection (used only by mapproj = 2).
+!  trulon    True longitude of map projection.
+!
+!-----------------------------------------------------------------------
+
+ &projection
+   mapproj = 2,
+   trulat1 =  34.0,
+   trulat2 =  36.0,
+   trulon  = -98.0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  plotting parameters:
+!
+!  Here are parameters setting the plotting domain:
+!     h_range_max_e: distance from the east boundary to the radar location
+!     h_range_max_w: distance from the west boundary to the radar location
+!     h_range_max_s: distance from the south boundary to the radar location
+!     h_range_max_n: distance from the north boundary to the radar location
+!     z_range_max : the height of cross section
+!  
+!  elev_error_range: the elevation angle always change from scan to scan,
+!             so the tilt with elvetion angle range from 
+!           elevations_ref - elev_error_range to elevations_ref + elev_error_range
+!             will be plotted as the tilt with elvetion angle
+!                      elevations_ref
+!  overlayrefcontour = 1 : overlay several contours in Reflectivity image 
+!                    = 0 : no overlay contours
+!
+! For reflectivity in a tilt:
+!   n_elevation_ref: how many tilts will be plotted
+!   elevations_ref : the elevation angles of the tilt plotted
+!
+!
+! For reflectivity cross section along certain azimuth angle
+!   n_azimuth_ref : how many cross sections will be plotted
+!   azimuth_ref : which azimuth angle will be plotted
+!
+! For radial velocity cross section along certain azimuth angle
+!   pltmin_ref : minimum value of reflectivity (dBZ) to plot
+!   pltmax_ref : maximum value of reflectivity (dBZ) to plot
+!   n_azimuth_vel : how many cross sections will be plotted
+!   azimuth_vel(01) : which azimuth angle will be plotted
+!
+!   pltmin_ref : minimum value of reflectivity (dBZ) to plot
+!   pltmax_ref : maximum value of reflectivity (dBZ) to plot
+!
+!   pltmin_vel : minimum value of radial velocity (m/s) to plot
+!   pltmax_vel : maximum value of radial velocity (m/s) to plot
+!
+! Colors used for reflectivity 
+!   coltab_ref  : Option for color map
+!        = -1, user defined color map (color_map must be defined).
+!        = 0,  black and white.
+!        = 1,  blue to red.
+!        = 2,  red to blue (reverse blue to red).
+!        = 3,  Radar reflectivity.
+!        = 4,  grey (white to black).
+!        = 5,  multi-spectum color table.
+!        color files color_map.ps/color_map.gmeta can be found in ftp site.
+!
+!   ibgncol_ref : the index of the first color in color table
+!   iendcol_ref : the index of last color in color table
+!   coltabfn_ref: Color map filename (used only if col_table = -1)
+!
+! Colors used by radial velocity ( have same mean as above but for velocity)
+!   coltab_vel 
+!   ibgncol_vel 
+!   iendcol_vel 
+!   coltabfn_vel
+!
+!-----------------------------------------------------------------------
+ &plotting
+   h_range_max_e= 20.0,
+   h_range_max_w= 220.0,
+   h_range_max_s= 220.0,
+   h_range_max_n= 20.0,
+   z_range_max= 12.0,
+   elev_error_range = 0.1,
+
+   overlayrefcontour=0,
+   n_elevation_ref = 2,
+     elevations_ref(01) = 0.50,
+     elevations_ref(02) = 0.80,
+     elevations_ref(03) = 1.3,
+     elevations_ref(04) = 2.4,
+     elevations_ref(05) = 4.3,
+     elevations_ref(06) = 6.0,
+     elevations_ref(07) = 9.9,
+     elevations_ref(08) =14.6,
+     elevations_ref(09) =19.5,
+
+   n_elevation_vel = 2,
+     elevations_vel(01) = 0.50,
+     elevations_vel(02) = 0.80,
+     elevations_vel(03) = 1.3,
+     elevations_vel(04) = 2.4,
+     elevations_vel(05) = 4.3,
+     elevations_vel(06) = 6.0,
+     elevations_vel(07) = 9.9,
+     elevations_vel(08) =14.6,
+     elevations_vel(09) =19.5,
+
+   n_azimuth_ref = 2,
+     azimuth_ref(01) = 240.0,
+     azimuth_ref(02) = 250.0,
+
+   n_azimuth_vel = 2,
+     azimuth_vel(01) = 240.0,
+     azimuth_vel(02) = 250.0,
+
+   pltmin_ref = 5.0,
+   pltmax_ref = 70.0,
+   coltab_ref  = -1,
+   ibgncol_ref = 28,
+   iendcol_ref = 42,
+   coltabfn_ref='../data/arpsplt/hubcaps5.pltcbar',
+   pltmin_vel=-40.0,
+   pltmax_vel= 40.0,
+   coltab_vel  = -1,
+   ibgncol_vel = 2,
+   iendcol_vel = 21,
+   coltabfn_vel='../data/arpsplt/velocity_solo_real.table',
+
+ /
+!
+!-----------------------------------------------------------------------
+!
+!  ovrmap  Option to overlay political map on horizontal plane plots
+!                = 0, no map overlay.
+!                = 1, overlay map on all of the plotted fields.
+!
+!  mapgrid       Grid for latitude and longitude
+!                = 0, no grid draw
+!                = 1, draw grid (default set latgrid=2 and longrid=2)
+!                = 2, draw grid (user specify latgrid and longrid)
+!
+!  latgrid,      longrid (degree)
+!                the grid for latitude and longitude (mapgrid=2)
+!  nmapfile      number of mapfiles ( maximum=10)
+!
+!  mapfile       Mapdata file name.
+!
+!-----------------------------------------------------------------------
+!
+ 
+ &map_plot
+   ovrmap = 1,
+   mapgrid = 0,
+      latgrid = -10., longrid = -10.,
+   nmapfile = 1,
+     mapfile(1) = '../data/arpsplt/us_spcounty.mapdata',
+     mapfile(2) = '../data/arpsplt/us_state.mapdata',
+ /

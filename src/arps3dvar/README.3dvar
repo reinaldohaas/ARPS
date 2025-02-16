@@ -1,0 +1,21 @@
+
+This directory contains source code for the ARPS 
+3D variational Data Analysis System. 
+
+run the 3dvar:
+
+  makearps 3dvar
+  bin/3dvar<input/arp.input.f90
+ 
+3dvar.f90: preparing observation data for the
+analysis. 
+
+Gminimization.f90  Minimization driver.
+
+Gcostf3d.f90       Calculating the cost function.
+
+Ggradc3d.f90       Calculating the gradient of cost function.
+
+Gminim_sub.f90     Limited Memory Gonjuagate gradient method.
+
+

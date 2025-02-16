@@ -1,0 +1,219 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSEXTSND IN NAMELIST FORMAT   ######
+!     ######                    ( arps5.3.2 )                     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+! This file contains the input parameters in namelist format for ARPS
+! sounding extraction program ARPSEXTSND.
+!
+! ARPSEXTSND reads in a set of ARPS history dump and write out sounding
+! profiles in GEMPAK format (can be plotted directly by Rich Carpenter's
+! skewt program skewt) at user specified location(s).
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!   Keith Brewster (long time ago)
+!
+!   Modification history:
+!
+!   Ming Xue (08/10/2000)
+!   Changed to namelist input file.
+!
+!   Kevin W. Thomas (03/30/2005)
+!   MPI version so that splitfiles can be handled.
+!
+!   Yunheng Wang (07/25/2006)
+!   Changed for Boeing project.
+!     o Added ROAB sounding format, outfmt
+!     o Added option to extract from ARPS grid, locopt == 3
+!     o Changed the ARPS history file specification, to be the same
+!       as other ARPS programs, such as arpsplt, arpscvt etc.
+!     o Sounding file name conventions are changed (see ofilehead below).
+!
+!-----------------------------------------------------------------------
+!
+!  Message passing namelist
+!
+!  nproc_x     : processor number in X direction
+!  nproc_y     : processor number in Y direction
+!
+!  readsplit_in : flag indicates whether the program needs to split the
+!                data files.
+!                = 1, Data for all processors is in one joined file, such
+!                     as the data dumped from joinfiles, or specifing
+!                     dmp_out_joined = 1 while run ARPS.
+!                = 0, Data are all split, needs to specify the following
+!                     two parameters.
+!---------------------------------------------------------------------
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+
+   readsplit_in = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  hinfmt   The format flag of the input history data.
+!          = 1, unformatted binary data dump
+!          = 2, formatted ascii data dump
+!          = 3, NCSA HDF4 format data dump
+!          = 4, Packed binary data dump
+!          = 5, dump for Savi3D visualization package
+!          = 6, binary allowing data point skip
+!          = 7, NetCDF format
+!          = 8, NetCDF in one file
+!          = 9, GrADS data dump
+!          = 10, GRIB data dump.
+!
+!  hdmpinopt = Indicate the way history data files are specified.
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed.
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!
+!  grdbasfn Base-state and grid data file name (hdmpinopt=2).
+!  nhisfile The number of time-dependent history files to be converted
+!           (hdmpinopt=2).
+!  hisfile  History data files to be converted (hdmpinopt=2).
+!
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!-----------------------------------------------------------------------
+!
+ &history_data
+   hinfmt = 3,
+   hdmpinopt    = 2,
+
+     hdmpfheader = './may20',
+     hdmpftrailer= '',
+     tintv_dmpin = 300.0,
+     tbgn_dmpin  = 0.0,
+     tend_dmpin  = 300.0,
+
+     grdbasfn = '/home/fkong/scratch/fw6km/cn/run_kf/fw6km_1800.hdfgrdbas',
+     nhisfile = 3,
+     hisfile(1) = '/home/fkong/scratch/fw6km/cn/run_kf/fw6km_1800.hdf000000',
+     hisfile(2) = '/home/fkong/scratch/fw6km/cn/run_kf/fw6km_1800.hdf003600',
+     hisfile(3) = '/home/fkong/scratch/fw6km/cn/run_kf/fw6km_1800.hdf007200',
+ /
+
+!-----------------------------------------------------------------------
+!
+!  ustorm  u component of storm motion or domain translation speed (m/s)
+!  vstorm  v component of storm motion or domain translation speed (m/s)
+!
+!  locopt  input coordinate option
+!          1=lat/lon degress
+!          2=x,y in km
+!          3=extract data at ARPS grid, "xpt" & "ypt" specifies the
+!            grid points to be skipped, i.e. the data to be extracted
+!            is "xpt" and "ypt" points separated in the ARPS grid and
+!            no interpolation is involved.
+!
+!  scondition A condition to be enforced when extracting sound for
+!             locopt = 3
+!             = 0, no restrictions
+!             = 1, Total water must be less then valuethres
+!                  Total water = (vertically intergrated) qc+qr+qi+qs+qh
+!             = 2, composite reflectivity must be less than valuethres
+!             = 3, Extract soundings only above a specified height in
+!                  valuethres below
+!
+!  valuethres Threshold value enforced for scondition
+!             scondition = 0, it is ignored
+!             scondition = 1, it is a value for vertically integrated total water,
+!                             such as 1.0E-6 kg m-2
+!             scondition = 2, it is a value for composite reflectivity,
+!                             such as 5dBZ
+!             scondition = 3, it is a height value about the ground in m.
+!
+!  slat,slon latitude (positive north from -90 to 90) and longitude
+!          (positive east) of the location(s) at which sounding(s)
+!          are to be extracted. Used when locopt=1.
+!
+!  xpt,ypt x and y coordinates of the location(s) at which sounding(s)
+!          are to be extracted. Used when locopt=2.
+!
+!  stid    Station name in three characters.
+!  istnm   Station number in 5 digits
+!
+!-----------------------------------------------------------------------
+
+ &input
+   ustorm = 0.0,
+   vstorm = 0.0,
+
+   locopt = 2,
+
+     scondition = 0,
+     valuethres = 1.0E-6,
+
+     nsnd   = 2,
+
+     slat(1) = 36.43,
+     slon(1) = -100.00,
+
+     xpt(1)  = 10
+     ypt(1)  = 10
+
+     xpt(2)  = 15.0,
+     ypt(2)  = 15.0,
+
+     stid(1) =  'NCA',
+     istnm(1) = 72001,
+
+     stid(2) =  'NCA',
+     istnm(2) = 72001,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  outfmt  Output sounding file format
+!          = 0, Same as old version, both GEMPAK sounding and ARPS sounding
+!          = 1, GEMPAK sounding look like SNLIST.FIL
+!          = 2, ARPS sounding look like may20.snd
+!          = 3, RAOB sounding (Concatenation of multiple rawinsonde sites)
+!
+!  ofilehead   output sounding file name header, the actual sounding file
+!              name will be:
+!              ofileheadYYYYMMDD_HHMMSS_STID.sounding  for GEMPACK format
+!              ofileheadYYYYMMDD_HHMMSS_STID.sound     for ARPS sounding
+!              ofileheadYYYYMMDD_HHMMSS_STID.snd       for ROAB format
+!
+!-----------------------------------------------------------------------
+
+ &output
+   dirname   = './',
+   ofilehead = 'OLD',
+   outfmt    = 0,
+ /

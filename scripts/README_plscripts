@@ -1,0 +1,139 @@
+#############################################################################
+#
+# This README is for the perl test scripts included in this directory
+#
+# Author: Yunheng Wang  (06/23/2001)
+#
+# Conventions: 
+#        1, 2, 3, ... , 14    Script sequences have been proved run well.
+#        a, b, c, ... , i     Check or change needed before run correspond script
+#        *, **, ***, ...
+#        I, II, III, ...      Notes
+#
+#############################################################################
+
+Prerequirements:
+
+     I.   The ARPS system is copyed to a subdirectory name arpsxxxx
+          where xxxx is the version number of arps like, 5.0.0Beta4
+     II.  The test scirpts (*.pl) should be at the subdirectory arpsxxxx/scripts
+     III. Set environment as follow: (**** is the father directory of arpsxxxx)
+            setenv ARPSDIR ****     -- csh(tcsh)
+            setenv ARPSVER xxxx     
+          or 
+            EXPORT ARPSDIR=****     -- sh (bash)
+            EXPORT ARPSVER=xxxx
+     IV.  Copy ARPSTERN.DATA, ARPSSFC.DATA and DATA.25MAY1998 from 
+          paige:/work/official or ftp://ftp.caps.ou.edu
+     V.   Change to directory arpsxxxx and run
+            [source] scripts/link_data ----
+          where ---- is a directory name you have copied data to in step IV.
+          prepend "source" on csh/tsch if you did not set the environments in
+          step III.
+
+================================================================================     
+
+7 independent tests:
+     
+ 1.  test_warmbubble.pl            (A simple warmbubble test)
+
+ 2.  test_may20delcitystorm.pl     (Same as 1 except for another restart run)
+
+ 3.  test_restart.pl               (Same as 2 except for another restart mpi run)
+
+ 4.  test_beltrami.pl
+
+ 5.  test_density.pl
+
+ 6.  test_symmetry.pl
+
+ 7.  test_surface.pl
+ 
+To run the above seven independent tests, change the following two scalar variables
+if you do not set environment as instructed in step III. 
+
+    a:   $topdir = "$ENV{'ARPSDIR'}"       ---  ARPS father directory
+         #    a directory under which the subdirectory arpsxxxx is installed 
+    b:   $arpsversion = "$ENV{'ARPSVER'}"  ---  version of ARPS 
+         #   the scripts look for the source code at a directory constructed from 
+	 #   $topdir/arps$arpsversion/src
+
+================================================================================
+
+Prepare tern data for the a realcase test (either one will work, arpstrn is prefer):
+
+ 8.   test_arpstrn.pl
+ 9.   test_arpstern.pl
+ 
+Besides the above changes (a and b) the following three scalars also need to change
+if you do not follow prerequired steps III, IV and V:
+
+   c:     $datadir = "$srcdir/data"          --- data subdirectory
+          #   It will be used to construct several other subdirectories,
+	  #   like:  arpssfc.data,  arpstern.data, data.test, etc.
+          #   Where $srcdir is constructed as: 
+          #         $srcdir = $topdir/arps$arpsversion
+   d:     $trndir = "$datadir/arpstern.data" --- subdirectory for tern data
+   e:     $tdatdir = "$datadir/data.test"    --- subdir. store test results
+          #   the real case test will use the results from this subdirectory
+--------------------------------------------------------------------------------
+
+NOTE: For users who can access PAIGE or CIRRUS data:
+   *   the only necessary change is:  $datadir = "/work/official"
+   *   or follow step V as: "scripts/link_data /work/official"
+   *   this note applys to all the following scripts.
+--------------------------------------------------------------------------------
+
+================================================================================
+
+Prepare surface data for the test
+
+ 10. test_arpssfc.pl
+ 
+Along with above changes (a, b, c, and e):
+    f:   $sfcdir = "$datadir/arpssfc.data"  --- subdirectory for surface data
+
+================================================================================
+
+Prepare external conditions for real case test:
+
+ 11. test_ext2arps.pl
+ 
+Besides the above changes (a, b, c, e):
+    g:    $etadir = "$datadir/data.25may1998/eta40grb" --- subdir. for real data 
+
+================================================================================
+
+Run ADAS:
+ 
+ 12. test_adas.pl
+ 
+Besides the above changes (a, b, c, e, and g):
+     h:   $nidsdir = "$tdatdir/data.test/nids/nids2arps" --- NIDS data directory 
+          #   only change if you want NIDS data
+          #   in the scirpt NIDS has been disable (nradfil => 0).
+==============================================================================
+
+Real Case test:
+
+ 13.  test_realcase.pl
+
+Make the changes according to the above:  a, b, c, d, e, f, g, h and
+     i:  $scriptdir = "$srcdir/scripts" --- subdirectory of the perl scripts
+
+==============================================================================        
+Run a real case test in one time:
+
+ 14. testarps.pl:
+
+Make a directory std_test under $ENV{'ARPSDIR'} or change:
+
+   $arcdir = "$ENV{'ARPSDIR'}/std_test"   --- to store the test result archives.
+
+Make sure the following are correct:
+
+   $arpsversion = "$ENV{'ARPSVER'}";
+   $topdir = "$ENV{'ARPSDIR'}";
+   $def_datadir  = "$topdir/arps$arpsversion/data";
+
+==============================================================================

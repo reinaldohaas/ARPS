@@ -1,0 +1,98 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR FAKERAD IN NAMELIST FORMAT      ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  for program fakerad. 
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+!
+! Yunheng Wang (02/22/2001)
+!
+! Modification history:
+!
+! 02/22/2001 (Yunheng Wang)
+! Converted to namelist format.
+!
+!-----------------------------------------------------------------------
+!
+!  DIMENSIONS  Namelist for dimensions.
+!
+!     nx, ny, nz: Dimensions of ARPS computational grid. When run in 
+!                 distributed memory mode on MPP using MPI, 
+!                 they represent of the size of decomposed the subdomains
+!                 (patches). See message_passing namelist block below.
+!  
+!                 Given nx, ny and nz, the physical domain size will be 
+!                 xl=(nx-3)*dx by yl=(ny-3)*dy by zh=(nz-3)*dz.
+!
+!-----------------------------------------------------------------------
+
+ &grid_dims
+   nx   = 67,
+   ny   = 67,
+   nz   = 35,
+ /   
+
+!-----------------------------------------------------------------------
+!
+!   Get the name of the input data set:
+!
+!   hdmpfmt:       input data format flag value 1/2/3/4
+!
+!   grdbasfn:      the name of the file containing the grid and base state
+!                  information. This is not used if these fields are 
+!                  stored in each data file.
+!
+!   filename:      the name of the input data file.
+!  
+!-----------------------------------------------------------------------
+
+ &file_name
+   hdmpfmt=10,
+   grdbasfn='',
+   filename='',
+ /   
+
+!-----------------------------------------------------------------------
+!
+!  Input the rada information
+!
+!  radid:        4-char radar ID for the output data file.
+!  latrad:       lat for the radar.
+!  lonrad:       lon for the radar.
+!  elvrad:       elevation for the radar.
+!  vcpnum:       a VCP number, 11,12,31 or 32
+!                     11: Storm mode  14 tilts 0.5-19.5 deg
+!                     12: Precip mode  9 tilts 0.5-19.5 deg
+!                     31: Clear-air    5 tilts 0.5- 4.5 deg
+!                     32: Clear-air    5 tilts 0.5- 4.5 deg
+!  dstmin
+!  dstmax:       a min and maximum range (km)
+!  thref:        a reflectivity threshold. 0=all
+!
+!-----------------------------------------------------------------------
+
+  &rada_info
+     radid='',
+     latrad=0,
+     lonrad=0,
+     elvrad=0,
+     vcpnum=11,
+     dstmin=0,
+     dstmax=0,
+     thref=0,
+  /   

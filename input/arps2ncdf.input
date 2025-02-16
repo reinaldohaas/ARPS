@@ -1,0 +1,120 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR ARPS2NCDF IN NAMELIST FORMAT     ######
+!     ######                   (arps5.3)                          ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!   AUTHOR:
+!
+!   Keith Brewster, CAPS 
+!   2/19/99
+!
+!   11/21/2003 (K. Brewster)
+!   Revised for ARPS5.0
+!
+!-----------------------------------------------------------------------
+!
+!
+!  This namelist block sets the input history data format and
+!  history data files.
+!
+!  hinfmt  History data dump format option. The available options are:
+!          = 0, no data dump is produced;
+!          = 1, unformatted binary data dump;
+!          = 2, formatted ascii data dump;
+!          = 3, NCSA HDF4 format data dump;
+!          = 4, Packed binary data dump;
+!          = 5, dump for Savi3D visualization package;
+!          = 6, binary allowing data point skip;
+!          = 7, NetCDF format (no longer supported starting from 4.1.5);
+!          = 8, Packed NetCDF format (no longer supported since from 4.1.5);
+!          = 9, GrADS data dump;
+!          = 10, GRIB data dump.
+!          = 11, Vis5D data dump.
+!
+!  hdmpinopt = Indicate the way history data files are specified.
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed.
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!
+!  grdbasfn    Name of base-state and grid data file (hdmpinopt=2).
+!  nhisfile    Number of history files to be processed (hdmpinopt=2).
+!  hisfile(i)  History data files to be processed (hdmpinopt=2).
+!
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!-----------------------------------------------------------------------
+!
+
+ &history_data
+   hinfmt = 3,
+   hdmpinopt = 2,
+   hdmpfheader = './may20',
+   hdmpftrailer = '',
+   tintv_dmpin = 1800.0,
+   tbgn_dmpin = 0.0,
+   tend_dmpin = 1800.0,
+
+   grdbasfn = 'adas_ksc_20050221_2000.bingrdbas',
+   nhisfile = 1,
+   hisfile(1) = 'adas_ksc_20050221_2000.bin000000',
+ /
+
+!
+!-----------------------------------------------------------------------
+!
+!  nprlvl    the number of pressure levels
+!  iprlvl    the actual pressure levels for which to interpolate in arps2ncdf
+!
+!  ipktyp    netCDF packing type, use ipktyp=1
+!  nbits     netCDF pack bits, use nbits=16
+!  ncdapnd   append option
+!            = 0 do not append, clobber any existing file
+!            = 1 append, use existing file, create new if doesn't exist
+!  ncdntime  total number of time levels of data to be written to this
+!            file, including the first run and any subsequent appends 
+!            = 0 time levels=number of history files in this run
+!            = n time levels=n (number larger than nhisfiles)
+!  ncdtinterval  time interval (secs) between output netcdf forecast records
+!            = should equal tintv_dmpin if using hdmpinopt = 
+!  cdfname   Name of the output netCDF grid file
+!
+!-----------------------------------------------------------------------
+!
+ &ncdf_options
+   nprlvl = 19,
+   iprlvl = 1000, 950, 900, 850, 800, 750, 700,
+             650, 600, 550, 500, 450, 400, 350,
+             300, 250, 200, 150, 100,
+   ipktyp       = 1,
+   nbits        = 16,
+   ncdapnd      = 0,
+   ncdntime     = 1,
+   ncdtinterval = 3600,
+   cdfname      = 'adas_ksc_20050221_2000.ncd',
+ /

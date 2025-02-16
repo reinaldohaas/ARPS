@@ -1,0 +1,119 @@
+#!/bin/ksh
+#  Shell script to link xlC .o files without xlC driver.
+
+# Change the following 2 lines as necessary
+startupdir=/opt5/blincoln/EWB/MERAF/Examples/bin
+STARTUP=crt0.o
+munchdir=/opt5/blincoln/EWB/MERAF/Examples/bin
+MUNCH=munch
+
+LD_ARGS="-bhalt:4 -T512 -H512"
+EXTRA_LIBS="-lm -lc"
+libdirs=
+files=
+twolink=0
+compat=
+outputfile="a.out"
+verbose=0
+
+function LinkAndExit	# $1 = 1 exit iff ld return code is non-zero
+{
+    if [[ $verbose = 1 ]] then
+        echo "ld -bloadmap:mymap $TEMPREN $LD_ARGS $startupdir/$STARTUP $CONSTFILE $files $EXTRA_LIBS -o $outputfile > /tmp/l$$"
+    fi
+    ld -bloadmap:mymap $TEMPREN $LD_ARGS $startupdir/$STARTUP $CONSTFILE $files $EXTRA_LIBS -o $outputfile > /tmp/l$$
+    RET_CODE=$?
+    /bin/rm -f ./m$$.[cto] $CONSTFILE
+    if [[ -s /tmp/l$$ ]] then
+	cat /tmp/l$$
+    fi
+    /bin/rm -f /tmp/l$$
+    if [[ "$1" = 1 && $RET_CODE = 0 ]] then
+	return
+    fi
+    exit $RET_CODE
+}
+
+function FindLib # $1 = -lXXX
+{
+    LIB=
+    NAME=lib${1#-l}.a
+    for i in $libdirs /usr/lpp/xlC/lib /lib /usr/lib
+    do
+	if [[ -r $i/$NAME ]] then
+	    LIB=$i/$NAME
+	    return
+	fi
+    done
+}
+
+function DoMunch # $1 = munch pattern $2 = extra files
+{
+    munch_files=
+    for i in $files
+    do
+	case "$i" in
+	    $1)   munch_files="$munch_files $i";;
+	esac
+    done
+    munch_files="$munch_files $2"
+    if [[ $verbose = 1 ]] then
+        echo "$munchdir/$MUNCH $compat -o ./m$$.c -t ./m$$.t $munch_files"
+    fi
+    LIBPATH=/usr/lib:/lib:$munchdir
+    export LIBPATH
+    $munchdir/$MUNCH $compat -o ./m$$.c -t ./m$$.t $munch_files
+    MUNCH_RET=$?
+    # static constructor/destructors
+    if [[ $MUNCH_RET = 2 ]] then
+	CONSTFILE=
+    else
+        if [[ $verbose = 1 ]] then
+       	    echo "cc -c ./m$$.c"
+	fi
+	cc -c ./m$$.c
+	CONSTFILE=m$$.o
+    fi
+    # template renames
+    if [[ -s ./m$$.t ]] then
+	TEMPREN="-bex2:./m$$.t"
+    else
+	TEMPREN=
+    fi
+}
+
+# parse arguments
+while [[ "$1" != "" ]]
+do
+    case "$1" in
+	-qtwolink)	twolink=1; shift;;
+	-qlang*=compat) twolink=1; compat="-c"; shift;;
+	-q*)		shift;;	# ignore other options
+	-p*)		echo "profiling not supported -- ignored"; shift;;
+	*.[oa])		files="$files $1"; shift;;
+	-l*)		FindLib $1; files="$files $LIB"; shift;;
+	-L)		libdirs="$libdirs ${2}";files="$files -L$2"; shift 2;;
+	-L*)		libdirs="$libdirs ${1#-L}"; files="$files $1"; shift;;
+	-I)		shift 2;; # skip include directories
+	-[agOIUDyw]*|-ma) shift;; # skip misc options
+	-o)		outputfile="${2}"; shift 2;;
+	-v)		verbose=1; shift;;
+	-o*)		outputfile="${1#-o}"; shift;;
+	-munch)		munchdir=$2; shift 2;;
+	-munch*)	munchdir="${1#-munch}"; shift;;
+	-start)		startupdir=$2; shift 2;;
+	-start*)	startupdir="${1#-start}"; shift;;
+	-*)		echo "Unknown option $1 -- ignored"; shift;;
+	*)		echo "Unknown file $1 -- ignored"; shift;;
+    esac
+done
+if [[ $twolink = 1 ]] then
+    # any work to do?
+    DoMunch '*.[oa]' ""
+    if [[ $MUNCH_RET = 2 ]] then
+	# no static constructors/destructors -- can do it in one link
+	LinkAndExit 0
+    fi
+    LinkAndExit 1; DoMunch '*.o' "$outputfile"; LinkAndExit 0
+fi
+DoMunch '*.[oa]' ""; LinkAndExit 0

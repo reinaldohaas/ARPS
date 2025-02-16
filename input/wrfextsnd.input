@@ -1,0 +1,224 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR WRFEXTSND IN NAMELIST FORMAT     ######
+!     ######               ( Version ARPS5.2.8)                   ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!   AUTHOR:
+!
+!   Keith Brewster, CAPS
+!   03/09/2007
+!
+!-----------------------------------------------------------------------
+!
+!   MODIFICATION HISTORY:
+!
+!   Yunheng Wang (03/27/2007)
+!   Removed parameter "frames_per_outfile". It is now determined automatically
+!   inside the code. Please note that parameter "end_time_str" specifies
+!   the last time of data when to stop processing.
+!
+*-----------------------------------------------------------------------
+!
+!  Message passing namelist
+!
+!  nproc_x     : processor number in X direction
+!  nproc_y     : processor number in Y direction
+!  max_fopen   : Maximum number of files allowed open when reading or
+!                writing, a number smaller than the number of processors
+!                can be used if dictated by the computing platform.
+!
+!        NOTE: When reading, the maximum number of processors which can
+!              read simultaneously will be set automatically to be
+!              the quotient of
+!              (max_fopen)/((nprocx_in/nproc_x)*(nprocy_in/nproc_y)).
+!
+!              Since WRF data is not read in a big chunk, you can
+!              set max_fopen = nprocx_in*nprocy_in for simplicity.
+!
+!  nprocx_in : Valid only when io_form > 100. processor number in X
+!                direction for WRF when dumping WRF split files.
+!                It must be a multiple of nproc_x.
+!  nprocy_in : Same as nprocx_in but in Y direction. It must be
+!                a multiple of nproc_y.
+!
+!  NOTE: There are 4 scenarios here.
+!          1. NO-MPI mode, all of these parameter have no effects.
+!             the program will ignore them.
+!          2. MPI mode, io_form < 100. The program only reads
+!             nproc_x & nproc_y.
+!          3. MPI mode, io_form > 100, nprocx_in/nproc_x == 1, and
+!             nprocy_in/nproc_y == 1. Each processor will read one
+!             WRF data patch.
+!          4. MPI mode, io_form > 100, nprocx_in/nproc_x > 1 and/or
+!             nprocy_in/nproc_y > 1. Each processor will read several
+!             WRF data patches and join them to get one large patch
+!             and do interpolation over the joined large patch.
+!
+!  NOTE:  At present, wrf2arps_mpi only supported for the case when
+!         WRF horizontal grid matches with ARPS horizontal grid.
+!         i.e. use_wrf_grid = 1.
+!
+!--------------------------------------------------------------------=*
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+   max_fopen = 8,
+
+   nprocx_in = 1,
+   nprocy_in = 1,
+ /
+
+*-----------------------------------------------------------------------
+!
+! WRF input information
+!
+!   dir_extd             The directory that contains the WRF data
+!                        files that are to be converted/processed.
+!   init_time_str        WRF model initial time string as:
+!                        'YYYY-MM-DD_HH:MM:SS'
+!
+!   io_form              WRF history data format
+!                      = 1, WRF internal binary format
+!                      = 5, PHDF5 format
+!                      = 7, NetCDF format
+!
+!     NOTE: when io_form > 100, it will read WRF split history files. However,
+!           The following conditions are required before running WRF.
+!
+!       1. Configure the WRF system using options containing "RSL_LITE"
+!          run-time library instead of "RSL";
+!       2. Must specify "nproc_x/nproc_y" explicitly in "namelist.input";
+!       3. The unstagger domain size must be dividable by nproc_x/nproc_y, i.e.
+!          MOD( (e_we-s_we),nproc_x) == 0 & MOD( (e_sn-s_sn),nproc_y) == 0;
+!       4. Do the following changes ONLY if the WRF version is earlier than
+!          WRFV2.1.1.
+!
+!          Found "SUBROUTINE compute_memory_dims_rsl_lite" in file "frame/module_dm.F"
+!          (or "external/RSL_LITE/module_dm.F" for the first time) and do
+!          the following changes
+!
+!              o Find these three lines, and Change to
+!                  idim = ide-ids+1              idim = ide-ids
+!                  jdim = jde-jds+1              jdim = jde-jds
+!                  kdim = kde-kds+1              kdim = kde-kds+1
+!
+!              o Find line
+!                  ipe = a + b
+!                and ADD a new line blow it
+!                  if (mytask_x+1 == ntasks_x) ipe = ipe + 1
+!
+!              o Find line
+!                  jpe = a + b
+!                and ADD a new line blow it
+!                  if (mytask_y+1 == ntasks_y) jpe = jpe + 1
+!
+!  grid_id:                 WRF grid_id. It used to be 1. It was added to handle
+!                           outputs from WRF nesting runs.
+!
+!  start_time_str:          WRF history started time string as:
+!                           'YYYY-MM-DD_HH:MM:SS'
+!  history_interval:        WRF history dump interval string as:
+!                                   'DD_HH:MM:SS'
+!  end_time_str:            WRF history ended time string.
+!
+!    NOTE: if you are converting all WRF history dumps at one time,
+!          start_time_str should be the same as init_time_str. On
+!          the other hand, if the WRF history dumps is converting
+!          one by one, start_time_str is the same as end_time_str and
+!          init_time_str should be the start time of the WRF model.
+!
+!----------------------------------------------------------------------=*
+
+ &wrfdfile
+   dir_extd               = '/home/kbrews/data/wrf/',
+   init_time_str          = '1998-05-25_00:00:00',
+
+   io_form                = 7,
+
+   start_time_str         = '1998-05-25_00:00:00',
+   history_interval       =         '00_01:00:00',
+   end_time_str           = '1998-05-25_06:00:00',
+ /
+
+!
+*-----------------------------------------------------------------------
+!
+!  ustorm  u component of storm motion or domain translation speed (m/s)
+!  vstorm  v component of storm motion or domain translation speed (m/s)
+!
+!  locopt  input coordinate option
+!          1=lat/lon degrees
+!          2=x,y in km
+!
+!  slat,slon latitude (positive north from -90 to 90) and longitude
+!          (positive east) of the location(s) at which sounding(s)
+!          are to be extracted. Used when locopt=1.
+!
+!  xpt,ypt x and y coordinates of the location(s) at which sounding(s)
+!          are to be extracted. Used when locopt=2.
+!
+!  stid    Station name in three characters.
+!  istnm   Station number in 5 digits
+!
+!----------------------------------------------------------------------=*
+
+  &sndloc
+
+   locopt = 1,
+   nsnd   = 3,
+
+   stid(1)  =  'ACY',
+   istnm(1) = 72407,
+   slat(1)  = 39.4494,
+   slon(1)  = -74.5672,
+   selev(1) = 20.,
+
+   stid(2)  =  'RAP',
+   istnm(2) = 72662,
+   slat(2)  = 44.0453,
+   slon(2)  = -103.0574,
+   selev(2) = 966.,
+
+   stid(3)  =  'TOP',
+   istnm(3) = 72456,
+   slat(3)  = 39.0725,
+   slon(3)  = -95.6258,
+   selev(3) = 268.,
+
+   xpt(1)  = 10.0,
+   ypt(1)  = 10.0,
+
+   xpt(2)  = 15.0,
+   ypt(2)  = 15.0,
+
+ /
+
+*-----------------------------------------------------------------------
+!
+! Output
+!
+!
+!----------------------------------------------------------------------=*
+
+  &output
+    dir_output = './',
+    outsnd     = 0,
+    outsfc     = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of namelist input file
+!
+!-----------------------------------------------------------------------

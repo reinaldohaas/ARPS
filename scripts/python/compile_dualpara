@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm dualpara.pyf
+rm dualpara.so
+
+f2py -m dualpara -h dualpara.pyf dualpara.f90
+f2py -c dualpara.pyf global_module.f90 dualpara.f90

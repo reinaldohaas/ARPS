@@ -1,0 +1,153 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSPRT IN NAMELIST FORMAT      ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  for ARPSPRT version 5.0 or later and a few utility programs.
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+!
+! Yunheng Wang (02/13/2001)
+!
+! Modification history:
+!
+! 02/13/2001 (Yunheng Wang)
+! Converted to namelist format.
+!  
+!
+!-----------------------------------------------------------------------
+!
+!  Get the name of the input data set:
+!
+!  hdmpfmt:      The input data format flag value 1/2/3/4
+!  grdbasfn:     The name of the file containing the grid and base state 
+!                information. This is not used if these fields are stored
+!                in each data file.
+!  filename:     The name of the input data file.
+!
+!----------------------------------------------------------------------- 
+
+ &input_fn
+   hdmpfmt = 10,
+   grdbasfn = 'may20.grbgrdbas',
+   filename = 'may20.grb000000',
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Determine variables to plot:
+!
+!  nreply:       How many fields are you going to process?
+!		 at most 5 fields can be processed.
+!
+!  ireply:       Do you wish to let the program determine the rest of the
+!                control parameters? If so, the program will show 2-D
+!                x-y, x-z and y-z slices of most fields through the center
+!                of model domain. Type in 1 or 0 for yes or no.
+!
+!  inline:       (When ireply=0) Tell the program what variables to show by
+!                using the following two character IDs:
+!
+!                   u,v,w wind components:         uu,vv,ww
+!                   u,v,w wind base state:         ub,vb,wb
+!                   u,v,w perturbations            up,vp,wp
+!                   potential temp, pressure:      pt,pr
+!                   base pt, pressure:             tb,pb
+!                   theta, pressure perturbations: tp,pp
+!                   Mixing ratio:vapor,rain,cloud: qv,qr,qc
+!                   Mixing ratio:ice, snow, hail:  qi,qs,qh
+!                   qv:base state, perturbations:  qb,qp
+!                   Temperature: sfc, soil:        st,lt
+!                   Moisture: sfc, soil, canopy:   sm,lm,cm
+!          
+!                 Now tell the program which slices you want.
+!
+!  iplot(1):      Do you want x-y to plot the slices? (1 or 0)
+!
+!  iplot(2):      Do you want x-z to plot the slices? (1 or 0)
+!
+!  iplot(3):      Do you want y-z to plot the slices? (1 or 0)
+!
+!                 Now input the i, j or k index for the slice to be selected.
+!                 if i<0, i=(nx-1)/1+1 is assumed. Same is for j and k.
+!
+!  kslice:        Input the index k for the x-y slice to be printed.
+!                 (1=< k =< nz-1)
+!
+!  jslice:        Input the index j for the x-z slice to be printed.
+!                 (1=< j =< ny-1)
+!
+!  islice:        Input the index i for the y-z slice to be printed.
+!                 (1=< i =< nx-1)
+!
+!-----------------------------------------------------------------------
+
+ &field_number
+   nreply=2,
+ /
+ 
+ &plot_options
+      ireply(1) = 0,
+	inline(1) = 'qr,pp',
+      	iplot(1,1) = 0,
+      	iplot(2,1) = 1,
+      	iplot(3,1) = 0,
+      	kslice(1) = 0,
+      	jslice(1) = -1,
+      	islice(1) = 3,
+      
+      ireply(2) = 0,
+	inline(2) = 'uu',
+      	iplot(1,2) = 1,
+      	iplot(2,2) = 0,
+      	iplot(3,2) = 0,
+      	kslice(2) = 3,
+      	jslice(2) = -1,
+      	islice(2) = -1,
+
+     ireply(3) = 1,
+	inline(3) = 'qr,pp',
+      	iplot(1,3) = 0,
+      	iplot(2,3) = 1,
+      	iplot(3,3) = 0,
+      	kslice(3) = 0,
+      	jslice(3) = -1,
+      	islice(3) = 3,
+      
+     ireply(4) = 1,
+	inline(4) = 'qr,pp',
+      	iplot(1,4) = 0,
+      	iplot(2,4) = 1,
+      	iplot(3,4) = 0,
+      	kslice(4) = 0,
+      	jslice(4) = -1,
+      	islice(4) = 3,
+	
+     ireply(5) = 1,
+	inline(5) = 'qr,pp',
+      	iplot(1,5) = 0,
+      	iplot(2,5) = 1,
+      	iplot(3,5) = 0,
+      	kslice(5) = 0,
+      	jslice(5) = -1,
+      	islice(5) = 3,
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of input file
+!
+!-----------------------------------------------------------------------

@@ -1,0 +1,19 @@
+Here was a code to convert mesonet data. In order to make this simple 
+I broke out the mesonet processing from the other processing - which 
+requires the complication of the GEMPAK i/o libraries.  I will state 
+again (for Ming and students) the original processing, especially the 
+QC, was designed to optimally work when all the surface data are in 
+the same "lso" file.
+
+There is a Makefile here.  Currently you do:
+  $> makearps [options] meso2lso
+
+To run the program
+  $> setenv MESODATA directory_containing_mesonet_files
+  $> meso2lso -t YYYYMMDDHHMM
+
+where YYYYMMDDHHMM is the time requested as in 200805090120
+
+If -t is not prescribed the op of the current hour is assumed.
+
+-Keith

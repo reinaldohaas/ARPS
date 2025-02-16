@@ -1,0 +1,28 @@
+ARPS output for GrADS display, 1/31/97
+
+1. Arps.gs
+
+If hdmpfmt was chosen to 9, you may display ARPS history data by GrADS.
+Script arps.gs provides an interface for those who don't know much about
+GrADS. To use the script, type
+
+% grads -lc "run arps.gs runname.gradscntl"
+
+where runname.gradscntl is the GrADS data control file for ARPS history
+data and should be created by ARPS run. The runname is the run name given
+in the arps.input.  By typing this command, you should see a new window
+with "GrADS, Display ARPS Data, Run name: runname, Click When Ready".
+Move the mouse into the window and click to continue.
+
+2. Sfcflx.gs
+
+When soil model is turned on with option sfcdiag=1, the soil and
+vegetation variables as well as surface fluxes will be dumped for
+diagnostic purpose. The data dump is in GrADS format. You may use GrADS
+to display the data. Script sfcflx.gs is an interface that allows user
+to display the data with mouse click. To use the script, type
+
+% grads -lc "run sfcflx.gs runname.sfcctl"
+
+where runname.sfcctl is the GrADS data control file for ARPS surface flux
+data created by ARPS run.

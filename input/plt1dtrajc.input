@@ -1,0 +1,47 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR PLTTRAJC IN NAMELIST FORMAT     ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters for program PLTTRAJC,
+!  which plots 3D trajectories.
+!
+!  Steps to use this program:
+!  
+!  Step 1: Compile and link using  zxncarifc plttrajc.f90
+!  Step 2: Edit input file 
+!  Step 3: Run job using a.out < plttrajc.input 
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!
+!   Ming Xue (3/15/2004)
+!   Modification history:
+!
+!-----------------------------------------------------------------------
+!
+! tstart_plt: Start time of the plotted trajectory.
+! tend_plt:   End time of the plotted trajectory.
+! tref:       Reference time of the trajectory (usually the time at which
+!             the trajectories are initialized)
+! trajc_fn:   File name of the trajectory data file created by program
+!             arpscalctrajc.
+!
+!-----------------------------------------------------------------------
+!
+
+ &input
+    tstart_plt = 12000.0,
+    tend_plt   = 14000.0,
+    tref = 13250.0,
+    trajc_fn = 'may20_25x20m_c_cd2_r200.trajc_005415-014400_013250.data',
+ /
+

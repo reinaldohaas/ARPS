@@ -1,0 +1,181 @@
+#!/usr/bin/perl -w
+#
+#     ##################################################################
+#     ##################################################################
+#     ######                                                      ######
+#     ######      Advanced Regional Prediction System (ARPS)      ######
+#     ######                   Version 4.0                        ######
+#     ######                                                      ######
+#     ######                     Developed by                     ######
+#     ######     Center for Analysis and Prediction of Storms     ######
+#     ######                University of Oklahoma                ######
+#     ######                                                      ######
+#     ##################################################################
+#     ##################################################################
+#
+#=======================================================================
+#
+#  PURPOSE: This C-shell script is to test all makearps options.
+#
+#  AUTHORS: Yuhe Liu
+#
+#  HISTORY:
+#
+#       05/31/1995
+#
+#       1999/11/06 Converted to perl.  Gene Bassett
+#
+#  USAGE: testmkarps [-opts_makearps "makearps_options"]
+#  e.g., testmkarps -opts_makearps "-opt 1"
+#
+#=======================================================================
+
+use strict;
+use Getopt::Long;
+use File::Basename;
+use Cwd;
+
+my ($cmd) = fileparse($0);
+
+$| = 1; #OUTPUT_AUTOFLUSH
+
+#---- Set default options ----
+
+my $trial = 0;
+my $opts_makearps = "";
+my $src_dir = cwd();
+
+my @default_packages = qw(
+   adas arps arps2gem arps2ncdf arpsagr arpsassim arpscvt arpsdiff
+   arpsens arpsextsnd arpsintrp arpsplt arpsprt arpssfc arpssoil
+   arpssolver arpstern arpstintrp ext2arps extract_avn
+   mci2arps nids2arps arps_mp arpsread wtretcol
+);
+
+#---- Parse input arguments ----
+
+my %opts = (
+   "trial!"             => \$trial,
+   "opts_makearps=s"    => \$opts_makearps,   
+   "src_dir=s"          => \$src_dir,   
+);
+
+my @opts_list = keys %opts;
+unless (GetOptions(%opts)) {
+  die "Usage: $cmd [@opts_list] [<makearps_package> ...]\n"
+};
+
+#---- Finish initialization ----
+
+my %package_cmds = (
+  
+    arps2ncdf =>      [ "makearps $opts_makearps arps2ncdf" ],
+
+    arpsintrp =>      [ "makearps $opts_makearps arpsintrp",
+                        "makearps $opts_makearps arpsintrp_ls" ],
+
+    arpsens =>        [ "makearps $opts_makearps arpsenscv",
+                        "makearps $opts_makearps arpsensbc",
+                        "makearps $opts_makearps arpsensic" ],
+
+    arpsplt =>        [ "makearps arpspltncar",
+                        "makearps arpspltpost",
+                        "makearps pltgrid",
+                        "makearps $opts_makearps arpspltmax" ],
+
+    arpstern =>       [ "makearps $opts_makearps dir1deg",
+                        "makearps $opts_makearps dir5min",
+                        "makearps $opts_makearps dir30sec",
+                        "makearps $opts_makearps arpstern",
+                        "makearps $opts_makearps arpstrn",
+                        "makearps $opts_makearps mergetrn" ],
+
+### If ext2arps.gempak is run then need to run a "makearps clean" after!
+#    "ext2arps.gempak" => [ "makearps clean; ".
+#                        "makearps $opts_makearps -abi o32 ext2arps.gempak" ],
+
+    arps_mp =>        [ "makearps $opts_makearps splitfiles",
+                        "makearps $opts_makearps joinfile",
+                        "makearps $opts_makearps joinfiles",
+                        "makearps $opts_makearps arps_mpi" ]
+);
+
+my @packages = @default_packages;
+@packages = @ARGV   if (@ARGV);
+
+my @result;
+
+chdir($src_dir) or die "$cmd: ERROR could not chdir to $src_dir ($!)";
+
+#---- Run makearps for the executables in each package ----
+
+my $package;
+foreach $package ( @packages ) {
+
+  print "$cmd: WORKING on package: $package ...\n";
+
+  my @cmds;
+  if (defined $package_cmds{"$package"}) {
+    @cmds = @{$package_cmds{"$package"}};
+  } else {
+    @cmds = ("makearps $opts_makearps $package");
+  }
+
+  my $mkcmd;
+  foreach $mkcmd (@cmds) {
+    print "$cmd: EXECUTING $mkcmd ...\n";
+    my $mkstat = system "$mkcmd";
+    my $string = "no error returned";
+    $string = errcodes($mkstat)   if ($mkstat);
+    my $result = "$package  command \"$mkcmd\"   status: $string\n";
+    push @result, "  $result";
+    print "RESULT: $result";
+  }
+
+}
+
+print "$cmd:  TESTING RESULTS SUMMARY:\n";
+print " @result";
+
+
+                    ########################################
+                    ########################################
+                    ####                                ####
+                    ####            errcodes            ####
+                    ####                                ####
+                    ########################################
+                    ########################################
+
+sub errcodes {
+
+#=======================================================================
+#
+#  PURPOSE: This Perl subroutine decodes Perl error codes.
+#
+#  HISTORY:
+#       1998/07/01  Written by Richard Carpenter [RLC].
+#
+#  INPUT:   Perl error number.
+#
+#  OUTPUT:  Array or string.
+#
+#  SYNOPSIS:
+#       ($exit, $signal, $core) = errcodes($err);
+#       $err_string = errcodes($err);
+#	EXPORTED.
+#
+#=======================================================================
+
+my $errcode	= shift @_;
+my $exit	= $errcode >> 8;		# system exit status
+my $signal	= $errcode & 127;		# signal value
+my $core	= $errcode & 128;		# core dumped
+
+if (wantarray()) {
+   return($exit, $signal, $core);
+} elsif (defined(wantarray())) {
+   return "[$errcode: exit=$exit sig=$signal core=$core]";
+}
+
+} # end sub errcodes
+

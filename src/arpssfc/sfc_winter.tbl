@@ -1,0 +1,19 @@
+#
+# ARPS vegetation type -to- ARPS veg, LAI, z0 conversion table
+#
+#vtyp   veg     LAI     z0      vtyp definition
+#------------------------------------------------------------
+01      0.1     0.5     0.002   Desert
+02      0.1     0.5     0.02    Tundra
+03      0.3     0.02    0.01    Grassland
+04      0.2     0.02    0.03    Grassland with shrub cover
+05      0.3     0.02    0.10    Grassland with tree cover
+06      0.5     0.05    0.20    Deciduous forest
+07      0.80    0.5     0.40    Evergreen forest
+08      0.99    0.5     2.00    Rain forest
+09      0.01    0.0     0.005   Ice
+10      0.3     0.02    0.01    Cultivation
+11      0.0     0.0     0.02    Bog or marsh
+12      0.4     0.5     0.06    Dwarf shrub
+13      0.2     0.5     0.04    Semidesert
+14      0.0     0.0     0.002   Water

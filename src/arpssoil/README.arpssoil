@@ -1,0 +1,7 @@
+
+This directory contains source code for ARPSSOIL, a program for creating 
+initial soil model time-dependent variables based atmospheric conditions
+(from a history file) and surface property data. 
+ 
+Doing 'makearps arpssoil' in arps root directory compiles and links this package.
+

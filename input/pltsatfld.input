@@ -1,0 +1,65 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR PLTSATFLD IN NAMELIST FORMAT    ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  for PLTSATFLD version 5.0 or later and a few utility programs.
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+!
+! Yunheng Wang (02/13/2001)
+!
+! Modification history:
+!
+! 02/13/2001 (Yunheng Wang)
+! Create this namelist input.
+!  
+!
+!-----------------------------------------------------------------------
+!
+!  DIMENSIONS  Namelist for dimensions.
+!
+!     nx, ny:     Dimensions of computational grid. When run in 
+!                 distributed memory mode on MPP using MPI, 
+!                 they represent of the size of decomposed the subdomains
+!                 (patches). See message_passing namelist block below.
+!  
+!                 Given nx, ny and nz, the physical domain size will be 
+!                 xl=(nx-3)*dx by yl=(ny-3)*dy by zh=(nz-3)*dz.
+!
+!-----------------------------------------------------------------------
+
+ &grid_dims
+   nx   = 67,
+   ny   = 67,
+ /
+
+!-----------------------------------------------------------------------
+!
+! Enter filename to plot:
+!
+!  fname:        Filename 
+!
+!-----------------------------------------------------------------------
+ &fn
+    fname='jian.9804201745.goes08.albedo',
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of input file
+!
+!-----------------------------------------------------------------------

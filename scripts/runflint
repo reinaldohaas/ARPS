@@ -1,0 +1,114 @@
+#!/bin/csh -f
+#
+#     ##################################################################
+#     ##################################################################
+#     ######                                                      ######
+#     ######      Advanced Regional Prediction System (ARPS)      ######
+#     ######                   Version 4.0                        ######
+#     ######                                                      ######
+#     ######                     Developed by                     ######
+#     ######     Center for Analysis and Prediction of Storms     ######
+#     ######                University of Oklahoma                ######
+#     ######                                                      ######
+#     ##################################################################
+#     ##################################################################
+#
+#=======================================================================
+#
+#  PURPOSE: This C-shell script is to run flint for all ARPS programs
+#
+#  AUTHORS: Yuhe Liu
+#
+#  HISTORY:
+#
+#       04/23/1998
+#
+#  USAGE: runflint [-h]
+#
+#=======================================================================
+
+if ( $#argv != 0 ) then
+  if ( $argv[1] =~ -h* ) then
+    echo ""
+    echo "Usage: runflint [-h]"
+    echo ""
+    exit 0
+  else
+    set args = "$argv[*]"
+  endif
+else
+  set args
+endif
+
+set machine = `uname -n`
+
+set VERSION = 50
+set ARPS_SRC_DIR = /disk1/arps_work/arps$VERSION
+set ARPS_SRC_DIR = /tmp/xue/arps50pre4
+
+if ( -d /tmp/yuhe ) then
+  set tmpdir = /tmp/yuhe
+else
+  set tmpdir = .
+endif
+
+set RUN_DIR = $tmpdir/test
+if ( ! -d $RUN_DIR ) then
+  mkdir $RUN_DIR
+endif
+
+set WORK_SRC_DIR = $RUN_DIR/$VERSION
+if ( ! -d $WORK_SRC_DIR ) then
+  mkdir $WORK_SRC_DIR
+endif
+
+cd $ARPS_SRC_DIR
+makearps Allfiles.tar
+
+cp -p $ARPS_SRC_DIR/Allfiles.tar $WORK_SRC_DIR
+cd $WORK_SRC_DIR
+tar xf Allfiles.tar
+
+set CMD = " arps adas arpsagri arpsplt arpscvt arpsintrp arpssoil arpsdiff arpsprt arpsextsnd arpssfc arpstern ext2arps arps_mp 88d2arps "
+
+echo ""
+echo "Running flint"
+echo ""
+
+foreach cmd ( ${CMD} )
+  echo Running flint for $cmd...
+  echo ""
+  cd $WORK_SRC_DIR
+
+  mkdir -p $RUN_DIR/$cmd
+
+  makearps $cmd.tar
+  cp -p $cmd.tar $RUN_DIR/$cmd
+
+  cd $RUN_DIR/$cmd
+  tar xf $cmd.tar
+
+  mkdir $cmd
+  cp -p src/*/* include/* $cmd
+  cd $cmd
+  rm -f no*io3d.f90
+
+  rm -f genlib3d.f90 htchlib3d.f90 ibmlib3d.f90 irixlib3d.f90 lnxlib3d.f90 sunlib3d.f90 t3dlib3d.f90 tru64lib3d.f90
+  rm -f *dummy*.f90
+
+  flint -g -t -S$cmd -Ttrim -Tcondensed -Tsquish *.f90
+  cp $cmd.lnt $ARPS_SRC_DIR/$cmd.lnt
+  cp $cmd.stt $ARPS_SRC_DIR/$cmd.stt
+  cp $cmd.tre $ARPS_SRC_DIR/$cmd.tre
+
+end
+
+cd $ARPS_SRC_DIR
+
+#ftp -i paige.caps.ou.edu << end_of_ftp
+#  cd flint.output
+#  mput *.lnt *.tre *.stt
+#  quit
+#end_of_ftp
+
+exit 0

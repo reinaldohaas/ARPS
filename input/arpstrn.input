@@ -1,0 +1,276 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSTRN IN NAMELIST FORMAT      ######
+!     ######                                                      ######
+!     ######                 ( Version ARPS5.3.4 )                ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+*-----------------------------------------------------------------------
+!
+! AUTHOR: Ming Xue
+!
+! MODIFICATION HISTORY:
+!
+!  (2/04/2002)
+!  Added supported for 30 second data set from USGS.
+!
+!  Y. Wang (09/11/2012)
+!  Added support for SRTM 90 m (~3 second) data sets.
+!
+!-----------------------------------------------------------------------
+!
+!  To compile without graphics:
+!      makearps arpstrn
+!
+!  To compile with ZXPLOT for Postscript graphics output:
+!      makearps -zxpost arpstrn
+!
+!  To compile with ZXPLOT and NCAR graphics for NCAR graphics metafile output:
+!      makearps -zxncar arpstrn
+!
+!  To run: bin/arpstrn < input/arpstrn.input
+!                                                                     =*
+!-----------------------------------------------------------------------
+!
+!  runname, a string of up to 80 characters long, is used to identify
+!  this job.
+!
+!  The first 6 characters, or the characters before either a blank space or
+!  comma, will be used to construct output file names. Not more than 6
+!  characters are used to define runname. This character string will be
+!  printed on plots produced by ARPSPLT.
+!
+!-----------------------------------------------------------------------
+
+ &jobname
+   runname = 'terrain',
+ /
+
+!-----------------------------------------------------------------------
+!  ARPS Horizontal Grid
+!
+!  nx, ny:  Dimensions of ARPS computational grid in x and y directions.
+!
+!           Given nx and ny, the domain size will be
+!           xl=(nx-3)*dx by yl=(ny-3)*dy.
+!
+!  dx       Grid spacing in x-direction in computational
+!           and physical space (m).
+!  dy       Grid spacing in y-direction in computational
+!           and physical space (m).
+!
+!  ctrlat   Latitude of the model physical domain center (deg. N).
+!  ctrlon   Longitude of the model physical domain center (deg. E).
+!           Default: 36.00N and -100.00W  (Del City, Oklahoma)
+!
+!-----------------------------------------------------------------------
+
+ &grid
+
+   nx   = 67,
+   ny   = 67,
+
+   dx   =   30000.000,
+   dy   =   30000.000,
+
+   ctrlat =   40.00,
+   ctrlon = -100.00,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  projection parameters:
+!
+!  mapproj   Map projection option.
+!          = 0, no map projection;
+!          = 1, North polar projection      (-1 South Pole);
+!          = 2, Northern Lambert projection (-2 Southern);
+!          = 3, Mercator projection.
+!  trulat1   1st true latitude of map projection.
+!  trulat2   2nd true latitude of map projection (used only by mapproj = 2).
+!  trulon    True longitude of map projection.
+!  sclfct    Map scale factor (default is 1.0).
+!
+!-----------------------------------------------------------------------
+
+ &projection
+   mapproj = 2,
+   trulat1 =  30.0,
+   trulat2 =  40.0,
+   trulon  = -95.0,
+   sclfct  =  1.0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  trndataopt Terrain data option
+!             = 1, use 1 degree global data (not implemented yet and may
+!                  never be because higher res data are available);
+!             = 2, use 5 minute global data;
+!             = 3, use 30 second global data;
+!             = 4, use 3 second terrain data.
+!
+!  ATTENTION:
+!
+!    To use trndataopt=3 or 4, you need a fast internet access, unless
+!    you already have all the necessary data on your local disk.
+!
+!    For both options, the program can automatically download the necessary
+!    data files from remote ftp server if the data file is not found
+!    in the local directory you specify through parameter dir_trndata.
+!    The downloaded files will be kept in directory dir_trndata so unless
+!    dir_trndata already contains all the necessary files you will need
+!    to have write permission to this directory.
+!
+!    The ftp server is caps.ou.edu. You need to have .netrc file in
+!    your home directory that contains line
+!
+!    machine caps.ou.edu login anonymous password your_email_address
+!
+!    and .netrc can be not readable by others, i.e., do 'chmod go-rw .netrc'.
+!    You also need to specify the full path of index file usgs_dem.index.
+!    The file usually resides in src/arpstrn inside ARPS root directory.
+!
+!    For the format of the 30s data, see README.files in
+!    ftp://caps.ou.edu/ARPS/ARPS.data/arpstopo30.data. For info on the
+!    original USGS set from which this data set is converted from (format
+!    change only except for the missing value flag), see README.TXT
+!    in the same directory.
+!
+!  nsmth        Number of times 9-point smoother is applied.
+!
+!  lat_sample   Data sampling interval in lat. direction in arc seconds.
+!  lon_sample   Data sampling interval in lon. direction in arc seconds.
+!
+!    They should be set to be equal to or larger than the data resolution,
+!    and be integer multiples of the data resolution. 3600 should be divisible
+!    by both parameters.
+!
+!    Choosing sampling interval larger than the data interval reduces
+!    the size of work arrays used to store the input data therefore reduce
+!    the memory usage. With lower sampling rate, you do lose accuracy
+!    because the grid point values are interpolated from surrounding
+!    sample values.
+!
+!    In general, the intervals should be chosen to be comparable to the
+!    ARPS grid resolution.
+!
+!    30 arc seconds on latitude circle correspond to approximately
+!    920 meters on the earth surface.
+!    30 arc seconds on the longitude circle correspond to approximately
+!    920*cos(lat) meters. The actual distance on the ARPS grid depends on
+!    the map projection used, but is in general close to these values.
+!
+!  dir_trndata  Directory of terrain data base file(s). See earlier comments.
+!
+!  fn_trndata   File name of terrain data base file (not used by 3 or 30s data).
+!
+!  usgs_dem_index_fn The file containing the file name index of
+!                    3s USGS terrain data patches
+!                    (usually called usgs_dem.index in src/arpstrn directory)
+!
+!  trn3src      Works with option trndataopt = 4 only. It specifies the
+!               3 second terrain data source.
+!             = 0 (default), for north US+Alaska data
+!             = 1, will read 3s European terrrain data.
+!                  This part of code is provided by an external ARPS user,
+!                  Tina Katopodes Chow from Stanford university. We have
+!                  not tested it fully. Usage of this feature requires user
+!                  to take the following actions:
+!
+!            NOTE:
+!            o 3s European data is not hosted at CAPS ftp server. It is the
+!              user's responsibility to download the data and save it to your
+!              local disk in a fold specified by "dir_trndata".
+!            o User should create their own file name index for 3s European terrain
+!              data patches, and give the correct name to "usgs_dem_index_fn".
+!              A sample is provided in "src/arpstrn/europe_dem.index" by the
+!              author. However, it is not complete. User should add entries for
+!              their own.
+!
+!             = 2, Read SRTM 90m "Eurasia" data (Version 2.1)
+!                  (http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/)
+!                  Users can also download Version 2.1 data over other areas
+!                  and put them in the working directory "dir_trndata".
+!                  For example, Africa, Australia, Islands, North_America
+!                  and South_America.
+!
+!             = 3, Read SRTM 90m digital elevation Data (version 4
+!                  with 5 degree tiles).
+!                  User can either download the data to "dir_trndata" or
+!                  let the program fetch those 5 degree tiles for you
+!                  autmatically. You should have program "wget" in the
+!                  environment PATH if the program fetchs data for you.
+!                  (http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp)
+!
+!  trnanxopt  Option for terrain data analysis scheme.
+!             = 1, bi-linear interpolation
+!             = 2, bi-quardratic interpolation.
+!
+!-----------------------------------------------------------------------
+!
+ &dem_trn
+
+   trndataopt = 4,
+
+     fn_trndata = 'tbase_global_5min.data',
+     dir_trndata= '/arpsofficial/data/arpstern.data/',
+
+     usgs_dem_index_fn = '../src/arpstrn/usgs_dem.index',
+     trn3src = 0,
+
+   nsmth      = 1,
+
+   lat_sample = 90,
+   lon_sample = 90,
+
+   trnanxopt  = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  latgrid,longrid (degree)
+!             the intervals between lat and lon grid lines.
+!             < 0.0, no grid lines in the given direction,
+!             = 0.0, internally determined,
+!
+!  nmapfile Number of mapfiles to plot
+!  mapfile File name of map data.
+!          e.g., usstate.mapdata, spcounty.mapdata, worldcoast.mapdata
+!
+!  hctrinc      Contour interval for the terrain height in meters.
+!
+!-----------------------------------------------------------------------
+
+ &map_plot
+   latgrid =  1.,
+   longrid =  1.,
+   nmapfile = 1,
+   mapfile(1) = 'data/arpsplt/us_state.mapdata',
+   mapfile(2) = 'data/arpsplt/world_us_country.mapdata',
+
+   hctrinc = 250.0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  terndmp   Flag to dump ARPS terrain data file.
+!          = 0, no terrain data file;
+!          = 1, Unformatted binary dumps;
+!          = 3, HDF4 (uncompressed) dumps.
+!          = 7, NetCDF format dumps;
+!
+!-----------------------------------------------------------------------
+
+ &trn_output
+   dirname = './',
+   terndmp = 3,
+ /

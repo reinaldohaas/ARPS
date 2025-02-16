@@ -1,0 +1,58 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSRAINDIFF IN NAMELIST FORMAT ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  for ARPSDIFF version 5.3 or later and a few utility programs.
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+!
+! Yunheng Wang (02/12/2001)
+!
+! Modification history:
+!
+! 02/28/2001 (Yunheng Wang)
+! Converted to namelist format.
+!
+! 1 June 2002 Eric Kemp
+! Removed nx,ny,nz namelist.  These variables are now read in from
+! history dump.
+!
+!-----------------------------------------------------------------------
+!
+!  Input file:
+!
+!  hinfmt:      Input the data format flag value 1/2/3/4 
+!  grdbasfn:    The name of the file containing the grid and base state
+!               array data. This file will not be read if the grid and base
+!               state arrays are present in each time-dependent data file.
+!  file1:       The name of the time-dependent data file
+!  file2:
+!
+!-----------------------------------------------------------------------
+
+ &input_files
+   hinfmt   = 10,
+   grdbasfn = 'may20.grbgrdbas',
+   file1 = 'may20.grb003600',
+   file2 = 'may20.grb007200',
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of input file
+!
+!-----------------------------------------------------------------------

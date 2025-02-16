@@ -1,0 +1,228 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR JOINWRF IN NAMELIST FORMAT      ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+! This file contains the input parameters in namelist format for program
+! joinwrf, which joins patches of WRF netCDF files into one large piece.
+! The following assumptions are made:
+!
+!   o The maximum rank of each data set/variable is 5;
+!   o The files are WRF history files in netCDF format.
+!
+! Steps to run the programs:
+!
+!  1. Compile the program
+!     $> makearps [options] joinwrfh
+!
+!  2. Edit namelist input file - this file
+!
+!  3. Run the program
+!     $> bin/joinwrfh < input/joinwrf.input
+!
+!-----------------------------------------------------------------------
+!
+!  Author: Yunheng Wang (04/25/2007)
+!
+!  Modification history:
+!  William.Gustafson@pnl.gov, 16-Feb-2009: Added nocolons option
+!
+!  04/16/2012 (Y. Wang)
+!  Improved attadj option to read extra column or extra row of patches.
+!
+!  03/09/2013 to 05/21/2013 (Y. Wang)
+!  Extended the program capabilites with the followings:
+!  o For run-time efficiency, added a new subroutine joinwrfncdf_mem to
+!    loop over variable instead of looping over patch files.
+!  o Added capability to select patches automatically. So namelist variables
+!    nproc_x/nproc_y are not important, but still play roles if they are
+!    specified. They can be the same as nproc_xin/nproc_yin.
+!  o Added parameters to output a bounded box within the original domain.
+!  o Added parameters to dump output files into split patches. So,
+!    "joinwrfh" can also be used to split WRF files or re-arrange the
+!    split patches. The name may be not appropriate :).
+!  o Added capbility to extract a bounded box from normal joined WRF files,
+!    set nproc_xin = 1 and nproc_yin = 1.
+!
+!    NOTE: please use different "dir_extd" and "outdirname", or set
+!          "outfiletail" differently. Otherwise, the original WRF files
+!          may be overwritten by the program.
+!
+*-----------------------------------------------------------------------
+!
+! WRF input information
+!
+!  dir_extd             The directory that contains the WRF data
+!                       files that are to be converted/processed.
+!
+!  io_form              WRF history data format
+!                      = 1, WRF internal binary format
+!                      = 5, PHDF5 format
+!                      = 7, NetCDF format (only one supported at present)
+!
+!  filename_convention  How to construct the file name
+!                      = 0, WRF history output (ARW), 'wrfout_d01_YYYY-MM-DD_HH:MM:SS[_xxxx]'
+!                      = 1, WPS metgrid output (ARW), 'met_em.d01.YYYY-MM-DD_HH:MM:SS.nc[_xxxx]'
+!                      = 2, WPS metgrid output (NMM), 'met_nmm.d01.YYYY-MM-DD_HH:MM:SS.nc[_xxxx]'
+!                      = 3, WRF history output (NMM), 'wrfout_d01_YYYY-MM-DD_HH:MM:SS[_xxxx]'
+!
+!  nocolons             Use colons or underscores for time in file name
+!                      = .false., use colons
+!                      = .true.,  use underscores
+!
+!  magnitude_processor Magnitude of the number processors for split WRF
+!                files. The parameter was added for CAPS spring 2010
+!                experiments where we had used 14,400 processors on Athena
+!                for 1km experiments, which is larger than 10,000 - the maximum
+!                allowable in the WRF system. So the file appendix must be
+!                5 digits in length instead of the default 4.
+!          = 4, (default)
+!          = 5, for 5 digits appendix with WRF/METO split files
+!
+!  start_time_str:          WRF history started time string as:
+!                           'YYYY-MM-DD_HH:MM:SS'
+!  history_interval:        WRF history dump interval string as:
+!                                   'DD_HH:MM:SS'
+!  end_time_str:            WRF history ended time string.
+!
+!    NOTE: if you are converting all WRF history dumps at one time,
+!          start_time_str should be the same as init_time_str. On
+!          the other hand, if the WRF history dumps is converting
+!          one by one, start_time_str is the same as end_time_str and
+!          init_time_str should be the start time of the WRF model.
+!
+!---------------------------------------------------------------------=*
+!
+ &wrfdfile
+   dir_extd            = './',
+   grid_id             = 1,
+   filename_convention = 0,
+   nocolons            = .false.,
+   magnitude_processor = 4,
+
+   start_time_str      = '1998-05-25_00:00:00',
+   history_interval    =         '00_01:30:00',
+   end_time_str        = '1998-05-25_06:00:00',
+ /
+
+*-----------------------------------------------------------------------
+!
+!  Patches      Specify the patches to be joined
+!
+!    NOTE:  All patches must form a rectangular subdomain.
+!
+!  proc_sw      No. of procs in the lower-left corner of the subdomain to be joined
+!  nproc_x      Number of procs in the west-east direction of the subdomain.
+!  nproc_y      Number of procs in the south-north direction of the subdomain.
+!  nproc_xin    Original nproc_x when running WRF. We want to know
+!               the configuration to get the process numbers.
+!  nproc_yin    Original nproc_y when running WRF. It is required when
+!               attadj is .TRUE..
+!              = 0, unknown, the program will make a wild guess.
+!
+!----------------------------------------------------------------------=*
+
+ &patches
+   proc_sw = 0,
+   nproc_x = 8,
+   nproc_y = 18,
+   nproc_xin = 8,
+   nproc_yin = 18,
+ /
+
+*-----------------------------------------------------------------------
+!
+! Output
+!
+!  outdirname   Name of directory for writting output files
+!
+!  outfiletail  File name tail to be appended.
+!
+!  jointime     Whether to join all time levels into one file
+!              = F, No, the UNLIMITED dimension keeps the same
+!              = T, Yes, Join all data into one file with multiple
+!                   UNLIMITED dimension.
+!
+!  attadj       Whether to adjust the attributs in output file to make
+!               it looks like outputs from an independent WRF (ARW only) run.
+!               When turns on attadj, the program will compute new central
+!               latitude and longitude. So the varlist should include at
+!               least LAT_M, LONG_M, LAT_U, LONG_U, LAT_V, LONG_V etc.
+!
+!  nvarout      Number of varibles to be writen in the joined file
+!               = 0, all variables in the patch files
+!               > 0, should specify variable names in varlist below
+!
+!  varlist      Character arrays of size nvarout containing name
+!               of variables to be written in the joined file.
+!
+!  istride      Grid points to be skipped in X direction
+!  jstride      Grid points to be skipped in Y direction
+!               They are used for thinning a WRF grid with large resolution.
+!              = 1, (default) no skipping.
+!
+!  iboxs, iboxe Output box indices in X direction
+!  jboxs, jboxe Output box indices in Y direction
+!
+!  nproc_x_out  Output the joined fields into patches (for pmode = 0 only)
+!  nproc_y_out  Output the joined fields into patches (number of patches in Y direction)
+!
+!----------------------------------------------------------------------=*
+
+ &output
+   outdirname = './',
+   jointime = .FALSE.,
+   nproc_x_out = 1,
+   nproc_y_out = 1,
+   nvarout = 0,
+     varlist(1) = 'xlat',
+     varlist(2) = 'xlong',
+     varlist(3) = 'xlat_u',
+     varlist(4) = 'xlong_u',
+     varlist(5) = 'xlat_v',
+     varlist(6) = 'xlong_v',
+     varlist(7) = 'P',
+     varlist(8) = 'v',
+     varlist(9) = 'u',
+ /
+
+*-----------------------------------------------------------------------
+!
+! Debugging  Namelist for program debugging
+!
+!   debug = 0, no debugging messages will be written.
+!         = 1, Write important milestons
+!         = 2, Write more detailed messages
+!         = 3, Hiding debug information for the author, it may be hard
+!              for users to understand these messages.
+!
+!   pmode    Program run mode
+!         = 0, Better turn-around time (maybe), but use a big chunk of memory.
+!              This mode use less system CPU time, but more CPU time in user mode.
+!              Furthermore, it has light load with the file system.
+!         = 1, Use less memory with more file I/O operations. It is
+!              suitable when the joined domain is large, especially
+!              with many split patches.
+!              This mode may use less percentage of the CPU because waiting
+!              for file I/O.
+!
+!            Note that pmode = 0 requires more file handlers to be opened
+!            at the same time.
+!
+!----------------------------------------------------------------------=*
+
+ &debugging
+   debug = 0,
+   pmode = 0,
+ /

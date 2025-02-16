@@ -1,0 +1,55 @@
+
+!-----------------------------------------------------------------------
+!
+!  Namelist file used by EXTRACT_AVN.
+!
+!  initime = 'yyyy-mm-dd.hr:mn:se', UTC(GMT) date/time. yyyy is a 
+!                                   4-digit integer for year, and mm, dd,
+!                                   hr, mn, and se are 2-digit integers
+!                                   for month, day, hour, minute, and 
+!                                   second, respectively. For example,
+!                                   20:30Z, Dec. 19, 1994 would be 
+!                                   represented as: 1994-12-19.20:30:00 
+!
+! dir_extd = The directory that contains the external data files
+!            that are to be converted/processed.
+!
+! extdname = Prefix string of external file name
+!
+! nextdfil = The number of external data files for EXT2ARPS to
+!            process.
+!
+! extdtime = The time corresponding to the external data files. 
+!            The format is a concatenation of the inidate and 
+!            initime formats, plus forecast time information, namely:
+!            extdtime(1) = 'yyyy-mm-dd.hh:mm:ss+hhh:mm:ss',
+!            For example:
+!            extdtime(1) = '1977-05-20.21:00:00+003:00:00'
+!            represents 3 hr forecast fields starting from 
+!            21z, May 20 1977
+! 
+! latbgn,latend Begin and end latitude  of the patch to extract from AVN data
+!            If the patch is between -180.0 and 180.0, set
+!            -180.0 =< latbgn, latend < 180.0
+!            If the patch is between 0.0 and 360.0, set
+!            0.0 =< latbgn, latend < 360.0
+!
+! lonbgn,lonend Begin and end longitude of the patch to extract from AVN data
+!            -90.0 =< lonbgn, lonend =< 90.0
+!
+!-----------------------------------------------------------------------
+
+ &extdfile
+   initime = '2000-07-21.00:00:00',
+   dir_extd = '/usr2/mxue/avn_data/avn_grb',
+   extdname = 'avn_grb',
+   nextdfil = 3,
+   extdtime(1) = '2000-07-21.00:00:00+000:00:00',
+   extdtime(2) = '2000-07-21.00:00:00+012:00:00',
+   extdtime(3) = '2000-07-21.00:00:00+024:00:00',
+   latbgn = -50.0,
+   latend =  10.0,
+   lonbgn = -10.0,
+   lonend = 40.0,
+ /
+

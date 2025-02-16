@@ -1,0 +1,23 @@
+'may20.maxmin'   !  max/min file, this is a input file for arpspltmax.f
+-50.0    ! ullim
+ 50.0    ! uulim
+-50.0    ! vllim
+ 50.0    ! vulim
+-20.0    ! wllim
+ 60.0    ! wulim
+-40.0     ! ptllim
+ 40.0     ! ptulim
+-10.0     ! pllim
+ 10.0     ! pulim
+ 0.0     ! qllim
+20.0     ! qulim
+-10.0    ! ubllim
+20.0     ! ubulim
+-10.0     ! vorbllim
+100.0      ! vorbulim
+-10.0     ! vorallim
+100.0      ! voraulim
+0.0      ! refllim
+70.0     ! refulim
+2        ! nxpic
+2        ! nypic

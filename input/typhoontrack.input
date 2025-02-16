@@ -1,0 +1,121 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR TYPHOONTRACK IN NAMELIST FORMAT  ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!   AUTHOR:
+!
+!   Yunheng Wang, CAPS
+!   10/07/2010
+!
+*-----------------------------------------------------------------------
+!
+!
+!  This namelist block sets the input history data format and
+!  history data files (only time independent grid and base file).
+!  It is used to extract the grid, map projection, terrain height as well
+!  as runtime (from file name).
+!
+!  grdbasfn   Grid & base file name with out split extention
+!  hinfmt     ARPS history file format
+!  nprocx_in  Number of patches in X direction if the files are in split format
+!  nprocy_in  Number of patches in Y direction
+!
+!----------------------------------------------------------------------=*
+
+ &base_file
+   grdbasfn = './may20.hdfgrdbas',
+   hinfmt   = 3,
+   nprocx_in = 1,
+   nprocy_in = 1,
+ /
+
+*-----------------------------------------------------------------------
+!
+! This namelist block sets hurrican path options
+!
+! numPath    Number of typhoon paths to be tracked (maximum is 6)
+! timeBgn    Beginning number of 2D file in seconds
+! timeIntvl  Time interval in seconds
+! timeEnd    End time of the data files
+! pathOpts   Path options, which is dimensioned with numPath
+!           1 : the typhoon track derived from mean sea level pressure
+!               2D output "mspres" from ARPSPOST must be available for reading
+!           2 : the typhoon track derived from hgt at 700 hPa
+!               2D output "hgt700" from ARPSPOST must be available for reading
+!           3 : the typhoon track derived from min wind at 10 m AGL
+!               2D output "u10m__" & "v10m__" from ARPSPOST must be available for reading
+!           4 : the typhoon track derived from min wind at 850 hPa
+!               2D output "u850__" & "v850__" from ARPSPOST must be available for reading
+!           5 : the typhoon track derived from min wind at 700 hPa
+!               2D output "u700__" & "700__" from ARPSPOST must be available for reading
+!           6 : the typhoon track derived from the combination of option 1 and option 2
+!               2D output "mspres" & "hgt700" from ARPSPOST must be available for reading
+!               If this track is an option, option 1 & option 2 must have chosen
+!               and their orders are before opiton 6.
+! dirname2d   Diretory name that contains the 2D files to be read
+! finfmt2d    2D file format to be read
+!
+!---------------------------------------------------------------------=*
+
+ &path_option
+   numPath = 6,
+   timeBgn   = 0,
+   timeIntvl =  3600,
+   timeEnd   = 79200,
+   pathOpts = 1, 2, 3, 4, 5, 6,
+   dirname2d = './',
+   finfmt2d = 3,
+ /
+*-----------------------------------------------------------------------
+!
+! Observation
+!
+! obsNumb    Whether observation data is available (0=no,>0=yes).
+!            It also denotes the number of observed pathes.
+!            There can be at most 5 observations simultanously, which
+!            denotes 5 hurricane centers.
+! obsLats    Observed latitude of typhoon Center
+! obsLons    Observed longitude of typhoon Center
+! obsMinp    Observed minimum sea level pressure of typhoon Center
+! obsMaxw    Observed maximum surface win of typhoon center
+!
+!---------------------------------------------------------------------=*
+
+ &obs_option
+   obsNumb = 17,
+   obsLats = 23.5,23.4,23.4,23.5,23.6,23.9,24.0,24.3,24.6,24.9,25.5,25.3,25.4,25.6,25.7,25.8,25.9,
+   obsLons = 123.2,122.6,122.4,122.3,122.1,121.9,121.6,121.5,121.5,121.3,121.0,120.8,120.8,120.8,120.7,120.6,120.5,
+   obsMinp = 955.,955.,955.,955.,955.,955.,965.,965.,970.,975.,975.,975.,975.,975.,975.,975.,975.,
+   obsMaxw = 40.,40.,40.,40.,40.,40.,38.,38.,38.,35.,35.,35.,35.,35.,35.,35.,33.,
+ /
+
+*-----------------------------------------------------------------------
+!
+! Output parameter
+!
+!  outdir   Output directory name
+!  outfile  Output path file name
+!  outmslp  Output minmum sea level pressure
+!  outmaxw  output maximum wind speed
+!  lvldbg   = 0 no debug
+!
+!---------------------------------------------------------------------=*
+
+ &output
+   outdir = './',
+   outfile = 'haiou_path.dat',
+   outmslp = 'minslp.dat',
+   outmaxw = 'maxwind.dat',
+   arpsdir = '/data3/ywang/arps5.2/',
+   lvldbg = 0,
+ /

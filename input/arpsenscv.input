@@ -1,0 +1,123 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSENSCV IN NAMELIST FORMAT    ######
+!     ######                 ( Version ARPS5.3 )                  ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+! Namelist for ARPSENSCV.
+!
+!   AUTHOR:
+!
+!------------------------------------------------------------------------
+! grdbasfn = 'ex1998051412vrf.grbgrdbas',   (keep this format for dating)
+! nhisfile = 1, (must be 13 for 36h fst.,oterwise, rainfal will be wrong)
+! hisfile(1) = 'ex1998051412vrf.grb000000', (keep this format for dating)
+!------------------------------------------------------------------------
+
+ &history_data
+   hinfmt = 3,
+   grdbasfn = '20020102ens/00Z/arb12002010200.hdfgrdbas',
+   nhisfile = 1, 
+   hisfile(1) = '20020102ens/00Z/arb12002010200.hdf000000',
+ /
+
+!------------------------------------------------------------------------
+!  outfile(1):     format may vary, maximum 80 characs.
+!  outfile(13):    format may vary, maximum 80 characs.
+!  iout(1):        0, no output: 1 output
+!  iout(2):        In operation, 1 should be use for all of iout's elements!
+!  iout(3):       
+!  iout(4):       
+!  iout(5):       
+!  iout(6):       
+!  iout(7):       
+!  iout(8):       
+!  iout(9):       
+!  iout(10):       
+!  iout(11):       
+!  iout(12):       
+!  iout(13):       
+!  icape:         choice of CAPE schem, 1 CAPS, 2,NCEP
+!  iplot:         plotting for inspection: 0,not: 1, rain only; 2 othervariables
+!  iterr:         plot terr. for test:1 yes;0 not. In operation, 0 should be used
+!  iaccu:         0 for entire accppt (accul. rain) (0h->current value);
+!                 1 for piecewise accppt (previous->current value) when nhisfile
+!                   (>1) hisfiles (in time series) are involved
+!------------------------------------------------------------------------
+
+ &output_data
+   outfile(1) = 'asc/enb12002010200.000000.asc',
+   iout=01*1,
+   icape=1,
+   iplot=1,
+   iterr=0,
+   iaccu=0,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Parameters for the output (new) grid
+!
+!  DESCRIPTIVE STRINGS:
+!
+!    enstag, model
+!
+!  intrpl       Interpolate output to a new grid.
+!             = 0, use the same grid as in the history file (no interpolation);
+!             = 1, interpolate to a new grid.
+!
+!  VARIABLES USED WHEN INTRPL=1:
+!
+!
+!   qni,qnj      Dimensions of the new grid (no fake zones).  Note that
+!                qni*qnj must be less than or equal to MAX2D_OUT in enscv.inc.
+
+!   dxnew        dx on the new grid (units of km).
+!
+!   qswcorn,qswcorw,qnecorn,qnecorw 
+!                Latitude (q*n) & longitude (q*w) of the sw & ne corners
+!                of the grid.
+!                
+!   mptjnew      Map projection option.
+!              = 0, no map projection;
+!              = 1, polar projection;
+!              = 2, Lambert projection;
+!              = 3, Mercator projection.
+!   trltnew(1)   1st true latitude of map projection on new grid.
+!   trltnew(2)   2nd true latitude of map projection (used only by mapproj = 2).
+!   trlnnew      True longitude of map projection on new grid.
+!
+!-----------------------------------------------------------------------
+
+ &output_grid         
+   
+   enstag = 'ARPSENS',
+   instit = 'CAPS_OU',
+   model = 'ARPS5.0.0',
+
+
+   intrpl = 0,
+     qni=117,
+     qnj=81,
+
+     qswcorn=27.0844,
+     qswcorw=-110.068,
+     qnecorn=45.1552,
+     qnecorw=-68.10911,
+
+     mptjnew=2,         
+     trltnew(1)=39.0,  
+     trltnew(2)=39.0, 
+     trlnnew=-100.0, 
+     dxnew=30.0,  
+ /

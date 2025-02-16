@@ -1,0 +1,12 @@
+ 1-D Sounding Input for ARPS
+ nuetral sounding
+ 00:00:00 CST
+ 02 Feb 1990
+ Ft. Swill, OK
+ 'height' 'potential temperature' 'relative humidity'
+   0.0 1.00e5
+           2
+ ZSND THSND QVSND USND      VSND      
+    20000.00000    420.00000      0.00000      0.00000      0.00000
+        0.00000    300.00000      0.00000      0.00000      0.00000
+

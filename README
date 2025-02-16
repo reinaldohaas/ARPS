@@ -1,0 +1,438 @@
+
+     ##################################################################
+     ##################################################################
+     ######                                                      ######
+     ######                   Welcome to                         ######
+     ######      Advanced Regional Prediction System (ARPS)      ######
+     ######                   Version 5.2                        ######
+     ######                                                      ######
+     ######                     Developed by                     ######
+     ######     Center for Analysis and Prediction of Storms     ######
+     ######                University of Oklahoma                ######
+     ######                                                      ######
+     ##################################################################
+     ##################################################################
+
+
+This directory contains ARPS version 5.2. 
+
+It includes the source code for ARPS forward prediction model,
+ARPS data analysis system (ADAS), terrain and surface
+chacracteristics pre-processing porgrams ARPSTERN and ARPSSFC, 
+graphics post-analysis program ARPSPLT and many other related tools. 
+
+To learn all included programs in ARPS package and their usage, please
+visit ARPS Quick Guide at http://www.caps.ou.edu/ARPS/arpsqg/. ARPS 
+Quick Guide also includes tables to summarize the required 
+softwares/tools to get started with ARPS.
+
+Terrain and surface characteristics data sets and documentations 
+can be found at ftp://ftp.caps.ou.edu which are also accessible 
+from the web at http://www.caps.ou.edu/ARPS. 
+
+Note that starting from Version 5.0, ARPS requires Fortran 90
+compiler. The source codes are now in Fortran 90 free format
+and uses dynamic memory allocation. The grid dimensions are now
+specified at run time as input parameters. 
+
+For further assistance, contact
+
+        ARPS User Support Group
+        Center for Analysis and Prediction of Storms
+        University of Oklahoma
+        Sarkeys Energy Center, Rm 1110
+        100 East Boyd
+        Norman, OK  73019-0628
+        USA
+
+        Phone:  405-325-3041
+        Fax:    405-325-7614
+        E-mail: arpssupport@ou.edu
+
+
+1. How to compile ARPS and supporting programs; 
+
+   The file organization starting from ARPS Version 4.3.0 is very
+different from previous versions. The files are organized in
+subdirectories data, docs, html, include, input, scripts, sounding,
+src and validate inside the ARPS root directory (where this README 
+file is found). The source files for individual programs are placed in
+subdirectories inside src, while shared files are either in src/arps
+or src/adas.
+
+   You start by going into the ARPS root directory. The compilation
+and linking of ARPS and all other ARPS-supported utility programs are
+orchestrated by a UNIX shell script, makearps. The script invokes a
+make command based on the parameters provided to it. A HELP page will
+be listed when command makearps is entered with argument -help, or
+simply no argument (we assume % is your command prompt).
+ 
+% makearps -help
+
+or
+
+% makearps
+
+  The script will try to determine the machine type that the code is
+compiled on. The main differences between the machines are the compiler
+and loader flags that are to be used. The built executable programs are
+located in subdirectory bin under the root directory.
+
+  It is recommended that you create a new work directory using script
+mkarpswd for each new project and select option 'all' so that most
+files (especially input files for controlling the program) that you may
+need to edit are copied into your work directory. You do most of your
+work inside this directory. The command entered from the root directory
+is:
+
+% scripts/mkarpswd
+
+followed by your replies to the prompts. 
+
+
+2. How to run ARPS
+
+* A quick start with ARPS
+
+  When ARPS is used for idealized simulation studies, often real
+terrain data or 3-D analysis data is not required. In this case, fewer
+steps are required for completing a model run. We list these steps in
+the following (we assume ZXPLOT graphics has been installed on your
+computer system. ZXPLOT is a locally developed independent graphics
+package with similar function as NCAR graphics, and it's object code
+library can be obtained from ftp://ftp.caps.ou.edu/ZXPLOT for all
+popular platforms.  The fortran source code of ZXPLOT is not freely
+distributed however).
+
+  The following is an example for making a 3D supercell storm simulation 
+using sounding for May 20, 1977 Del City, Oklahoma tornadic storm. See
+ARPS 4.0 User's Guide section 13.6. UNIX vi editor is used for
+illustrative purposes in the following, comments are given after #.
+
+% cd ARPS_root_directory    # Go into the ARPS root directory
+
+% makearps arps             # compile and link ARPS executable, which is placed 
+                            # inside bin.
+
+% mkdir may20               # Create a work directory may20 
+
+% cd may20                  # Change into your work directory may20
+% cp ../sounding/may20.snd  # Copy sounding file used by the test
+
+% vi may20.snd              # Prepare a sounding if necessary. may20.snd.
+
+% cp ../input/arps.input may20.input # Make a copy of the standard ARPS input file
+
+% vi may20.input            # Set control parameters for the model run
+                            # Set runname='may20'. Note that the grid dimensions
+                            # nx ,ny and nz are now set at run time in the input file. 
+
+% ../bin/arps < may20.input >! may20.output
+                            # Run the model
+
+% ls -l may20.*             # List the output files
+
+% cp ../input/arpsplt.input . # Make a copy of arpsplt.input.
+
+% vi arpsplt.input          # Set plotting control parameters including 
+                            # the names of history files to be plotted. 
+
+% cd ..                     # Got the ARPS root directory
+
+% makearps arpspltpost      # Compile and link ARPSPLT with ZXPLOT,
+                            # assuming you have ZXPLOT version 3 or later 
+                            # installed on your system.
+                            # If you have NCAR graphics on your system,
+                            # you can do 'makearps arpspltncar' to generate
+                            # NCAR graphics instead of postscript output.
+
+% cd may20                  # Go back to your work directory
+
+% ../bin/arpspltpost < arpsplt.input
+                            # Run ARPSPLT program to generate 
+                            # postscript (PS) graphics output
+
+% ls -l *.ps                # See what PS file has been created by ARPSPLT
+% ghostview may20.ps        # View the PS output using ghostview. 
+                            # Ghostview is a free GNU PS viewer available
+                            # on most platforms.
+
+% lpr may20.ps              # Send the PS file to a Postscript printer
+
+
+* A complete run of ARPS
+
+  The steps required to make a complete ARPS run using real terrain, real 
+surface characteristic data, and 3-D initial data set are listed as follows:
+
+- Prepare the terrain data
+
+  Steps to prepare the terrain data, assuming the terrain data
+  base has been properly set up (This step is unnecessary if you use 
+  an analytic terrain). See ARPS 4.0 User's Guide 8.2:
+
+% cd ARPS_root_directory    # Go into the ARPS root directory
+% mkdir myruns              # Create your work directory myrun1 
+% makearps dir1deg          # Compile and link program DIR1DEG
+% makearps dir5min          # Compile and link program DIR5MIN
+% makearps dir30sec         # Compile and link program DIR30SEC
+% makearps -ncarg arpstern  # Compile and link terrain analysis
+                            # program  ARPSTERN. Assume you have 
+                            # NCAR Graphics. Otherwise, drop -ncarg option.
+% cd myrun1
+% cp ../input/arpstern.input . # copy arpstern.input into current work directory
+% vi arpstern.input         # Set parameters for model grid
+                            # configuration  and terrain data analysis
+% ../bin/dir1deg < arpstern.input >! dir1deg.output
+                            # Convert 1 degree terrain data into
+                            # direct access files. This needs to be
+                            # done only once if the output data are saved
+% ../bin/dir5min < arpstern.input >! dir5min.output
+                            # Convert 5 minute  terrain data into
+                            # direct access files. This needs to be
+                            # done only once if the output data are saved
+% ../bin/dir30sec < arpstern.input >! dir30sec.output
+                            # Convert 30 second terrain data into
+                            # direct access files. This needs to be
+                            # done only once if the output data are saved
+% ../bin/arpstern < arpstern.input >! arpstern.output
+                            # Execute program ARPSTERN
+% idt gmeta                 # Examine the graphic plotting of the terrain field
+
+  Terrain data file, arpstern.dat, should have been be produced for use
+  by ARPS.
+
+- An alternative to arpstern is provided since arps4.5.0. The program 
+  is called ARPSTRN and at the time of 4.5.0 release, global 5 minutes 
+  data and 3 second US data are supported by the program. The 5 minute data
+  set, tbase_global_5min.data.gz, is available from 
+  ftp://ftp.caps.ou.edu/pub/ARPS/ARPS.data/arpstern.data. The 3 second data 
+  is automatically downloaded by the program from a ftp server. See instruction
+  in input/arpstrn.input. The steps are:
+
+% cd ARPS_root_directory    # Go into the ARPS root directory
+% makearps -zxpost arpstrn  # Compile and link program ARPSTRN. 
+                            # ZXPLOT is assumed to have been installed.
+                            # If not, omit -zxpost option. No graphic
+                            # plot will be generated.
+% cd myrun1
+% cp ../input/arpstrn.input . # copy arpstern.input into current work directory
+
+% vi arpstrn.input          # Set parameters for model grid
+                            # configuration  and terrain data analysis
+% ../bin/arpstrn < arpstrn.input >! arpstrn.output
+                            # Execute program ARPSTRN
+% ghostview zxout.ps        # Examine the graphic plotting of the terrain field
+
+  Terrain file, runname.arpstrn, should have been be produced.
+
+- Prepare the surface characteristic data
+
+  Steps to prepare the surface characteristic data, assuming the
+  data base has been properly set up.
+
+% cd ARPS_root_directory    # Go into the ARPS root directory
+% makearps -ncarg arpssfc   # Compile and link program ARPSSFC, again assuming 
+                            # you have NCAR graphics. This should create arpssfc
+                            # inside bin.
+% cd myrun1                 # Go into your work directory.
+% cp ../input/arps.input myrun1.input 
+                            # Make a copy of standard ARPS input file for myrun1.
+% vi myrun1.input           # Set grid configuration parameters for ARPS
+                            # and ARPSSFC namelist block soil_veg_data is
+                            # for ARPSSFC. We assume you set run name as
+                            # myrun1.
+% ../bin/arpssfc < myrun1.input >! arpssfc.output
+                            # Run program ARSSSFC
+% ls -l myrun1.sfcdata      # Check that the output has been produced.
+
+- Produce initial and boundary condition data set
+
+  Steps to produce three-dimensional initial condition and boundary
+  condition (BC) data can be from the forecast of another model, ARPS's
+  own simulation/forecast in a bigger domain, or from analyses. Usually,
+  the ARPS objective analysis package, ADAS (ARPS data analysis system)
+  requires background fields coming from another bigger scale model. 
+
+  A program called ext2arps is provided for interpolating gridded data
+  from a number of operational NWP models, mostly from NCEP/NOAA/USA. To
+  add support for additional gridded data, a use can modify subroutines
+  in src/ext2arps/rdextfile.f. See ARPS 4.0 User's Guide section 8.5.
+
+% cd ARPS_root_directory    # Go into the ARPS root directory
+% makearps ext2arps         # Compile and link program EXT2ARPS
+% cd myrun1                 # Go into your work directory
+% cp myrun1.input myrun1-ext.input # Make a copy of input file for ext2arps.
+% vi myrun1-ext.input       # Set control parameters, including the dates and 
+                            # the input data file names, for EXT2ARPS
+                            # Change the run name to something different from
+                            # myrun1, e.g., myrun1-ext, to avoid output name 
+                            # conflict with the final ARPS run. Make sure
+                            # exbcdmp is set to 1.
+% ../bin/ext2arps < myrun1-ext.input >! ext2arps.output
+                            # Run program EXT2ARPS
+% ls -l myrun1_ext.*        # Check the output files. You can use ARPSPLT to 
+                            # view the output. Files
+
+- Run ARPS Data Analysis program ADAS, using observational data and
+  background fields from EXT2ARPS.
+
+% cd ARPS_root_directory    # Go into the ARPS root directory
+% makearps adas             # Compile and link program ADAS 
+% cd myrun1                 # You know what is for now    
+% cp myrun1.input myrun1-adas.input 
+                            # Make a copy of the arps.input template
+% vi myrun1-adas.input      # Set parameters used by ADAS, and other common 
+                            # parameters for ARPS. Make sure the latter are 
+                            # consistent with those used by EXT2ARPS.
+                            # Set run name to, e.g., myrun1-adas.
+% ../bin/adas < myrun1-adas.input >! myrun1-adas.output
+                            # Run program ADAS to perform objective analysis 
+% ls -l myrun1-adas.*       # Check the output files. Again you can use ARPSPLT
+                            # to examine these files.
+
+- Run ARPS. Now you have everything you need to produce an APRS forecast. 
+
+% cd ARPS_root_directory    # Go into the ARPS root directory
+                            # all previous programs
+% makearps arps             # Compile and link ARPS main program. 
+% cd myrun1                 # No need to say anything here.
+% vi myrun1.input           # Set control parameters/options model integration
+                            # Specify IC and BC file names.
+% ../bin/arps < myrun1.input >! myrun1.output
+                            # Run the forward prediction program, ARPS.
+% ls -l myrun1.*            # List ARPS output files. Use ARPSPLT to plot
+                            # the output. Hopefully you see what you like.
+
+3. Model Output
+
+  The ARPS model provides options for a number of formats for the
+history data output. Here history data refers to data written by the
+model and containing all necessary model variables for post-analysis.
+The history data formats are designed so that they can also be used to
+initialize the model. In this document, history data is sometimes
+referred to as the history dump. The output directory is specified in
+arps.input. Parameter runname is a character string chosen (in arps.input) 
+to identify your run. Most output file names are constructed from this
+string.
+
+  The main output files from ARPS are described below.
+
+  arps.output      - A file containing information from the
+                     standard output of model execution. Formatted
+                     printout of field arrays, run time diagnostic
+                     information, warnings of improper parameter
+                     settings, job aborting information, etc., can
+                     be found in this file. The user is strongly
+                     encourage to examine this file during and
+                     after the job execution. 
+
+  myrun1.log       - A record of all input parameters in a
+                     NAMELIST format ready to be re-used as a input
+                     file for ARPS execution. Assuming runname='myrun1'.
+
+  myrun1.maxmin    - The maximum and minimum values of various
+                     fields at time intervals specified by the user
+                     in the file arps.input. This file is read by
+                     program ARPSPLTMAX to plot the time series of
+                     certain model variables. 
+
+  myrun1.rstnnnnnn - A set of binary data files produced at an
+                     interval specified by the user in
+                     arps.input. Here nnnnnn represents the model time 
+                     in seconds. Each file contains two time levels of 
+                     data and can be used to restart the model. After the
+                     restart, the model should run as if it had
+                     never stopped.
+
+  myrun1.fmtgrdbas - history data containing only the time
+                     independent base-state and model grid arrays.
+                     Each run will generate only one such file.
+                     Here fmt is one of bin, asc, hdf, pak, bn2,
+                     grd, grb and v5d, indicating the format of
+                     the data. A description on these formats and
+                     their use can be found in ARPS 4.0 User's Guide 
+                     Section 10.1. 
+
+  myrun1.fmtnnnnnn - a set of history data files that contain all
+                     necessary model variables for post-processing
+                     purposes. Here fmt represents the data format
+                     as before, and nnnnnn are six or more digits 
+                     representing the data time in seconds. 
+
+
+4. Vector Graphics Analysis of ARPS Data
+
+  CAPS distributes a vector graphics plotting program, ARPSPLT 
+(see User's Guide, Section 10.2), based on graphics software known as
+ZXPLOT. ARPSPLT uses history data from the ARPS. To use this package,
+you must install the .i.ZXPLOT; executable library on your machine. The
+object codes for most popular systems can be obtained from anonymous FTP
+site: ftp.caps.ou.edu:/pub/ZXPLOT. More detailed information on ZXPLOT
+can be found in Chapter 12, User's Guide. Alternatively, a user can
+write his/her own analysis program using the history data read
+facilities supplied with ARPS.  A template program for reading history
+data is provided in Section 10.1. For a quick start up, the steps to run
+ARPSPLT are:
+
+  
+% cd ARPS_root_directory    # Go into the ARPS root directory
+
+For NCAR Graphics output,
+
+% makearps arpspltncar      # ARPSPLT Compile and link ARPSPLT with
+                            # ZXPLOT and NCAR Graphics libraries
+% cd myrun1                 # Assume you have a work directory called myrun1.
+                            # See earlier sections.
+% vi arpsplt.input          # Set plotting control parameters including 
+                            # the names of history files to be processed
+% ../bin/arpspltncar < arpsplt.input >! arpsplt.output
+                            # Run ARPSPLT to generate graphic metafile output
+% idt gmeta                 # View metafile using X-windows
+
+Or for PostScript plotting,
+
+% makearps arpspltpost      # Compile and link ARPSPLT with ZXPLOT
+                            # and ZXPLOT PostScript driver
+% cd myrun1                 # You know what. 
+% vi arpsplt.input          # Set plotting control parameters for ARPSPLT.
+% ../bin/arpspltpost < arpsplt.input >! arpsplt.output
+                            # Run ARPSPLT to generate PostScript output
+                            # The output should be called myrun1.ps, assuming
+                            # myrun1 is the run name. View the output using, 
+                            # e.g., ghostview or print it.
+
+
+5. To run ARPS in distributed memory parallel mode using MPI (message passing
+inteface). 
+
+The foreward prediction component of ARPS supports distributed memory 
+parallelization, by performing domain decomposition in x and y directions. 
+No domain decomposition is supported in the vertical.
+Linux Beowulf cluster is one example of distributed memory parallel systems. 
+Almost all vedors support distributed memory parallelization via MPI. 
+
+The procedure to run ARPS with MPI:
+
+makearps splitfiles         # creates executable bin/splitfiles 
+makearps joinfiles          # creates executable bin/splitfiles 
+makearps arps_mpi           # creates executable bin/arps_mpi
+
+vi input/arps.input         # Set nproc_x and nproc_y, number of cpus/decomposed 
+                            # patches in x and y direction, respectively.
+                            # Currently, only binary history format is supported 
+                            # by split and join programs. HDF format will be 
+                            # supported later.
+
+bin/splitfiles < input/arps.input > splitfiles.output
+                            # Split input data files into pieces for 
+                            # individual processors to read
+
+mpirun -np number_of_cpus_to_use bin/arps_mpi < input/arps.input > arps.ouput
+                            # Run MPI version of arps
+
+bin/joinfiles < input/arps.input > jointfiles.output
+                            # Join together output data files generated by 
+                            # individual processors. 
+
+

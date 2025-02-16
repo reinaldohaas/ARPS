@@ -1,0 +1,497 @@
+#!/bin/csh -f
+#
+#     ##################################################################
+#     ##################################################################
+#     ######                                                      ######
+#     ######      Advanced Regional Prediction System (ARPS)      ######
+#     ######                     Version 4.3                      ######
+#     ######                                                      ######
+#     ######                     Developed by                     ######
+#     ######     Center for Analysis and Prediction of Storms     ######
+#     ######                University of Oklahoma                ######
+#     ######                                                      ######
+#     ##################################################################
+#     ##################################################################
+#
+#
+#=======================================================================
+#
+#  PURPOSE: This C-shell script helps to set up to run ARPS in a
+#           working directory
+#
+#  AUTHORS: Yuhe Liu
+#           09/19/1997
+#
+#  HISTORY:
+#
+#  OTHER INFORMATION:
+#       See file makearps and Makefile
+#
+#=======================================================================
+
+#-----------------------------------------------------------------------
+#
+#  Determine the machine type
+#
+#-----------------------------------------------------------------------
+
+if ($?HOSTTYPE) then
+  set mach = $HOSTTYPE
+  if ( $mach == unknown ) then
+    set os   = "`/bin/uname -s`"
+    set hw   = "`/bin/uname -m`"
+    set mach = "$os,$hw"
+  endif
+else if (-f /bin/uname) then
+  set os   = "`/bin/uname -s`"
+  set hw   = "`/bin/uname -m`"
+  set mach = "$os,$hw"
+endif
+
+#-----------------------------------------------------------------------
+#
+#  Argument -vpath assumes the system make supposts VPATH macro
+#
+#-----------------------------------------------------------------------
+
+if ( $#argv >= 1 ) then
+
+  set arg = $argv[1]
+  if ( $arg == "-vpath" ) then
+    set vpath = 1
+  else
+    if ( $arg == "-novpath" ) then
+      set vpath = 0
+    else 
+      echo ""
+      echo "Usage: $0 [-vpath | -novpath]"
+      echo ""
+      exit 1
+    endif
+  endif
+
+else
+
+#-----------------------------------------------------------------------
+#
+#  Determine if the system make supports VPATH macro by the machine type
+#
+#-----------------------------------------------------------------------
+
+  if ( $mach =~ SunOS || $mach =~ ULTRIX || $mach =~ alpha || $mach =~ OSF || $mach =~ AIX || $mach =~ rs6000 || $mach =~ Linux ) then
+    set vpath = 1
+  else
+    set vpath = 0
+  endif
+
+endif
+
+set vpath = 0
+
+if ( $vpath == 1 ) then
+  echo ""
+  echo "Assume make command support VPATH macro."
+else
+  echo ""
+  echo "Assume make command NOT support VPATH macro."
+endif
+
+#-----------------------------------------------------------------------
+#
+# Default directories
+#
+# WRKDIR - Working directory
+# TOPDIR - ARPS root directory
+#
+#-----------------------------------------------------------------------
+
+set CURDIR = `pwd`
+set WRKDIR = $CURDIR
+set TOPDIR = $CURDIR
+
+#-----------------------------------------------------------------------
+#
+# Asking input from the user where the working directory is located.
+#
+#-----------------------------------------------------------------------
+
+printf "\n"
+printf "Enter the ARPS root directory ["$TOPDIR"]: "
+set readin = $<
+if ( $readin != '' ) then
+  set TOPDIR = $readin
+  if ( ! -d $TOPDIR ) then
+    printf "Error: $TOPDIR not found\n"
+    exit 1
+  endif
+endif
+
+cd $TOPDIR
+set TOPDIR = `pwd`
+cd $CURDIR
+
+printf "Enter the ARPS working directory ["$WRKDIR"]: "
+set readin = $<
+if ( $readin != '' ) then
+  set WRKDIR = $readin
+  if ( ! -d $WRKDIR ) then
+    mkdir -p $WRKDIR
+    if ( $status != 0 ) then
+      printf "Error: can not create $WRKDIR\n"
+      exit 2
+    else
+      printf "$WRKDIR was created\n"
+    endif
+  endif
+endif
+
+cd $WRKDIR
+set WRKDIR = `pwd`
+cd $CURDIR
+
+ProgSelect:
+  printf "\n"
+  printf "Which ARPS programs you want to work on?\n"
+  printf "\n"
+  printf "0.  all (DeFAult)\n"
+  printf "1.  arps\n"
+  printf "2.  adas\n"
+  printf "3.  arpsagri\n"
+  printf "4.  arps_mp\n"
+  printf "5.  arpscvt\n"
+  printf "6.  arpsdiff\n"
+  printf "7.  arpsextsnd\n"
+  printf "8.  arpsintrp\n"
+  printf "9.  arpsplt\n"
+  printf "10. arpsprt\n"
+  printf "11. arpssfc\n"
+  printf "12. arpssoil\n"
+  printf "13. arpstern\n"
+  printf "14. arpstrn\n"
+  printf "15. ext2arps\n"
+  printf "16. wtretcol\n"
+  printf "17. 88d2arps\n"
+  printf "\n"
+  printf "Your input: "
+
+set readin = $<
+
+printf "\n"
+printf "Copying files from $TOPDIR to your working directory\n"
+printf "\n"
+
+switch ( "$readin" )
+
+  case 1:
+    cp -p $TOPDIR/sounding/*.snd $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/sounding/*.snd was copied into $WRKDIR\n"
+  case 11:
+  case 16:
+    cp -p $TOPDIR/input/arps.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arps.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 2:
+    cp -p $TOPDIR/input/arps.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arps.input was copied into $WRKDIR\n"
+    cp -p $TOPDIR/data/adas/*.tab $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/src/adas/*.tab was copied into $WRKDIR\n"
+    cp -p $TOPDIR/data/adas/blacklist.sfc $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/data/adas/blacklist.sfc was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 3:
+    cp -p $TOPDIR/input/arps.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arps.input was copied into $WRKDIR\n"
+    cp -p $TOPDIR/sounding/*.snd $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/sounding/*.snd was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/alloc.h $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/alloc.h was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 4:
+    cp -p $TOPDIR/input/arps.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arps.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/par*.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/par*.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 5:
+    cp -p $TOPDIR/input/arpscvt.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpscvt.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 6:
+    cp -p $TOPDIR/input/arpsdiff.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpsdiff.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/diffdims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/diffdims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 7:
+    cp -p $TOPDIR/input/arpsextsnd.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpsextsnd.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 8:
+    cp -p $TOPDIR/input/arpsintrp.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpsintrp.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/intrpdims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/intrpdims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 9:
+    cp -p $TOPDIR/input/arpsplt.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpsplt.input was copied into $WRKDIR\n"
+    cp -p $TOPDIR/data/arpsplt/*.mapdata $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/src/arpsplt/*.mapdata was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 10:
+    cp -p $TOPDIR/input/arpsprt.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpsprt.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 12:
+    cp -p $TOPDIR/input/arpssoil.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpssoil.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 13:
+    cp -p $TOPDIR/src/arpstern/*.file $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/include/*.file was copied into $WRKDIR\n"
+    cp -p $TOPDIR/input/arpstern.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpstern.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/terrain.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/terrain.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 14:
+    cp -p $TOPDIR/src/arpstrn/usgs_dem.index $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/include/usgs_dem.index was copied into $WRKDIR\n"
+    cp -p $TOPDIR/input/arpstrn.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arpstrn.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 15:
+    cp -p $TOPDIR/input/arps.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/arps.input was copied into $WRKDIR\n"
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/extdims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/extdims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/phycst.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/phycst.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/gribcst.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/gribcst.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 17:
+
+    if ( $vpath == 1 ) then
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+    endif
+    breaksw
+
+  case 0:
+    if ( $vpath == 1 ) then
+      printf "\nCopying include files\n"
+      cp -p $TOPDIR/include/dims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/dims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/alloc.h $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/alloc.h was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/par*.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/par*.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/diffdims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/diffdims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/intrpdims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/intrpdims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/terrain.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/terrain.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/extdims.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/extdims.inc was copied into $WRKDIR\n"
+      cp -p $TOPDIR/include/gribcst.inc $WRKDIR
+      if ( $status == 0 ) \
+        printf "$TOPDIR/include/gribcst.inc was copied into $WRKDIR\n"
+    endif
+
+    printf "\nCopying all input files\n"
+    cp -p $TOPDIR/input/*.input $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/input/*.input was copied into $WRKDIR\n"
+
+    printf "\nCopying sounding files\n"
+    cp -p $TOPDIR/sounding/*.snd $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/sounding/*.snd was copied into $WRKDIR\n"
+
+    printf "\nCopying other needed files\n"
+    cp -p $TOPDIR/data/adas/*.adastab $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/src/adas/*.tab was copied into $WRKDIR\n"
+    cp -p $TOPDIR/data/adas/blacklist.sfc $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/src/adas/blacklist.sfc was copied into $WRKDIR\n"
+
+    cp -p $TOPDIR/data/arpsplt/*.mapdata $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/data/arpsplt/*.mapdata was copied into $WRKDIR\n"
+
+    cp -p $TOPDIR/src/arpstern/*.file $WRKDIR
+    if ( $status == 0 ) \
+      printf "$TOPDIR/src/arpstern/*.file was copied into $WRKDIR\n"
+
+    breaksw
+endsw
+
+if ( $TOPDIR != $WRKDIR ) then
+  if ( -f $TOPDIR/makearps ) then
+    set MAKE_opt = \$\MAKE_opt
+    set FFLAGS0_inc = '"-I\$WRKDIR -I\$TOPDIR\/include"'
+    set CFLAGS0_inc = '"-I\$WRKDIR -I\$TOPDIR\/include"'
+    set TOPDIR_str = `echo $TOPDIR |sed "s/\./\\\./g" |sed "s/\//\\\//g"`
+    set WRKDIR_str = `echo $WRKDIR |sed "s/\./\\\./g" |sed "s/\//\\\//g"`
+    sed "\?set TOPDIR?s/.CURDIR/$TOPDIR_str/" $TOPDIR/makearps \
+    | sed "\?set WRKDIR?s/.CURDIR/$WRKDIR_str/" \
+    | sed "\?MAKE -f?s/MAKE -f/MAKE $MAKE_opt -f/" \
+    | sed "\?set FFLAGS0 = .-I.TOPDIR.include.?s/set FFLAGS0 = .-I.TOPDIR.include./set FFLAGS0 = $FFLAGS0_inc/" \
+    | sed "\?set CFLAGS0 = .-I.TOPDIR.include.?s/set CFLAGS0 = .-I.TOPDIR.include./set CFLAGS0 = $CFLAGS0_inc/" \
+    | cat >! $WRKDIR/makearps
+    if ( $status == 0 ) \
+      printf "$TOPDIR/makearps was modified and saved into $WRKDIR\n"
+      chmod +x $WRKDIR/makearps
+  endif
+
+  if ( $vpath == 1 ) then
+    cp -p $TOPDIR/Makefile.wrkdir $WRKDIR/Makefile
+    if ( $status == 0 ) \
+      printf "$TOPDIR/Makefile.wrkdir was copied to $WRKDIR/Makefile\n"
+  else
+    cp -p $TOPDIR/Makefile $WRKDIR/Makefile
+  endif
+else
+  echo ""
+  echo "The working directory is the same as the ARPS root directory."
+  echo "Please save the original Makefile to a safe place."
+  echo "Then copy Makefile.wrkdir to Makefile."
+  echo ""
+endif
+
+exit 0

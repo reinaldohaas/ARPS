@@ -1,0 +1,125 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR ARPS2ETA212 IN NAMELIST FORMAT   ######
+!     ######                    ( arps5.3 )                       ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!   AUTHOR:
+!
+!   Yunheng Wang, CAPS
+!   4/19/03
+!
+!-----------------------------------------------------------------------
+!
+
+!-----------------------------------------------------------------------
+!
+!  hinfmt  History data dump format option. The available options are:
+!     = 1, unformatted binary data dump
+!     = 2, formatted ascii data dump
+!     = 3, NCSA HDF format data dump
+!     = 4, Packed binary data dump
+!     = 7, NetCDF format
+!     = 8, Packed NetCDF format
+!     = 9, GrADS data dump
+!
+!  hdmpinopt = Indicate the way history data files are specified. 
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed. 
+!
+!  hdmpfheader  History data file name header (not including '.' at the end), 
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!  
+!  grdbasfn Base-state and grid data file name (hdmpinopt=2).
+!  nhisfile The number of time-dependent history files to be converted
+!           (hdmpinopt=2).
+!  hisfile  History data files to be converted (hdmpinopt=2).
+!
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!-----------------------------------------------------------------------
+!
+ &history_data
+   hinfmt = 3,
+   hdmpinopt = 2,
+
+     hdmpfheader = './ar2003041509',
+     hdmpftrailer= '',
+     tintv_dmpin = 300.0,
+     tbgn_dmpin  = 0.0,
+     tend_dmpin  = 300.0,
+
+     grdbasfn = 'ar2003041509.hdfgrdbas',
+     nhisfile = 1,
+       hisfile(1)  = 'ar2003041509.hdf000000',
+       hisfile(2)  = 'ar2003032500.hdf000000',
+       hisfile(3)  = 'ar2003032500.hdf000000',
+ /
+
+!--------------------------------------------------------------------
+!
+!  iorder:      Input order of interpolation
+!                 1 = Linear
+!                 2 = Quadratic
+!                 3 = Cubic (recommended)
+!
+!---------------------------------------------------------------------
+
+ &interpolation_options
+   iorder = 3,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Data output control parameters.
+!
+!  dirname   Name of directory into which output files are written.
+!  grbpkbit  Number of bits in packing GRIB data
+!          = 16 (default)
+!  readyfl   Flag to writing a _ready file after each history dump file 
+!            is writen
+!          = 0, no _ready file
+!          = 1, write _ready file
+!
+!  vvelout   Flag to specify the output type of vertical velocity
+!          = 0 no output,
+!          = 1 geometric vertical velocity, w (m/s),
+!          = 2 pressure vertical velocity, omega (Pa/s), default.
+!
+!----------------------------------------------------------------------
+ 
+ &output
+   dirname  = './',
+   grbpkbit = 16,
+   readyfl  = 1,
+
+   vvelout  = 2,
+ /
+!---------------------------------------------------------------------
+!
+! END of Input file
+!
+!----------------------------------------------------------------------

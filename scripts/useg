@@ -1,0 +1,71 @@
+#!/usr/bin/perl -w
+#
+# @Author Yunheng Wang  11/07/2003
+#
+# Requirments:
+#   1. Perl 5.0 and later
+#   2. grads & gradshdf
+#   3. openfn.gs    --  GrADS script file
+#   4. openhdf.gs   --  GrADS script file
+#   5. arps.gs      --  GrADS script file
+#   6. setenv  GASCRP /home/xxx/arps5.1.0/scripts
+#
+
+if( !defined @ARGV){
+  @files= <*.gradscntl>;
+  $opt  = "";
+} else {
+  $opt = shift @ARGV;
+  @files = @ARGV;
+  if ( $opt ne "-arps" and 
+       $opt ne "-hdf"  and 
+       $opt ne "-help" and $opt ne "-h") {
+    @files = ($opt, @files);
+    $opt="";
+  }
+}
+
+if( $opt eq "-hdf" && scalar(@files) < 1) {@files = <*.ctl>;}
+
+&Usage() if ($opt eq "-h" or $opt eq "-help");
+&Usage() unless (defined @files);
+
+$fargs=join(" ", @files);
+
+if(defined $ENV{"ARPSVER"}) {
+  $scr_dir = $ENV{"ARPSDIR"}."/arps".$ENV{"ARPSVER"}."/scripts";
+} else {
+  $scr_dir = "";
+}
+
+if($opt eq "-arps") {
+  $execmd = "grads -lc \"run $scr_dir/arps.gs $fargs\"";
+} elsif ($opt eq "-hdf") {
+  $execmd = "gradshdf -lc \"run $scr_dir/openhdf.gs $fargs\"";
+} else {
+  $execmd = "grads -lc \"run $scr_dir/openfn.gs  $fargs\"";
+}
+system($execmd);
+#print $execmd;
+
+exit(0);
+
+sub Usage {
+        print "\n    -------- Run GrADS/gradhdf using command line arguments -------\n\n";
+
+        print "    Usage: $0 [option] CntlFile(s).\n\n";
+        print "\tOption:  -arps     Use arps.gs script.\n";
+        print "\t                   One (only one) cntl file must specified.\n";
+        print "\t                   more than one cntl files will be ignored.\n";
+        print "\t         -hdf      Open HDF control file using gradshdf.\n\n";
+        print "\t  When CntlFiles is omitted, open all files with extension\n";
+        print "\t  '.gradscntl' & '.ctl'.\n\n";
+        print "    Required file:   openfn.gs    --  GrADS script file\n";
+        print "                     openhdf.gs   --  GrADS script file\n";
+        print "                     arps.gs      --  GrADS script file\n\n";
+        print "    Environment variable:\n";
+        print "\t     setenv  GASCRP /home/xxx/arps5.1.0/scripts/ \n\n";
+        print "    =========== By Yunheng Wang 09/22/01. ===============\n\n";
+
+        exit(0);
+}

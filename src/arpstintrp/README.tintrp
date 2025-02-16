@@ -1,0 +1,8 @@
+
+ 
+This directory contains source code for ARPSTINTRP. The program interpolates 
+two ARPS history data of different times on grid of the same size to a time 
+inbetween them. The output will be written into a new history dump file.
+
+Doing 'makearps arpstintrp' in arps root directory compiles and links this package.
+

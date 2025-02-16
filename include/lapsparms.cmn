@@ -1,0 +1,30 @@
+
+!       These parameters are read in at runtime with subroutine get_laps_config
+!       Note: Do not include this in the same module as 'lapsparms.for'
+!             The same variable names are still used in a few cases
+!                (i.e. vertical_grid).
+
+  integer*4    iflag_lapsparms_cmn
+  real*4       PRESSURE_BOTTOM_L
+  real*4       PRESSURE_INTERVAL_L
+  real*4       PRESSURE_0_L
+  character*40 vertical_grid
+  integer*4    nk_laps
+  real*4       standard_latitude
+  real*4       standard_longitude
+  logical      l_highres
+  integer*4    i_low_lowres
+  integer*4    j_low_lowres
+  integer*4    nest_ratio
+  character*50 c50_lowres_directory
+  character*6  c6_maproj
+
+  common  /lapsparms_cmn/                                     &
+  iflag_lapsparms_cmn,PRESSURE_BOTTOM_L,PRESSURE_INTERVAL_L    &
+  ,PRESSURE_0_L,vertical_grid,nk_laps,standard_latitude       &
+  ,standard_longitude,i_low_lowres,j_low_lowres,nest_ratio    &
+  ,c50_lowres_directory,c6_maproj,l_highres
+
+!       data iflag_lapsparms_cmn /0/
+
+

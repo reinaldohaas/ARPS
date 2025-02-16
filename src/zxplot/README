@@ -1,0 +1,12 @@
+
+This directory contains the ZXPLOT graphics package developed
+by Ming Xue with contributions from Zuojun Zhang. It's 
+included inside the ARPS package for the convenience of
+ARPS users. The authors reserve full rights to the package.
+For problem or question, please contact Ming Xue, at 
+mxue@ou.edu.
+
+
+This direction contains only the minimum set of files for
+ARPS package to work. For the full ZXPLOT package and
+documents, please visit http://www.caps.ou.edu/ZXPLOT.

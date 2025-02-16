@@ -1,0 +1,8 @@
+
+ 
+This directory contains source code for ARPSSFC, a program that prepares 
+surface characteristics data set for ARPS.
+ 
+Doing 'makearps arpssfc' in arps root directory compiles and links this package.
+makearps -ncarg arpssfc will turn on plotting using NCAR graphics.
+

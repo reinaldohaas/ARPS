@@ -1,0 +1,214 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######   INPUT FILE FOR HDFSUBDOMAIN IN NAMELIST FORMAT     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters for program HDFSUBDOMAIN.
+!
+!  HDFSUBDOMAIN writes out a portion of the grid in arps HDF history format,
+!  at the original resolution. It is supposed that the first two dimensions
+!  of each dataset are ARPS horizontal coordinates and should be subsetting.
+!  It can read and write split files, but global temporary arrays are used.
+!  So it may not suitable for very large domain. But for most of our
+!  applications so far, the data can fit in the memory of the platform used.
+!
+!  Scenarios that "hdfsubdomain" may be useful.
+!
+!  1. Subset a larger arps domain with the same central coordinates and
+!     same resolution. The files for input domain can be in split form
+!     or one joined file. It can output either one joined file or split
+!     files with any number of patches.
+!
+!  2. Join split-files into one large joined file or files with larger
+!     patches (set nxpnt = nypnt = 0).
+!
+!  3. Split one joined file into small patches, or convert files with
+!     larger patches into files with smaller patches.
+!
+!  Note:
+!
+!    This program can be run in MPI mode. However, it may be more efficient
+!  in no-MPI mode if memory space allows. Since the program processes
+!  data field one by one, so it does not require more memory than
+!
+!     o One large array for global domain
+!     o One large integer array for global domain (with limit size of 3rd dimension)
+!     o One large array for soil variable (The sizes of 3rd and 4th
+!       dimensions are usually small)
+!     o A similar set arrays as above over output domain
+!     o One local real array and one integer array on output patch
+!     o One local real array and one integer array with working size
+!       (determined by nproc_x, nproc_y)
+!     o One local array over input patch
+!
+!----------------------------------------------------------------------
+!
+!  Steps to use this program:
+!
+!  Step 1: Compile and link using 'makearps hdfsubdomain'
+!  Step 2: Edit input file input/hdfsubdomain.input (this file)
+!  Step 3: Run job using 'bin/hdfsubdomain < input/hdfsubdomain.input'.
+!
+!-----------------------------------------------------------------------
+!
+!   Author: Yunheng Wang (02/16/2009)
+!
+!   It is based on Ming's program arpsubdomain and my earlier program
+!   hdf2grads. This program is coded from the HDF view instead of handling
+!   ARPS arrays explicitly. So it is hoped that the performance may be better.
+!   Furthermore, it should work with any ARPS file (history, lateral boundary,
+!   terrain, surface data, split files etc.) in HDF 4 format.
+!
+!   Modification history:
+!
+!-----------------------------------------------------------------------
+
+&message_passing
+  nproc_x = 1,
+  nproc_y = 1,
+/
+
+!-----------------------------------------------------------------------
+!
+!  hdmpinopt = Indicate the way history data files are specified.
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed.
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!
+!  grdbasfn Base-state and grid data file name (hdmpinopt=2).
+!  nhisfile The number of time-dependent history files to be processed
+!           (hdmpinopt=2).
+!  hisfile  Name of history data files (hdmpinopt=2).
+!
+!  nprocx_in  number of the patches if the input file are in split form.
+!  nprocy_in  These two number must be multiples of nproc_x, nproc_y respectively.
+!
+!  nprocx_lw  The processor number of the most western patch for the subdomain
+!             to be subtracted from. If the whole domain from a specific run
+!             will be handled, nprocx_lw shoud be 1.
+!
+!  nprocy_lw  The processor number of the lowest patch for the subdomain
+!             to be subtracted from. If the whole domain from a specific run
+!             will be used, nprocy_lw should be 1.
+!
+!-----------------------------------------------------------------------
+!
+
+ &history_data
+
+   hdmpinopt    = 1,
+
+     hdmpfheader = './arps25may1998',
+     hdmpftrailer= '',
+
+     tintv_dmpin = 60.0,
+     tbgn_dmpin  = 0.0,
+     tend_dmpin  = 3600.0,
+
+     nhisfile = 1,
+     grdbasfn =   './arps25may1998.hdfgrdbas'
+     hisfile(1) = './arps25may1998.hdf003600',
+
+  nprocx_in = 1,
+  nprocy_in = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+! Grid points to be reduced in each horizontal coordinate. They must be
+! even numbers so that half the number of grid points will be subtracted
+! in the output domain in each direction.
+!
+! For example, nxpnt = 0 means the X coordinate of the output domain is
+! the same as the input coordinate.
+!
+! nxpnt = 2 means the X coordinate of the output domain is 2 points less
+! than the input domain, but the domain center is still the same.
+!
+!-----------------------------------------------------------------------
+
+ &output_dims
+   nxpnt =2,
+   nypnt =4,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  runname, a string of up to 80 characters long, is used to identify
+!  this job and construct the output file names.
+!
+!  The characters before either a blank space or comma will be used
+!  as the prefix of the output file names.
+!
+!-----------------------------------------------------------------------
+
+ &jobname
+   runname = 'test'
+ /
+!-----------------------------------------------------------------------
+!
+!  Data output control parameters.
+!
+!  dirname   Name of directory into which output files are written.
+!
+!  readyfl   Flag to writing a _ready file after each history dump file
+!            is writen
+!          = 0, no _ready file
+!          = 1, write _ready file
+!
+! varnames  Character array for variable names of datasets found in the 
+!           HDF files that are to be joined or split and written out (case sensitive).
+!           If it is empty, then all datasets in the original file
+!           will be dumped.
+!
+! grdbasopt = 0, no grdbas file dump
+!           = 1, include grdbas file dump
+!
+! nprocx_out  Number of patches for the output files.
+! nprocy_out
+!
+!-----------------------------------------------------------------------
+
+ &output
+   dirname  = './',
+   varnames = '',
+   grdbasopt = 1,
+   readyfl  = 0,
+   lvldbg   = 0,
+
+   nprocx_out = 1,
+   nprocy_out = 1,
+ /
+
+!----------------------------------------------------------------------------
+!
+!  End of input file
+!
+!----------------------------------------------------------------------------

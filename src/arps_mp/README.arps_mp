@@ -1,0 +1,9 @@
+
+This directory contains source code for using distributed memory 
+(Massively parallel) version of ARPS via MPI interface.
+
+Instruction on how to use the MP version in ARPSmpp.html in 
+directory docs inside ARPS root directory.
+
+Open it inside a web browser to view it, e.g, 
+'netscape ARPSmpp.html'.

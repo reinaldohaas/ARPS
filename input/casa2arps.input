@@ -1,0 +1,67 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######   INPUT FILE FOR CASA2ARPSPPI IN NAMELIST FORMAT     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######                  CASA / CAPS / SoM                   ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in namelist format for 
+!  the program CASA2ARPSPPI, which processes CASA NetCDF datafiles 
+!  for use in the ARPS system.
+!
+!  Steps to use this program:
+!  
+!  Step 1: Run the program 'scantier2a' for your data.
+!  Step 2: Compile using: 'makearps casa2arps'
+!  Step 3: Edit this input file (casa2arps.input), append the file 
+!          arps.input to the end of file input/casa2arps.input
+!  Step 4: Run job using 'casa2arps < casa2arps.input'
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!
+!   Nate Snook (06/09/2008)
+!
+!-----------------------------------------------------------------------
+!
+!  Variable Descriptions:
+!--------------------------
+!
+!  inputfile    Name of the file containing the output of scantier2a
+!		This should contain data from multiple times for *one*
+!		CASA radar.
+!
+!  t_assim      The time of your assimilation cycle -- radar data will
+!		be valid at this time. Use hhmmss format.
+!
+!  range_min    Minimum range observed by the radar in meters.
+!
+!  range_max    Maximum range observed by the radar in meters.
+!
+!-----------------------------------------------------------------------
+
+ &casa2arps
+   inputfile = '/home/nsnook/arps5.2.8/radar/listfile_KSAO.txt',
+   t_assim   = 013000,
+   range_min = 500.0,
+   range_max = 45000.0,
+/
+
+!-----------------------------------------------------------------------
+!
+! Attach your arps.input blow
+!
+! Note: It is for the background fields, just as 88d2arps/nids2arps/ncrad2arps.
+!
+!-----------------------------------------------------------------------
+

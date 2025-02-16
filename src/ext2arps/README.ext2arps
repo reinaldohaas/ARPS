@@ -1,0 +1,10 @@
+
+ 
+This directory contains source code for EXT2ARPS, a program for interpolating
+various NWS/US standard gridded data set to the ARPS grid. The output can be
+used as the background for ADAS analysis or directly used as the I.C. and/or B.C. 
+ 
+Doing 'makearps ext2arps' in arps root directory compiles and links this package.
+For data in some formats (e.g., GEMPAK) different argument may be required 
+for makearps. See internal comments in makearps.
+

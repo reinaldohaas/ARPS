@@ -1,0 +1,213 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR ARPSPOST  IN NAMELIST FORMAT     ######
+!     ######                 ( Version ARPS5.3.2 )                ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+! Namelist for ARPSPOST
+!
+!   AUTHOR:
+!
+!   Fanyou Kong, CAPS
+!   2/28/2007
+!
+!-----------------------------------------------------------------------
+!
+!   MODIFICATION HISTORY
+!
+!   Fanyou Kong, CAPS
+!   7/22/2008 Changed namelist
+!
+!   03/23/2012 (Y. Wang)
+!   Changed the definition of mp_physics.
+!
+!-----------------------------------------------------------------------
+!
+!  Message passing namelist
+!
+!  nproc_x     : processor number in X direction
+!  nproc_y     : processor number in Y direction
+!
+!  readsplit_in : flag indicates whether the program needs to split the
+!                data files.
+!                = 1, Data for all processors is in one joined file, such
+!                     as the data dumped from joinfiles, or specifing
+!                     dmp_out_joined = 1 while run ARPS.
+!                = 0, Data are all split, needs to specify the following
+!                     two parameters.
+!
+!    nprocx_in : Valid only when readsplit = 0. processor number when
+!                the data to be read was dumped.
+!                It must be a multiple of nproc_x.
+!    nprocy_in : Same as nprocx_in but in Y direction. It must be
+!                a multiple of nproc_y
+!
+!---------------------------------------------------------------------
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+
+   readsplit_in = 1,
+     nprocx_in = 1,
+     nprocy_in = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  hinfmt   The format flag of the input history data.
+!          = 1, unformatted binary data dump
+!          = 2, formatted ascii data dump
+!          = 3, NCSA HDF4 format data dump
+!          = 4, Packed binary data dump
+!          = 5, dump for Savi3D visualization package
+!               (Not supported as an INPUT file format)
+!          = 6, binary allowing data point skip
+!          = 7, NetCDF format
+!          = 8, Packed NetCDF format
+!          = 9, GrADS data dump
+!          = 10, GRIB data dump.
+!
+!  hdmpinopt = Indicate the way history data files are specified.
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed.
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!
+! grdbasfn      Base data file name
+! nhisfile      Number of data files
+! hisfile(1)    Data file name
+!------------------------------------------------------------------------
+
+ &history_data
+   hinfmt = 1,
+
+   hdmpinopt    = 2,
+
+     hdmpfheader = 'ar2007030421',
+     hdmpftrailer= '',
+     tintv_dmpin = 3600.0,
+     tbgn_dmpin  = 0.0,
+     tend_dmpin  = 118800.0,
+
+     grdbasfn = 'ar2007030421.bingrdbas',
+     nhisfile = 1,
+     hisfile(1) = 'ar2007030421.bin021600',
+ /
+
+!------------------------------------------------------------------------
+!  outheader:      Header of output file name (for ascii and binary)
+!  gemoutheader:   Header of output GEMPAK file name
+!  icape:         choice of CAPE schem, 1 CAPS, 2,NCEP
+!  iaccu:         0 for entire accppt (accul. rain) (0h->current value);
+!                 1 for piecewise accppt (previous->current value) when nhisfile
+!                   (>1) hisfiles (in time series) are involved
+!  icrtm:         = 0 turn off CRTM call (default)
+!                 = 1 for calling CRTM ABI VI channels (6)
+!                 = 2 for calling CRTM ABI IR channels (10)
+!                 = 3 for both VI & IR channels (16)
+!  isatid:        = 1 GOES-R
+!                 = 2 GOES-13
+!  chbgn:          Begining channel (default 0: full channels)
+!  chend:          Ending channel   (default 0: full channels)
+!                 !!! currently only support both zero or both non-zero
+!  icitm:         = 0 turn off CIRA call (under icrtm control)
+!
+!  user_emis:      = 0 look-up table for a rough surface in CRTM is used.
+!                      Currently, N. Nalli Quasi-specular emissivity LUT (2008, appl. Opt.)
+!                      NOTE> NOT TESTED FOR CIRA_RTM!!!
+!                  = 1 Surface emissivity file is provided by user
+!
+!  iascii:         Write out ASCII format output (code not ready)
+!  i2dfmt:         Write out 2D file in various format
+!                    i2dfmt=1 binary
+!                    i2dfmt=3 HDF4
+!                    i2dfmt=7 netCDF
+!  igempak:        Write out GEMPAK format output (for SPC)
+!
+!  The following parameters are used if igempak=1
+!  ilite:          A lite set of GEMPAK fields (if ilite=1; default: 0)
+!  iltgci:         switch on LTG & CI output  (if iltgci=1; default: 0)
+!  ibeg_offset:    Offset for writing out sub-domain GEMPAK file (default: 0)
+!  iend_offset:
+!  jbeg_offset:
+!  jend_offset:
+!
+!------------------------------------------------------------------------
+
+ &output_data
+   outheader    = 'data2d/ar2007030421',
+   gemoutheader = 'ssef_cn_2007030421',
+   icape=1,
+   iaccu=1,
+
+   icrtm=0,
+     isatid = 2,
+     chbgn = 3,
+     chend = 3,
+     icitm = 0,
+     user_emis = 0,
+
+   iascii = 0,
+   i2dfmt = 3,
+   igempak = 0,
+    ilite       = 0,
+    iltgci      = 0,
+    ibeg_offset = 0,
+    iend_offset = 0,
+    jbeg_offset = 0,
+    jend_offset = 0,
+ /
+
+!------------------------------------------------------------------------
+!  mp_physics:   microphysics scheme ARPS used (for reflectivity purpose)
+!                If this is an ARPS run, it is the same as mphyopt in arps.input.
+!                If this is a  WRF run, it is mp_physics+100.
+!                If this is a  COAMPS run, it is 201 for original COAMPS microphysics
+!
+!------------------------------------------------------------------------
+
+ &microphysics_opt
+   mp_physics = 2,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Parameters for the ASCII output header [NOT IN USE!]
+!
+!  DESCRIPTIVE STRINGS:
+!
+!    enstag, model, instit
+!
+!-----------------------------------------------------------------------
+
+ &output_grid
+   enstag = 'WRF_ENS',
+   instit = 'CAPS_OU',
+   model = 'ARPS5.2.6',
+ /

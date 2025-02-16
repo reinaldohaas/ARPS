@@ -1,0 +1,3 @@
+SUBROUTINE splitncdf
+  IMPLICIT  NONE
+END SUBROUTINE splitncdf

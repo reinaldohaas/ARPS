@@ -1,0 +1,5 @@
+in_alaska_or_not   file_name                     lat_se(deg N) lon_se(deg E)
+EU                 N57W007.dat.gz                      57.0      -7.0          
+EU                 N57W008.dat.gz                      57.0      -8.0          
+EU                 DLMS.B47L08.dat.gz                  46.0       8.0          
+EU                 DLMS.B47L09.dat.gz                  46.0       9.0          

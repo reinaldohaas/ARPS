@@ -1,0 +1,12 @@
+
+
+This directory contains source code for MCI2ARPS, a program to read McIDAS 
+AREA files and remap to ARPS grid. HDF library is needed.
+
+Doing 'makearps mci2arps' in arps root directory compiles and links this package.
+
+A C compiler is also needed.
+
+
+
+

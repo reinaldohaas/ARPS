@@ -1,0 +1,357 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR PPIPLT IN NAMELIST FORMAT        ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the control parameters for PPICORZ in the NAMELIST
+!  format. PARAPLT is a graphical post-processing program for EnKF.
+!
+!  Note that only lines between &NAMELIST_NAME and / are read as the
+!  input data, and there must be a blank space in front of the '&' sign.
+!  Comments can be written between these data blocks. We are using '!'
+!  in the first column of comment line only to distinguish them from the
+!  data statement.
+!
+!-----------------------------------------------------------------------
+!
+!   Author:
+!     Mingjing Tong (9/21/2005)
+!
+!-----------------------------------------------------------------------
+!
+!  plot namelist
+!
+!-----------------------------------------------------------------------
+!
+!  Input data:
+!  datanamopt Option of data name 
+!           =1, prefix plus model time, prefix is specified by 
+!               radarnam, vanam or varnam 
+!           =2, specified by rdrdtanam, vadtanam or vardtanam
+!  datafmt    
+!           = 0, old format arps5.2.3_EnKF
+!           = 1, new format   
+!  rdrdtadir  Radar data directory
+!  vadtadir   Cross-beam wind data directory
+!  vardtadir  arbitrary variable data directory (correlation coefficient)  
+!
+!  (when datanamopt == 2)
+!  nfile      Number of data file
+!  rdrdtanam  Name of radar data
+!  vadtanam   Name of cross-beam component data 
+!  vardtanam  Name of arbitrary variable data
+!
+!  (when datanamopt == 1)
+!  radarnam  Radar name
+!  vanam   Prefix of cross-beam component data name 
+!  varnam  Prefix of arbitrary variable data name
+!  t0
+!  tn
+!  dt
+!
+!  vardatanam Data name of other variable 
+!-----------------------------------------------------------------------
+!
+ &input_data
+   datanamopt = 2,
+   datafmt = 1,
+   rdrdtadir = './RDROBS',
+   vadtadir = './', 
+   vardtadir = './',
+     
+   nfile = 1,
+     rdrdtanam(1) = 'KTLX.20040530.010000',
+     vadtanam(1) = '', 
+     vardtanam(1) = ''
+
+   radarnam = 'KTLX',
+   vanam = 'KTLXcrsbmv', 
+   varnam = 'may20s_2km.vrvacvelv_KTLX_01_',
+   t0 = 3600,
+   tn = 3600,
+   dt = 300,
+
+ /
+
+!
+!-----------------------------------------------------------------------
+!
+!  Output file
+!  psfile    The name of the generated .ps file
+!
+!-----------------------------------------------------------------------
+!
+ &output
+   psfile = 'ppi_KTLX_3600.ps',
+ /
+ 
+!
+!-----------------------------------------------------------------------
+! Grid
+!  dxr     Grid spacing in x-direction in computational
+!          and physical space (m). (datatype == 2)
+!  dyr     Grid spacing in y-direction in computational
+!          and physical space (m). (datatype == 2)
+!  coordopt Option to set origin of the coordinate
+!           = 0, at south-west conner of the domain
+!           = 1, at center of the domain
+!-----------------------------------------------------------------------
+!
+ &grid
+   dxr = 2000.0,
+   dyr = 2000.0,
+   coordopt = 0,
+ /
+
+!
+!-----------------------------------------------------------------------
+! 
+!  ctrlbopt     Contour labeling option
+!               =0, no label                                      
+!               =1, label in real number format (default)
+!               =2, label in integer format
+!
+!  ctrlbfrq     n, every nth contours relative to the reference contour
+!               (typically zero contours) are labeled.
+!  
+!  ctrlbsiz     Contour label size as its height in terms of the 
+!               fraction of vertical plotting space (typically 0.025)
+!
+!  ctrstyle     Contour plotting style
+!               = 1, positive solid, negative dashed, zero line dotted
+!               = 2, all in solid
+!               = 3, all dashed
+!
+!  lbmaskopt    Option to mask/blank out labeled areas on contours or
+!               labeled curves.
+!               = 0, no. =1, yes.
+!
+!  refpltopt The option to plot reflectivity
+!            = 0, No
+!            = 1, color shades
+!            = 2, color contour
+!            = 3, color shades + contour
+!    coltab_ref Option of color table Z
+!               = 1-6, internal color table
+!               = -1, User defined color table
+!    coltabfn_ref The name of the user defined color table 
+!                 (when coltab_ref = -1) 
+!    ibgncol_ref  The index of the beginning color 
+!    iendcol_ref  The index of the ending color 
+!    refminc      Minimum contour for Z  
+!    refmaxc      Maxmium contour for Z 
+!    refinc       Countour interval 
+!    refhlf       The interval of highlight contour
+!    refzro  Attributes of zero contours
+!        = 0, zero line are suppressed.                           
+!        = 1, zero lines are drawn as dotted lines.
+!        = 2, zero lines are drawn as dotted-dashed lines.
+!        = 3 (default), zero lines are drawn as thick full lines.
+!    refprio Priority for reflectivity
+!
+!  vrpltopt  The option to plot Vr
+!            = 0, No
+!            = 1, color shades
+!            = 2, color contour
+!            = 3, color shades + contour
+!    coltab_vr Option of color table for Vr
+!               = 1-6, internal color table
+!               = -1, User defined color table
+!    coltabfn_vr The name of the user defined color table 
+!                 (when coltab_ref = -1)
+!    ibgncol_vr  The index of the beginning color
+!    iendcol_vr  The index of the ending color
+!    vrminc      Minimum contour for Vr   
+!    vrmaxc      Maxmium contour for Vr    
+!    vrinc       Countour interval
+!    vrhlf       The interval of highlight contour
+!
+!  vapltopt  The option to plot cross-beam wind component
+!            = 0, No
+!            = 1, color shades
+!            = 2, color contour
+!            = 3, color shades + contour
+!    coltab_va Option of color table for cross-beam wind component
+!               = 1-6, internal color table
+!               = -1, User defined color table
+!    coltabfn_va The name of the user defined color table
+!                 (when coltab_ref = -1)
+!    ibgncol_va  The index of the beginning color
+!    iendcol_va  The index of the ending color
+!    vaminc      Minimum contour for cross-beam wind component
+!    vamaxc      Maxmium contour for cross-beam wind component
+!    vainc       Countour interval
+!    vahlf       The interval of highlight contour
+!
+!  varpltopt  The option to plot arbitrary variable on radar elevation
+!             level
+!            = 0, No
+!            = 1, color shades
+!            = 2, color contour
+!            = 3, color shades + contour
+!    coltab_var Option of color table for arbitrary variable
+!               = 1-6, internal color table
+!               = -1, User defined color table
+!    coltabfn_var The name of the user defined color table
+!                 (when coltab_ref = -1)
+!    ibgncol_var  The index of the beginning color
+!    iendcol_var  The index of the ending color
+!    varminc      Minimum contour for cross-beam wind component
+!    varmaxc      Maxmium contour for cross-beam wind component
+!    varinc       Countour interval
+!    varovr       Overlay option
+!                 = 0, first field on a plot
+!                 = 1, this field will be overlaid on the preceding field.
+!    varhlf       The interval of highlight contour
+!
+!   tiltbgn  The first tilt
+!   tiltend  The end tilt
+!   x1   The beginning of the frame in x direction
+!   x2   The end of the frame in x direction
+!   y1   The beginning of the frame in y direction
+!
+!   dxscale  Minor tick spacing for x axis (km)
+!   dyscale  Minor tick spacing for y axis (km)
+!
+!-----------------------------------------------------------------------
+!
+ &plot_setup
+   ctrlbopt  = 2,
+   ctrstyle  = 1,
+   ctrlbfrq  = 2,
+   ctrlbsiz  = 0.02,
+   lbmaskopt = 1,
+
+   refpltopt = 1,
+     coltab_ref = -1,
+     coltabfn_ref = './clrbar',
+     ibgncol_ref = 34,
+     iendcol_ref = 47,
+     refminc = 10.0,
+     refmaxc = 80.0,
+     refinc = 10.0,
+     refovr = 0,
+     refhlf = 400,
+     refzro = 0,
+     refprio = 1,
+
+   vrpltopt = 1,
+     coltab_vr = -1,
+     coltabfn_vr = '../data/arpsplt/velocity_solo_real.table',
+     ibgncol_vr = 2,
+     iendcol_vr = 20,
+     vrminc = -35.0,
+     vrmaxc = 35.0,
+     vrinc = 3.5,
+     vrovr = 0,
+     vrhlf = 400,
+     vrzro = 0,
+     vrprio = 2,
+
+   vapltopt = 0,
+     coltab_va = -1,
+     coltabfn_va = '../data/arpsplt/velocity_solo_real.table',
+     ibgncol_va = 4,
+     iendcol_va = 17,
+     vaminc = -70.0,
+     vamaxc = 70.0,
+     vainc = 10.0,
+     vaovr = 0,
+     vahlf = 400,
+     vazro = 0,
+     vaprio = 3,
+
+   varpltopt = 0,
+     coltab_var = -1,
+     coltabfn_var = '../data/arpsplt/velocity_solo_real.table',
+     ibgncol_var = 1,
+     iendcol_var = 1,
+     varminc = -1.0,
+     varmaxc = 1.0,
+     varinc = 0.1,
+     varovr = 1,  
+     varhlf = 1,
+     varzro = 0,
+     varprio = 4,
+
+   tiltbgn = 1,
+   tiltend = 14,
+   x1 = 0.2,
+   x2 = 0.8,
+   y1 = 0.2,
+
+   dxscale = 2.,
+   dyscale = 2.,
+ /
+
+!
+!-----------------------------------------------------------------------
+!  Projection parameters:
+!  mapproj   Map projection option.
+!          = 0, no map projection;
+!          = 1, North polar projection      (-1 South Pole);
+!          = 2, Northern Lambert projection (-2 Southern);
+!          = 3, Mercator projection.
+!  trulat1   1st true latitude of map projection.
+!  trulat2   2nd true latitude of map projection (used only by mapproj = 2).
+!  trulon    True longitude of map projection.
+!  ctrlat   Latitude of the model physical domain center (deg. N).
+!  ctrlon   Longitude of the model physical domain center (deg. E).
+!  xorig
+!  yorig
+!
+!-----------------------------------------------------------------------
+!
+ &projection
+  mapproj=0,
+  trulat1=20.,
+  trulat2=50.,
+  trulon=-97.5,
+  ctrlat = 34.40,
+  ctrlon = -98.70,
+  xorig=0.,
+  yorig=0.,
+
+ /
+
+!
+!-----------------------------------------------------------------------
+!  ovrmap  Option to overlay political map on horizontal plane plots
+!                = 0, no map overlay.
+!                = 1, overlay map on all of the frames.
+!  mapgrid       Grid for latitude and longitude
+!                = 0, no grid draw
+!                = 1, draw grid (default set latgrid=2 and longrid=2)
+!                = 2, draw grid (user specify latgrid and longrid)
+!
+!  latgrid,longrid (degrees)
+!                The lat and lon intervals for grid lines in the map.
+!                < 0.0  No grid line
+!                = 0.0  Automatically determined by the program
+!                > 0.0  Interval set in degrees.
+!
+!  nmapfile      Number of map data files to be plotted (maximum is 3)
+!  mapfile       Mapdata file name(s).
+!
+!-----------------------------------------------------------------------
+!
+ &map_plot
+   ovrmap = 1,
+   mapgrid = 0,
+      latgrid = 10., longrid = 10.,
+   nmapfile = 2,
+   mapfile(1) = '../data/arpsplt/us_spcounty.mapdata',
+   mapfile(2) = '../data/arpsplt/us_state.mapdata',
+
+/
+  

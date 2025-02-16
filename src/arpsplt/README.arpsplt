@@ -1,0 +1,7 @@
+
+This directory contains ARPS graphics plotting program ARPSPLT
+source code. Simple compilation and linking commands can be found 
+in the README file in the ARPS root directory. 
+
+ARPSPLT requires ZXPLOT Version 3.0 or later (ftp://ftp.caps.ou.edu/ZXPLOT3). 
+

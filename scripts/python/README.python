@@ -1,0 +1,108 @@
+This folder contains python scripts and python-callable Fortran codes,
+which are contributed by ARPS users at CAPS or other institutes.
+
+
+!--- 1: Contributions from Dan Dawson ----------------------------------
+
+    PREREQUISITES: NumPy, Scipy, PyNio, matplotlib
+
+    compile_dualpara  : simple shell script to compile the dualpara.f90
+                        and global_module.f90 files into a python-callable
+                        module for computing polarimetric variables
+                        from ARPS history data.  The fortran code is
+                        originally from Youngsun and modifed to play nice
+                        with f2py (f2py doesn't like derived types).
+
+    dualpara.f90      :
+    global_module.f90 : contain the needed fortran code for the
+                        olarimetric variable module.
+
+    arpsmodule.py     : contains several functions relating to reading
+                        variables from the ARPS HDF4 history dump, and
+                        for reading trajectory information from arpstrajc
+                        output files.  Also contains several other
+                        functions for computing reflectivity, vorticity
+                        components, and for interpolating a variable
+                        to a given height.
+
+    thermolib.py      : a collection of thermodynamic functions (to
+                        compute theta_e, RH, saturation vapor pressure, etc.).
+                        Each function has a docstring and most are based
+                        on the similar fortran functions in the ARPS
+                        thermolib3d.f90 file.
+
+    DSDlib.py         : a collection of functions that compute various
+                        drop-size-distribution parameters
+
+    plot_ARPS_beta.py : just an example plotting script which is provided
+                        as an example of how to use the other modules in
+                        a user-specific script.
+
+!--- 2: Contributions from Nathan A. Snook -----------------------------
+
+    PREREQUISITES: Numpy, PyNIO, matplotlib,  basemap
+
+    plot_config.py    : a configuration file including input file lists,
+                        plot settings, and color table definitions --
+                        it is used by almost all other scripts.
+
+    ensemble_spread.py  : calculates ensemble spread of a variable which
+                          you choose, then plots it at a given vertical level
+
+    field_difference.py : calculates the difference in a field between
+                          two ARPS history files, then plots it at a
+                          given vertical level
+
+    plot_probability.py : calculates neighborhood ensemble probability (NEP)
+                          for a field you choose and plots it at a given
+                          vertical level
+
+    plot_var.py         : plots any field stored in an ARPS history dump
+                          on a given vertical level
+
+    rmsgraph.py         :
+
+    singlevariable_rmsgraph.py : creates the "sawtooth" innovation and s
+                                 pread plots of Z and Vr for EnKF from
+                                 arpsenkf output
+
+    varlist.py          : lists the variables and attributes stored in an
+                          ARPS history dump file
+
+    vardump.py          : prints the contents of a variable or attribute
+                          stored in a history dump file to the terminal
+
+!--- 3: Contributions from Brett J. Roberts ----------------------------
+
+   PREREQUISITES: matplotlib, Mayavi
+
+   PURPOSE: Python files for handling and plotting arpstrajc/arpscalctrajc
+            output
+
+   plttimeseries.py :  requires matplotlib
+                       produces a set of timeseries plots from an
+                       arpscalctrajc file. User-editable arrays specify
+                       which quantities to plot and their labels, units, etc.;
+                       the specified plots are then produced for each trajectory in the file.
+
+   view3dtrajc.py   :  requires Mayavi
+                       produces a three-dimensional Mayavi rendering of all
+                       trajectories in an arpstrajc file
+
+   modules/arpscalctrajc_lib.py   : module providing an interface for reading
+                                    data from an arpscalctrajc file, as well
+                                    as deriving additional variables from the data
+
+   modules/arpstrajc_lib.py       : module providing an interface for reading
+                                    data from an arpstrajc file
+
+   modules/mayavi_plot_lib.py     : module providing general functions for Mayavi 3D plotting
+
+!--- 4: General purporse -----------------------------------------------
+
+   PREREQUISITES: Numpy, Scipy
+
+   arps2vdf.py         : Generate VAPOR Data Collocation from ARPS history files
+
+   modules/namelist.py : Genearal module for handling namelist file and namelist
+                         file comparison.

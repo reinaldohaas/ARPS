@@ -1,0 +1,345 @@
+ 
+Creatation and modification history for ARPSPLT.
+ 
+##################################################################
+##################################################################
+######                                                      ######
+######                PROGRAM ARPSPLT                       ######
+######                                                      ######
+######                     Developed by                     ######
+######     Center for Analysis and Prediction of Storms     ######
+######                University of Oklahoma                ######
+######                                                      ######
+##################################################################
+##################################################################
+ 
+This is a graphic analysis/plotting program for display ARPS
+history format data set.
+ 
+It is based on Ming Xue's graphics package ZXPLOT, which is an
+independent package from the ARPS code. The object code library
+of ZXPLOT for most platforms are freely available from
+ftp://ftp.caps.ou.edu/pub/ZXPLOT3. Documentation and other info
+on ZXPLOT can be found at http://www.caps.ou.edu/ZXPLOT.
+ 
+ZXPLOT can be interfaced with NCAR graphics to produce metafile
+output consistent with NCAR graphics viewing facilities
+or linked to the Postscript driver (pure fortran program) to
+produce Postscript output directly (i.e., no NCAR graphics needed).
+ 
+Documentation on the control parameters for plotting can be found
+in input/arpsplt.input.
+
+
+ 
+AUTHOR: Ming Xue, CAPS/OU. 
+  2/19/1992.     
+ 
+MODIFICATION HISTORY:
+4/1/92 version 2.1.
+  wind vector plotting calls added.
+ 
+4/7/92
+  3-D wireframe plotting of w, qc+qr fields added 
+  (borrow NCARgraphic routines).
+ 
+4/13/92, version 2.2
+  Modifed to handle multi-dataset.
+ 
+4/14/92 Version 2.3.
+  plt3d and plt2d names changed to ctr3d and ctr2d.
+  Physical space and mapping definitions changed in ctr2d and vtr2d. 
+  Plotting of a portion of domain now possible. 
+  Function for overlaying of fields added.
+ 
+  Control over the contour interval via subroutine ctrinc added.
+  Control over the wind vector unit via subroutine vtrunt added.
+  The aspect ratio of the 2-d plots can now be modified.
+ 
+5/05/92 (M. Xue) and 06/04/92 (K. Brewster)
+  Added full documentation.
+ 
+6/20/92 K. Brewster
+  Cosmetic changes to the output.
+ 
+  Added runname variable to ascread.
+ 
+6/29/92 M. Xue
+  Removed external statement for getpte (caused problem on CRAY).
+  Removed close(unit=...) statement before open(unit...), several
+  places (caused trouble on CRAY).
+ 
+  Vertical aspect ratio increased to 2.0
+ 
+  Added a parameter that controls the plotting layout, this change
+  affects the input file.
+ 
+7/01/92 M. Xue
+  Plot comments on the wireframe plots.
+ 
+8/02/92 Keith Brewster
+  Changed reading sequence to allow for a separate file containing
+  the grid and base state information.
+ 
+  Changed structure so that the files are not re-read for each loop
+  over slicopt (DO 130).
+ 
+  Removed start and end time parameters.  It is assumed that each file
+  contains data from a single time.  Times desired are controlled by
+  naming the files to plot (the end of the input file).
+ 
+  These changes affect the input file.
+ 
+8/09/92 M. Xue
+  uprt , vprt , wprt , ptprt and qvprt  are read in from the data
+  instead of u, v, w, pt and qv.
+
+8/16/92 M. Xue
+  Grouped data read into subroutine dtaread.
+
+9/04/92 M. Xue
+  Reading of parameters grdin, basin, mstin and icein from parameter
+  input file was removed.  
+  They are now read in directly from the data set.  
+
+9/20/92 M. Xue
+  parameter kmplot added to the input parameter reading list and 
+  subroutine call to plot km added.
+
+Version 2.6.
+
+10/6/1992 M. Xue
+  Added the option to plot slices through the w-maximum.      
+
+10/7/1992 M. Xue
+  Plotting of vertical vorticity perturbation and horizontal 
+  divergence added. The input file is modified. 
+
+10/24/1992 M. Xue
+  Modified to plot multiple cross-sections (input parameters
+  are affected..
+
+12/15/1992 M. Xue
+  Modified the time format in the plot caption.
+
+Version 3.0
+
+12/25/1992 M. Xue and H. Jin
+  Added capability to plot arbitrary cross-sections and windowed
+  domain plotting.
+
+1/15/1993 M. Xue 
+  Added capability to plot streamline fields. But the streamline 
+  plotting is only available with the NCAR graphic version.  
+
+2/09/1993 K. Brewster
+  Added option to subtract a constant velocity from the mean winds
+  (see imove).  User now selects whether (inwfrm = 1) or not
+  (inwfrm = 0) to have a form feed separating plots from different
+  times. These both affect the input file.
+
+2/10/93 (K. Droegemeier)
+  Cleaned up documentation.
+
+Version 3.0
+
+12/25/1992 M. Xue
+c 
+  Modified to conform to the new format of history data dump -
+  the variables are staggered as in the model. 
+
+
+Version 3.1
+
+4/22/1993 (M. Xue)
+  Modified to take in new data format.
+  Added HDF image capabilities.
+
+
+Version 3.2
+
+8/08/1993 (M. Xue)
+  Contour intervals and overlay control parameters are now read 
+  in from input file. 
+
+Version 3.3
+
+3/20/1994 (A. Sathye and M. Xue)
+  Added vertical profile plotting capability. 
+4/15/1994 (Yuhe Liu)
+  Added surface variables.
+
+Version 4.0 
+
+4/20/1994 (M. Xue)
+  Cleaned up vertical profile plotting routine. 
+  Added surface variable and terrain height plotting.
+
+4/22/1994 (M. Xue)
+  Added map plotting capability.
+
+8/28/1994 (M. Zou)
+  Added color ploting capability.
+  Added namelist capability.
+  overlay terrain.
+
+10/13/1994 (M. Xue)
+  dxkm, dykm, and dzkm added to the arguments of ctr3d, vtr3d, and strm3d.
+
+04/03/1995 (Yuhe Liu)
+  Split namelist &sclrplt_cntl in arpsplt44.f into two namelist so
+  that the continuation lines in defining the namelist became less
+  than 20 lines, which was required by some systems.
+
+04/05/1995 (Min Zou)
+  Added two options to arpsplt when plot map: map color and grid.
+
+04/10/1995 (M. Zou)
+  Added two variables rainc and raing 
+
+2/1/1995 (J. Zhang)
+  Adding plot options for constant p-level plots.
+  Adding sea level pressure plot option.
+
+4/18/1995 (M.Zou)
+  Added option for total rain (rainc+raing)
+
+4/19/1995 (M. Zou)
+  Added J. Zhang's work to new version 4.6
+  Adjusted the plotting order.
+
+4/20/1994 (M. Zou)
+  Added option for divergence of moist.
+  Corrected qv ploting.
+
+4/24/1995 (M. Zou)
+   Move hinfmt into the block of history_data.
+
+4/25/1994 (M. Xue)
+  Removed namelist block projection, since the 
+  map projection parameters are read in from the history data.
+
+5/2/1995 (M. Zou)
+  Added option to plot dew-point temperature
+
+5/15/1995 (M. Zou)
+  Added option to choose the color table
+
+5/15/1995 (M. Zou)
+  Added options to plot cape,cin,horizontal wind and columnwater 
+
+8/09/1995 (Donghai Wang)
+  Added plotting options for surface characteristics.
+
+12/6/95 (J. Zong and M. Xue)
+  Added qs and qh to the argument list of REFLEC when it is called
+  to include the contributions of qs and qh to reflectivity. The 
+  global parameter ice is set to be icein here to control if snow
+  and graupel/hail are considered in reflectivity calculation.
+
+Version 5.1
+
+1/5/1996 (M. Zou)
+  Added the selective plotting of contours.
+
+1/17/96 (Ming Xue).
+  Added call to xafsty to set the default style of area fill
+  that uses GFA.
+
+1/20/96 (Min Zou)
+  Added grayscale color table (col_tab=4).
+  Added user-specfied color table (col_tab=-1).
+
+3/01/96 ( Min Zou)
+  Added priority option.
+
+3/12/96 (Keith Brewster)
+  Added option for brnplt, brnuplt, srlfplt, srmfplt 
+
+3/13/96 (Ming Xue)
+  Added arrays tke, kmh and kmv. Removed km.
+
+4/19/96 (Min Zou)
+  Added winsiz , uplot=4(color contour) and col_table=5
+  Remove trninc,trnminc,trnmaxc from namelist trn_plot, rename
+  to ovr_terrain
+
+7/23/96 (Min Zou)
+  Added option tunits and tdunits for t ot td Fahrenheit or 
+  Celsius units.
+  Added option boxcol for box color. Added option rfcplt.
+
+8/9/96 (Min Zou)
+  Breaked continuation line to sereral blocks in setcolors (xncar.f
+  xpost.f). 
+
+8/9/96 (Jinxing Zong)
+  Corrected the lower and upper bounds of horizontal axis for 
+  plotting qv profiles.
+
+8/12/96 (Min Zou)
+  Breaked namelist sclrplt_cntl into two parts, in order to keep
+  continuation line less then 19.
+
+Version 6.0
+
+6/4/97 (Min Zou)
+  Added new options qtplot, gricplt, avorplt, xuvplt, strmplt, 
+  viqcplt, viqrplt, viqiplt, viqsplt, vilplt, viiplt, vicplt
+  Added option to plot line/polygons.
+  Added option for ovrelay wind vector/barb or cross-section wind
+  on multiplt plots.
+  Added option for uneven interval contours.
+  Added option for plot wind barbs.
+  Added more options in grid_setup block, such as margnx, margny,
+  xfmat, lbaxis, haxisu, vaxisu, tickopt, hmintick, hmajtick, 
+  vmintick, vmajtick, presaxis_no, pres_val.
+  Added option to plot extra tilles.
+  Added option to overlay multiple map.
+  Added option to read external file, and plot its information.
+  Added option to plot marker type for each observation station.
+  Added option to plot different soil type number
+  
+6/6/97 (Min Zou)
+  Added uhlf, vhlf... to set contours highlighting frequency for each
+  variable..
+
+6/7/97 (Min Zou)
+  Added the zero contour to be ploted or not in each variable.
+
+7/10/1997(Min Zou)
+  Added option for plot convective temperature (ctplot)
+
+10/6/97(Min Zou)
+  Added a block of namelist to plot arbitrary variable. (arbvaropt)
+
+5/10/1998 (Min Zou)
+  Add vit and pw option.
+
+5/15/1998 ( Min Zou)
+  Add option for tprplt, gprplt, cprplt
+  and add option missfill_opt for color fill the missing value area
+
+11/15/1998 (Ming Xue)
+  Updated to use ZXPLOT Version 3.0.
+
+12/14/1998 (Donghai Wang)
+  Added the snow cover to dtaread, and added a new plot option,
+  snowdplt, to plot snow cover field.
+
+04/17/2000 (Ming Xue)
+  Added an option that allows one to specify input history data
+  at a constant time interval.
+
+05/24/2000 (Gene Bassett)
+  Converted to F90, creating allocation and main subroutines.
+    
+06/20/2000 (Eric Kemp and Keith Brewster)
+  Changed BRN Shear to be the denominator of BRN, instead of wind
+  speed, now has units of speed squared.
+
+07/15/2000 (Ming Xue)
+  Significant upgrade to include isentropic plotting etc).
+
+02/03/2003 (Yunheng Wang)
+  Added message passing code.

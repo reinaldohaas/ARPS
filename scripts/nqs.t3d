@@ -1,0 +1,18 @@
+#!/bin/csh
+#QSUB -lM 16Mw -lT 1800
+#QSUB -l mpp_p=4,mpp_t=9000
+#QSUB -q qm_twister
+#QSUB -s /bin/csh
+#QSUB -eo
+#QSUB -o nqs.mpit3d0a.log
+
+
+cd /tmp/users/0/yliu2/79907/arps4.3.5.samex/bin
+
+pwd
+
+arps_mpit3d -npes 4 < mpit3d.input >! mpit3d.output
+
+echo Run completed.
+
+exit 0

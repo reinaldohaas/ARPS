@@ -1,0 +1,171 @@
+
+!-----------------------------------------------------------------------
+!
+!  DIMENSIONS  Namelist for dimensions.
+!  These variables must match those used to create the remapped radar files.
+!
+!     nx, ny, nz: Dimensions of computational grid.
+!                 When run in distributed memory mode on MPP using MPI,
+!                 they represent of the size of the global domain when
+!                 entered through this input file, but will later be
+!                 redefined as the dimensions of the decomposed the
+!                 subdomains (patches) inside the code.
+!
+!                 Given nx, ny and nz, the physical domain size will be
+!                 xl=(nx-3)*dx by yl=(ny-3)*dy by zh=(nz-3)*dz.
+!
+!-----------------------------------------------------------------------
+
+ &grid_dims
+   nx   = 363,
+   ny   = 363,
+   nz   = 43,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Options and parameters related to terrain specification
+!  These variables must match those used to create the remapped radar files.
+!
+!  ternopt  Model terrain option.
+!         = 0, no terrain, flat ground;
+!         = 1, analytic mountain profile;
+!         = 2, terrain data read in from file terndta (defined later)
+!  mntopt   Option for choosing idealized mountain type.
+!         = 1, Bell-shaped mountain, default;
+!         = 2, user specified (in code).
+!         mntopt used only for ternopt = 1.
+!         Note: For mntopt = 2, the user must specify the
+!         desired terrain in subroutine INIGRD.
+!
+!         The following options are used if ternopt = 1:
+!  hmount   Mountain height (m).
+!  mntwidx  Half-width of bell-shaped mountain in x-dir.
+!  mntwidy  Half-width of bell-shaped mountain in y-dir.
+!  mntctrx  x coordinate of the bell-shaped mountain center.
+!  mntctry  y coordinate of the bell-shaped mountain center.
+!
+!         The following option is used if ternopt = 2:
+!  terndta  Name of the terrain data file for ternopt=2.
+!
+!  ternfmt  Format of terrain data file.
+!         = 1, Fortran unformatted (default);
+!         = 3, HDF4 (uncompressed).
+!
+!-----------------------------------------------------------------------
+
+ &terrain
+   ternopt = 2,
+   mntopt  = 0,
+   hmount  =     0.000,
+   mntwidx = 10000.000,
+   mntwidy = 10000.000,
+   mntctrx = 10000.000,
+   mntctry = 10000.000,
+   terndta = '/data3/jcheng/88D2arps/May242011.trndata',
+   ternfmt = 3,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  Grid specification section
+!  These variables must match those used to create the remapped radar files.
+!
+!  dx       Grid spacing in x-direction in computational
+!           and physical space (m).
+!  dy       Grid spacing in y-direction in computational
+!           and physical space (m).
+!  dz       Averaged vertical grid spacing in transformed
+!           computational space (m).
+!
+!  strhopt  Grid stretching option.
+!         = 0, no vertical stretching;
+!         = 1, vertical stretching with f=z**3 function for dz;
+!         = 2, vertical stretching with hyperbolic tangent (see User's Guide).
+!  dzmin    Minimum vertical grid spacing in physical space (m). Used
+!           if strhopt = 1 or 2.
+!  zrefsfc  Reference height of the surface (ground level) (m).
+!
+!  dlayer1  Height (m) of the layer beneath which stretching is not applied.
+!           0.0 =< dlayer1 < (nz-3)*dz
+!
+!  dlayer2  Depth of the mid-layer with stretched vertical spacing (m)
+!           0.0 =< dlayer2 < (nz-3)*dz and 0.0 =< dlayer1+dlayer2 < (nz-3)*dz
+!           For consistency, dlayer2 is reset to: min(dlayer2,ztop-dlayer1).
+!
+!  strhtune Tuning parameter used when strhopt = 2.
+!           A value between 0.2 and 5.0 is recommended. Stretching
+!           becomes more linear as strhtune increases. Default value is 1.0.
+!
+!  zflat    Height at which the grid becomes flat in the
+!           terrain-following coordinate transformation (m).
+!
+!  ctrlat   Latitude of the model physical domain center (deg. N).
+!  ctrlon   Longitude of the model physical domain center (deg. E).
+!
+!           Parameters ctrlat and ctrlon do not have to be set when
+!           initopt=3, since the values in the header of the input data
+!           file will be used in this case.
+!
+!  crdorgnopt Option for origin of the model physical domain
+!             = 0, at the southwest corner of the domain (default)
+!             = 1, at the center of the domain
+!
+!-----------------------------------------------------------------------
+
+ &grid
+   dx       =  1500.000,
+   dy       =  1500.000,
+   dz       =   500.000,
+   strhopt  = 2,
+     dzmin    =   50.000,
+     zrefsfc  =     0.0,
+     dlayer1  =     0.0,
+     dlayer2  =     1.0e5,
+     strhtune =     0.2,
+   zflat    =     1.0e5,
+   ctrlat   =    34.50,
+   ctrlon   =   -97.907,
+
+   crdorgnopt = 0,
+
+ /
+
+!-----------------------------------------------------------------------
+!
+! List of remapped radar files (output from 88d2arps or nids2arps) to
+! include in the mosaic.
+!
+!-----------------------------------------------------------------------
+
+ &filelist
+  nradfil=10,
+  radfname( 1)='/scratch/kbrews/dec02/rem88d/KAPX.021202.1255.hdf4',
+  radfname( 2)='/scratch/kbrews/dec02/rem88d/KCLE.021202.1301.hdf4',
+  radfname( 3)='/scratch/kbrews/dec02/rem88d/KDTX.021202.1301.hdf4',
+  radfname( 4)='/scratch/kbrews/dec02/rem88d/KGRR.021202.1258.hdf4',
+  radfname( 5)='/scratch/kbrews/dec02/rem88d/KILX.021202.1256.hdf4',
+  radfname( 6)='/scratch/kbrews/dec02/rem88d/KLOT.021202.1254.hdf4',
+  radfname( 7)='/scratch/kbrews/dec02/rem88d/KMKX.021202.1301.hdf4',
+  radfname( 8)='/scratch/kbrews/dec02/remnids/KGRB.021202.1300.hdf4',
+  radfname( 9)='/scratch/kbrews/dec02/remnids/KIND.021202.1254.hdf4',
+  radfname(10)='/scratch/kbrews/dec02/remnids/KIWX.021202.1300.hdf4',
+ /
+
+!-----------------------------------------------------------------------
+!
+! Runname to use in naming the output file.
+! Directory name in which to write the output file.
+!
+! The output file will have name dirname/runname.radmos000000
+! It will be a 3d ARPS binary datafile readable in the arpsplt arbvar
+! section (see arpsplt.input for details).
+!
+!-----------------------------------------------------------------------
+!
+ &output
+  runname='test1',
+  dirname='./',
+  lvldbg = 0,
+  mosaicfmt = 3,
+ /

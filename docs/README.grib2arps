@@ -1,0 +1,168 @@
+Convert the NMC GRIB data to ARPS grid
+
+This file is to describe how to convert NMC RUC and ETA GRIB data into
+ARPS grid using ARPS utility EXT2ARPS.
+
+1. Basic
+
+Program EXT2ARPS converts external data set to ARPS grid. There needs to
+have 6 basic 3-D external variables with 5 additional for water
+components other than specific humidity, Which are
+
+Basic:
+      p_ext    Pressure (Pascals)
+      hgt_ext  Height (m)
+      t_ext    Temperature (K)
+      u_ext    Eastward wind component
+      v_ext    Northward wind component
+      qv_ext   Specific humidity (kg/kg)
+Additional:
+      qc_ext   Cloud H2O mixing ratio (kg/kg)
+      qr_ext   Rain  H2O mixing ratio (kg/kg)
+      qi_ext   Ice   H2O mixing ratio (kg/kg)
+      qs_ext   Snow  H2O mixing ratio (kg/kg)
+      qh_ext   Hail  H2O mixing ratio (kg/kg)
+
+The conversion procedure can be described as the follow:
+
+      Read in needed GRIB variables (user specified)
+=>    convert GRIB variables into standard external data set (see above)
+=>    convert standard external data into ARPS variables at ARPS grid
+
+2. Setup GRIB parameters
+
+Currently the program supports two NMC GRIB data sets. The GRIB file
+name should be like this:
+
+      extdname.yymmddhhf##
+
+where extdname is a character string with length less or equal to 8
+characters and yymmddhhfff is the GRIB data's time representation:
+
+      yy  -- Year
+      mm  -- Month of year
+      dd  -- Day of month
+      hh  -- Initial hour that RUC or ETA model start at
+      f## -- Forecast hours starting from the initial time.
+
+a. RUC (grid #87, 60km, Hybrid-b coordinates)
+
+This RUC data can be obtained from NMC/NOAA ftp site:
+ftp://nic.fb4.noaa.gov/pub/ruc/ruc.T??Z.grbbf##
+
+where ?? is a two digital number for intial hours and ## is the hours for
+forecast from the initial hour.
+
+Before compiling ext2arps, edit file extdims.inc and set
+
+      nx_ext = 81
+      ny_ext = 62
+      nz_ext = 25
+
+Then before running the program, you need to set up the input
+parameters, see namelist &extdfile, in arps40.input. For NMC RUC, set
+
+      extdopt = 1
+
+b. ETA (grid #212, 40km, pressure coordinates)
+
+This ETA data can be obtained from NMC/NOAA ftp site:
+ftp://nic.fb4.noaa.gov/pub/erl/eta.$$z/eta.T$$Z.AWIP3D##.tm??
+
+where $$ is a two digital number for cycle (00,12), ## is the hours for
+forecast, and ?? is the beginning time of the file relative to the start
+of the forecast.
+
+Edit extdims.inc to set the GRIB dimension parameters:
+
+      nx_ext = 185
+      ny_ext = 129
+      nz_ext = 39
+
+and arps40.input to specify data option:
+
+      extdopt = 2
+
+c. Other GRIB data
+
+For any other GRIB data set, it is user's responsibility to provide the
+information of the GRIB data and the converter (subroutine) that
+convert GRIB variables to standard external variables (see subroutine
+GETNMCRUC and GETNMCETA in file getextd3d.f).
+
+The following parameters in file gribcst.inc have to be set in your
+subroutine in order to read the GRIB variables:
+
+c
+c#######################################################################
+c
+c     General definitions for GRIB parameters and variables
+c
+c#######################################################################
+c
+      integer nprods     ! Maximum number of GRIB products (2-D arrays)
+      parameter ( nprods = 1000 )
+
+      integer n2dvs      ! Maximum number of 2-D variables   to be read
+      integer n2dlvt     ! Maximum number of 2-D level types to be read
+      parameter ( n2dvs = 6, n2dlvt = 2 )
+
+      integer n3dvs      ! Maximum number of 3-D variables   to be read
+      parameter ( n3dvs = 6 )
+
+      integer rcbytes(nprods)  ! record length in bytes
+      integer rcstart(nprods)  ! record starting byte in a GRIB fil
+
+      integer var_nr2d(n2dvs,n2dlvt)
+                         ! number of record for all 2-D variables
+      integer var_nr3d(n3dvs)  ! number of record for each 3-D variable
+      integer var_lev3d(nzgrb,n3dvs)
+                               ! Levels (hybrid) for each 3-D variable
+
+      real rcdata(nxygrb)      ! temporary data array
+      real var_grb2d(nxgrb,nygrb,n2dvs,n2dlvt) ! GRIB variables
+      real var_grb3d(nxgrb,nygrb,nzgrb,n3dvs) ! GRIB 3-D variables
+c
+c#######################################################################
+c
+c     The following variables and arrays must be set before calling
+c     subroutine RDNMCGRB.
+c
+c     (See subroutine GETNMCRUC for RUC and GETNMCETA for ETA in file
+c     getextd3d.f as examples.)
+c
+c#######################################################################
+c
+      integer gridtyp    ! Grid ID (working variable)
+      integer mproj_grb  ! Map projection ID
+
+      integer n2dvars    ! Number of 2-D variables (working variable)
+      integer n2dlvtps   ! Number of 2-D level types (working variable)
+      integer levtyp2d(n2dlvt)     ! 2-D Level IDs (working variable)
+      integer var_id2d(n2dvs,n2dlvt)
+                         ! Working array for 2-D variable IDs
+
+      integer n3dvars    ! Number of 3-D variables (working variable)
+      integer levtyp3d   ! 3-D Level IDs (working variable)
+      integer var_id3d(n3dvs)
+                         ! Working array for 3-D variable IDs
+c
+c#######################################################################
+c
+
+Please see subroutine GETNMCRUC87, GETNMCRUC211, GETNMCETA212 and
+GETREANALT62 in getextd3d.f, as well as file gribcst.inc about the
+supported data sets, for detail.
+
+User may look at the blocks in gribcst.inc for RUC and ETA as examples.
+
+There are some softwares that can be used to extract the information
+from a GRIB file, for examples:
+
+      gribscan -- GrADS utility that scan a GRIB file and output a
+                  report based on given options;
+
+      wgrib    -- Free source code available at
+                  ftp://nic.fb4.noaa.gov/pub/info/reanl/wgrib
+
+Both programs have been installed in the CAPS IBM RS6000 cluster.

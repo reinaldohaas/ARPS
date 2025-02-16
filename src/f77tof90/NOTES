@@ -1,0 +1,85 @@
+
+Simple steps for running F77 to F90 converter:
+
+f90 -o f77tof90 convert_src_to_f90.f90 
+/bin/ls *.f >! list
+f77tof90 < list
+
+output will be in *.f90.
+
+
+ 
+
+
+Code converion notes by Ming Xue
+
+7/27/2000
+Modifed convert_src*.f90 to not to add :: when :: is found in the statement
+Graceful stop of program as the end of file list
+
+The converted codes might have a few glitches, and most of them
+will show up immediately when the code is compiled.
+Some of the problems may have been fixed by the original 
+author since the version on which our code is based.
+
+4/19/2000
+
+arps5.5.0 and arps4.5.0.release.f90 are copied from /work/yli,
+and they are believed to be the last f90 version and the f77 that the 
+converted 5.5.0 was based on.
+
+Instruction for running the conversion is found at 
+http://caps.ou.edu/ARPS/F90ARPS.html.
+A few changes are needed on paige:
+
+Using /bin/ls */*.f >! enlist rather than ls -l.
+
+Run of convert_src_to_f90.f90 had segmentation error when processing 
+subroutine EXTBDTINI in arpsintrp/dummyintrp.f. 
+RETURN had to be added before END.
+Same is done to arpstintrp/dummyintrp.f and arpstrn/nozxplot.f.
+
+Converting include files
+
+The conversion program must be run inside include directory
+
+cd include
+/bin/ls *.inc >! enlist
+f90 -o inctof90 econvert_inc_to_mod.f90
+inctof90 < enlist
+
+Have to change all character definition of the form 
+character char*80 
+to
+character*80 char
+They include agricst.inc, globcst.inc 
+
+
+grddsc.f90 converted from grddsc.inc failed to compile because the dimension
+  parameters are declared in a different include file now a difference module 
+  - agrigrid.f90. 
+grddsc.f90 should be merged with agrigrid.f90 - need double-check
+
+The convert can't handle continuation statements separated by blank lines
+or line with 'c' only.  Need to remove such lines in grddsc.inc.
+
+changed include "netcfd.inc" to include 'netcdf.inc' in meraf.inc
+
+
+Problem with declaration of arrays in par1d.inc and par2d.inc
+which appear in arps_mp/mptrans.c that generate fortran code that
+include these include files. 
+Adding include 'par.inc' in these two include files solves the problem.
+mptrans.c needs to be altered accordingly
+make file need to be aware of the dependency (par2d.f90 depends on par.mod -
+or par.mod needs to be compiled before par1d.f90 and par2d.f90)
+
+
+Same problem occurs in remap.inc. Add include 'dims.inc' solves the problem.
+The arrays with dimensions nx, ny or nz should be passed via argument list,
+not common block or as SAVED arrays
+
+character*(*) in enscv.inc should be translated to character (LEN=*)
+
+We may need to still keep include directory for include files from external 
+packages.

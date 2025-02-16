@@ -1,0 +1,23 @@
+README file for program ARPSTRAJC and ARPSCALCTRAJC
+
+1) Purpose: Calculates trajectories from a set of ARPS history dumps and performs 
+   calculations of various quantities along those trajectories.
+
+2) Compiling:  Type the command "makearps arpstrajc" in the ARPS root directory.  
+   This will compile both the arpstrajc and arpscalctrajc executables.
+
+3) Running:  The program is run with a namelist input file similar to the other 
+   programs in the ARPS package.  Examples of arpstrajc.input and arpscalctrajc.input
+   can be found in the directory ARPSROOT/input.
+
+ATTENTIONS:
+
+1. Right now the vorticity components along the trajectories are calculated 
+   assuming the model surfaces are level.  The error should only be large 
+   near steep terrain.
+
+2. The arpsplt code was modified to allow plotting of trajectories projected
+   to horizontal or vertical cross sections (not arbitrary cross sections 
+   yet though).  The trajectories can be colored and an option to plot the 
+   height of each trajectory at regular intervals is also provided.
+

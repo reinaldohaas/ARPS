@@ -1,0 +1,40 @@
+ ARPS Program radmosaic
+
+   PURPOSE: Create a mosaic of radar reflectivity from the remapped radar 
+            file in the same manner as is done for the cloud analysis.  
+            The mosaic file can be displayed in arpsplt using the "arbvar" 
+            option.  Plots can be used for verification figures or 
+            comparison to analysis output.  This program is NOT required 
+            for ADAS.  ADAS does the same mosaicking within the cloud 
+            analysis.
+
+   USE:     radmosaic has its own input file, ./input/radmosaic.input 
+            which consists primarily of a list of radar files to include 
+            in the mosaic.  See documentation in radmosaic.input
+
+ ARPS Program arps2rad
+
+   PURPOSE: Using an ARPS history dump as input create a remapped radar 
+            file of data to simulate the atmosphere in the history file 
+            being observed by a radar.
+
+   USE:     arps2rad has its own input file, ./input/arps2rad.input 
+            which includes the history file to read and the location of 
+            the observing radar.
+
+ ARPS Program difobs
+
+   PURPOSE: Calculates the difference between a set of observations and 
+            the gridded fields in an ARPS history file.   Statistics of 
+            bias and rms are reported, broken down by data source.  This 
+            program allows calculation of verification statistics without 
+            running the entire arpsverif code.
+
+   USE:     difobs uses the arps.input file set up as if the data were to 
+            be used in adas.  That is, the data files are named in the 
+            input file and the "iuse" switches for passes 1-to-npass are 
+            used to determine which data sources contribute to the global
+            statistics.  Output is written to a file in the present 
+            working directory with name runname.difobs.  If a file with 
+            that name already exists, a sequential number is appended
+            to the name.

@@ -1,0 +1,79 @@
+
+For updates in arps version 5.0.0, see file HISTORY.
+
+
+This file contains the updates in arps version 4.5.1 since arps version 4.4.0. 
+For more details on these changes, see file HISTORY.
+
+Version 4.5.1
+
+- Corrected a bug which reversed the order of soil levels in GRIB data
+  in ext2arps.
+- Changed input file reading for message passing version of the ARPS.
+- Integrated Hub-CAPS modifications into the official version.
+- Corrected MDCRS data processing in ADAS.
+- Updated ensemble code.
+- Added arpsassim (thermodynamic retrieval) package.
+- Added Ruc2 native and isobaric GRIB files to ext2arps.
+- Corrected error in ADAS which caused cloud observations to be rejected.
+- Fixed problem with century change over in reading GRIB files in ext2arps.
+- Changed snow cover (0 or 1) to be snow depth in meters.
+- Corrected an error in soil model which reduced the interaction between deep
+  and surface soil by half.
+- Corrected RUC specific humidity conversions in ext2arps.
+  
+Version 4.5.0
+
+- Added a new subroutine to support NCEP AVN data conversion in EXT2ARPS. 
+- Fixed a bug with the Kain-Fritsch scheme calls.
+- Synchronized quality control flags for u and v components of winds.
+- Removed version numbers from filenames of each program
+- Added new terrain pre-processing program arpstrn (different from arpstern)
+- Added new program ARPSTINTRP for interpolating two ARPS history data
+  sets to another time
+- Added several new parameters for fine-tuning the plots in arpsplt.input.
+- Changed the coefficient in the dissipation term of TKE equation
+  for the lowest two levels Sun and Chang scheme (tkeopt=3).
+- TKE at the same time level as the dissipation term in the TKE
+  equation is now used to determine Km.
+- Change made to ext2arps for ETA #212 to use sfc temp. as tsfc instead
+  of the first layer soil temp.
+- Updated the calculation of solar time equation with more accurate
+  formula
+- Fixed a bug in two-way nest computation of pressure in small steps
+- Fixed a problem in the calculation of surface radiation fluxes for
+  the diffusive radiation
+- Fixed a bug in ext2arps in writing wetcanp into soil variable file
+- New control parameters for iterative soil model initialization of balance
+- Added snow cover in a simple scheme for soil model
+- Changed the format of soil variable file to include the soil variables
+  associated with multiple soil types at each grid points
+- Fixed an error in soil model in calculating wr2max for the one-step
+  prediction
+- Added Incremental Analysis Uupdate (a way of nudging) scheme in ARPS
+- Changed the use of pibar to full pi
+- Significantly improved code efficiency by removing operators,
+  combining loops and storing repeatedly used values. 
+- Fixed a bug in initialization with option sfcdat=1
+- Added new subroutines to write GrADS control file for surface, soil,
+  and terrain data files for GrADS display
+- Fixed a few problems in GrADS control files for GRIB and GrADS formats
+- Fixed a problem in computing the drag coefficients in sfcphy3d.f
+  when multiple soil types are defined in a grid box.
+- Changed default compiler option for arpsplt on SGI so as not to use IPA option
+- Upgraded ADAS to include writing analysis increments for the ARPS 
+  nudging (incremental analysis update) scheme
+- Bug fixes in cmpclddrv.f and cldinsert.f to properly account for
+  the limited areal coverage of the physical domain within the
+  ARPS grid
+- Bug fix in RADMCRO after DO 150 to go to next column
+- Bug fix in prepsfc.f and rdsfcobs.f to correct a problem with
+  cloud height storage indexing when using multiple input sfc
+  observation files
+- Fixed a problem in ext2arps when the external GRIB data are in random
+  order in vertical.
+- Fixed a problem in src/arps_mp/Makefile to include an ARPS new file in
+  the src and obj list
+- Fixed problems in Vis5D history dump
+- Modifications in the cloud code and call to cmpclddrv to clean up a
+  few problems due to switch to ARPS grid in cloud code

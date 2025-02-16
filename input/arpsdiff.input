@@ -1,0 +1,140 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ARPSDIFF IN NAMELIST FORMAT     ######
+!     ######                   ( VERSION arps5.3 )                ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  for ARPSDIFF version 5.0 or later
+!
+!-----------------------------------------------------------------------
+!
+! Author:
+!
+!   Yunheng Wang (02/12/2001)
+!
+! Modification history:
+!
+!   02/12/2001 (Yunheng Wang)
+!   Converted to namelist format.
+!  
+!   1 June 2002 Eric Kemp
+!   Removed namelists for nx,ny,nz,vnx,vny,vnz.  These are now read
+!   in from the history dumps.
+!
+!-----------------------------------------------------------------------
+!
+!  FORECAST file:
+!
+!  iorder:      Input order of interpolation
+!                 1 = Linear
+!                 2 = Quadratic
+!                 3 = Cubic (recommended)
+!
+!  hinfmt:      Input the data format flag value 1/2/3/4 
+!
+!  grdbasfn:    The name of the file containing the grid and base state
+!               array data. This file will not be read if the grid and base
+!               state arrays are present in each time-dependent data file.
+!
+!  filename:    The name of the time-dependent data file
+!
+!-----------------------------------------------------------------------
+
+ &frcst_fn
+   iorder   = 3,
+   hinfmt   = 3,
+   grdbasfn = 'may20.hdfgrdbas',
+   filename = 'may20.hdf003600',
+ /
+
+!
+!-----------------------------------------------------------------------
+!
+!  VERIFICATION file:
+!  
+!   hinfmt:     Input the data format flag value 1/2/3/4
+!
+!   grdbasfn:   The name of the file containing the grid and base state 
+!               array data. This file will not be read if the grid and base
+!               base state arrays are present in each t-dependent data file.
+!
+!   filename:   The name of the time-dependent data file.
+!
+!-----------------------------------------------------------------------
+
+ &vrftn_fn
+   vhinfmt   = 3,
+   vgrdbasfn = 'may20.hdfgrdbas',
+   vfilename = 'may20.hdf000000',
+ /
+
+!-----------------------------------------------------------------------
+!
+!  OUTPUT
+!
+!  runnmin:     The output run name
+!
+!  hdmpfmt:     Data format flag value 1/2/3/4
+!
+!  grdout:      Will it contain any grid information? (1 or 0)
+!               If it will not, grid and base information will be dumped
+!               to a separate file (filename input later as grdbasfn).
+!
+!  basout:      Will it contain any base state data? (1 or 0)
+!
+!  varout:      Do you want to write u, v, w, ptprt and pprt arrays?
+!               (select 0 or 1)
+!
+!  mstout:      Write moisture fields to the output file?(1 or 0)
+!
+!  iceout:      Write ice fields to the output file?(1 or 0)
+!
+!  trbout:      Write turbulence fields to the output file?(1 or 0)
+!
+!  sfcout:      Write surface (soil) fields to the output file?(1 or 0)
+!
+!  rainout:     Write rain fields to the output file?(1 or 0)
+!
+!  prcout:      Write precipitation rate to output file?(1 or 0)
+!
+!  radout:      Write radiation arrays to output file?(1 or 0)
+!
+!  flxout:      Write the surface fluxes to output file?(1 or 0)
+!
+!  filcmprs:    Do you want to compress the output data? (select 0 or 1)
+!
+!-----------------------------------------------------------------------
+!
+ &output
+    runnmin = 'diffm20',
+    hdmpfmt = 3,
+    grdout = 0,
+    basout = 0,
+    varout = 1,
+    mstout = 1,
+    iceout = 0,
+    trbout = 0,
+    sfcout = 0,
+    rainout = 0,
+    prcout = 0,
+    radout = 0,
+    flxout = 0,
+    filcmprs = 0,
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of input file
+!
+!-----------------------------------------------------------------------

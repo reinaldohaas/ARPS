@@ -1,0 +1,241 @@
+#!/bin/csh -f
+#
+#     ##################################################################
+#     ##################################################################
+#     ######                                                      ######
+#     ######      Advanced Regional Prediction System (ARPS)      ######
+#     ######                     Version 4.5                      ######
+#     ######                                                      ######
+#     ######                     Developed by                     ######
+#     ######     Center for Analysis and Prediction of Storms     ######
+#     ######                University of Oklahoma                ######
+#     ######                                                      ######
+#     ##################################################################
+#     ##################################################################
+#
+#
+#=======================================================================
+#
+#  PURPOSE: This C-shell script is to update a released ARPS version
+#
+#  AUTHORS: Yuhe Liu
+#           09/29/1998
+#
+#=======================================================================
+
+#-----------------------------------------------------------------------
+#
+# ARPS version to be updated
+#
+#-----------------------------------------------------------------------
+
+set arpsversion = 4.5.0
+set updateversion = update.2
+set listfilename = filelist.$updateversion
+
+#-----------------------------------------------------------------------
+#
+# Default directories
+#
+# UPDDIR - Working directory
+# TOPDIR - ARPS root directory
+#
+#-----------------------------------------------------------------------
+
+set CURDIR = $cwd
+set UPDDIR = $CURDIR
+set TOPDIR =
+
+#-----------------------------------------------------------------------
+#
+# Asking input from the user where the working directory is located.
+#
+#-----------------------------------------------------------------------
+
+printf "\n"
+printf "Where is the directory of original ARPS version? ["$TOPDIR"]: "
+set readin = $<
+if ( $readin != '' ) then
+  set TOPDIR = $readin
+  if ( ! -d $TOPDIR ) then
+    printf "Error: $TOPDIR not found\n"
+    exit 1
+  endif
+endif
+
+cd $TOPDIR
+set TOPDIR = $cwd
+cd $CURDIR
+
+printf "Where is the directory of update version? ["$UPDDIR"]: "
+set readin = $<
+if ( $readin != '' ) then
+  set UPDDIR = $readin
+  if ( ! -d $UPDDIR ) then
+    printf "Error: can not find $UPDDIR\n"
+    exit 2
+  endif
+endif
+
+cd $UPDDIR
+set UPDDIR = $cwd
+cd $CURDIR
+
+printf "\n"
+printf "The ARPS version to be updated is in $TOPDIR\n"
+printf "The updated files are in $UPDDIR\n"
+printf "\n"
+
+#-----------------------------------------------------------------------
+#
+# list of files to be updated
+#
+#-----------------------------------------------------------------------
+
+if ( ! -f $UPDDIR/$listfilename ) then
+  printf "Can not get the list of update files\n"
+  exit 0
+endif
+
+set listfile = `cat $UPDDIR/$listfilename`
+
+#-----------------------------------------------------------------------
+#
+# directory to save original files
+#
+#-----------------------------------------------------------------------
+
+set bakdir = $TOPDIR/$updateversion.original
+
+#-----------------------------------------------------------------------
+#
+# options to install or uninstall the update
+#
+#-----------------------------------------------------------------------
+
+Options:
+  printf "\n"
+  printf "Select an option please:\n"
+  printf "\n"
+  printf "1. Install all update files to arps$arpsversion\n"
+  printf "2. Uninstall arps$arpsversion.$updateversion from arps$arpsversion\n"
+  printf "\n"
+  printf "0. Quit\n"
+  printf "\n"
+  printf "\n"
+  printf "Your input: "
+
+set readin = $<
+printf "\n"
+
+switch ( "$readin" )
+
+  case 0:
+    exit 0
+    breaksw
+
+  case 1:
+    if ( -d $bakdir ) then
+      printf "ARPS $arpsversion $updateversion was previously installed\n"
+      printf "Do you want to reinstall the update? [n/y] "
+      set reinst = $<
+      if ( $reinst != 'y' && $reinst != 'Y' ) then
+        exit 0
+      else
+        printf "Do you want to preserve the previous backup? [n/y] "
+        set presv = $<
+        if ( $presv == 'y' || $presv == 'Y' ) mv $bakdir $bakdir.bak
+      endif
+    else
+      mkdir -p $bakdir
+    endif
+
+    foreach newfile ( $listfile )
+      set subdir  = `dirname $newfile`
+      set dir  = $TOPDIR/$subdir
+      set file = `basename $newfile`
+
+      if ( $file == "Makefile" && $subdir != "." ) then
+        set updfile = `basename $subdir`.Makefile
+      else
+        set updfile = $file
+      endif
+
+      printf "Updating $dir/$file...\n"
+
+      if ( -f $dir/$file ) then
+        cp -p $dir/$file $bakdir/$updfile
+        if ( -f $UPDDIR/$updfile ) then
+          cp -p $UPDDIR/$updfile $dir/$file
+        else
+          printf "  The file is not found in updates.\n"
+          printf "  Remove the file from $dir\n"
+          rm -f $dir/$file
+        endif
+      else
+        if ( -f $UPDDIR/$updfile ) then
+          printf "  The file does not exist in original version.\n"
+          printf "  Add the new file into $dir.\n"
+          cp -p $UPDDIR/$updfile $dir/$file
+        else
+          printf "  The file is not found in either original or update version.\n"
+          printf "  No action is taken\n"
+          rm -f $dir/$file
+        endif
+      endif
+
+    end
+
+    printf "\nARPS $arpsversion $updateversion has been installed\n"
+    printf "The original files which have been updated were saved in\n"
+    printf "  $bakdir\n"
+    printf "You may run this script again to uninstall the update.\n\n"
+
+    breaksw
+
+  case 2:
+    if ( ! -d $bakdir ) then
+      printf "The original ARPS $arpsversion files not were found\n"
+      printf "Can not uninstall arps$arpsversion.$updateversion\n"
+
+      exit 0
+    endif
+
+    printf "Uninstalling ARPS $arpsversion $updateversion...\n"
+
+    foreach newfile ( $listfile )
+
+      set subdir  = `dirname $newfile`
+      set dir  = $TOPDIR/$subdir
+      set file = `basename $newfile`
+
+      printf "Restoring $file...\n"
+
+      if ( $file == "Makefile" && $subdir != "." ) then
+        set updfile = `basename $subdir`.Makefile
+      else
+        set updfile = $file
+      endif
+
+      if ( -f $bakdir/$updfile ) then
+        cp -p $bakdir/$updfile $dir/$file
+      else
+        printf "  The file must be a newly added file.\n"
+        printf "  Remove the file from $dir\n"
+        rm -f $dir/$file
+      endif
+
+    end
+
+    printf "\nARPS $arpsversion $updateversion has been uninstalled.\n"
+    printf "You may run this script to install the update again.\n\n"
+
+    breaksw
+
+  default:
+    goto Options
+    breaksw
+
+endsw
+
+exit 0

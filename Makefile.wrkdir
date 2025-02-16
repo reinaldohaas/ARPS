@@ -1,0 +1,1666 @@
+#
+#     ##################################################################
+#     ##################################################################
+#     ######                                                      ######
+#     ######      Advanced Regional Prediction System (ARPS)      ######
+#     ######                   Version 4.3                        ######
+#     ######                                                      ######
+#     ######                     Developed by                     ######
+#     ######     Center for Analysis and Prediction of Storms     ######
+#     ######                University of Oklahoma                ######
+#     ######                                                      ######
+#     ##################################################################
+#     ##################################################################
+#
+#=======================================================================
+#
+#  PURPOSE: This makefile generates the ARPS executables. It can be run
+#           directly or through the makearps script.
+#
+#  AUTHOR:  Yuhe Liu
+#
+#  08/15/1997 (Yuhe Liu)
+#  A complete new makefile in responding to the re-structure of ARPS
+#  source code.
+#
+#  OTHER INFORMATION:
+#       See the makearps command.
+#
+#=======================================================================
+
+#
+#-----------------------------------------------------------------------
+#
+# Version number
+#
+#-----------------------------------------------------------------------
+#
+
+VERSION = 4.3.0
+
+#
+#-----------------------------------------------------------------------
+#
+# Files to be included
+#
+#-----------------------------------------------------------------------
+#
+
+INCFILE = /dev/null
+
+include $(INCFILE)
+
+GEMINC = GEMPRM.AIX
+MACHDEPLIB = GENLIBOBJ
+NCARGDEP = NCARGOBJ_OFF
+
+MPIDEP = MPIOBJ_OFF
+
+HDFDEP = HDFOBJ_OFF
+PAKDEP = PAKOBJ_OFF
+SVIDEP = SVIOBJ_OFF
+NETDEP = NETOBJ_OFF
+V5DDEP = V5DOBJ_OFF
+
+#
+#-----------------------------------------------------------------------
+#
+# Default shell
+#
+#-----------------------------------------------------------------------
+#
+
+# SHELL=/bin/csh
+
+#
+#-----------------------------------------------------------------------
+#
+# Commands to be used
+#
+#-----------------------------------------------------------------------
+#
+
+F77 = f77
+LDR = f77
+CC  = cc
+
+AWK = awk
+CP  = cp
+LN  = ln
+RM  = rm
+TAR = tar
+
+ARPS_LD = $(LDR)
+
+WRKDIR = `pwd`
+
+TOPDIR =
+
+#-----------------------------------------------------------------------
+#
+# Directories
+#
+#-----------------------------------------------------------------------
+
+BIN_DIR    = bin
+INCL_DIR   = include
+DATA_DIR   = data
+VAL_DIR    = validate
+DOC_DIR    = docs
+INPUT_DIR  = input
+SCRPT_DIR  = scripts
+SND_DIR    = sounding
+HTML_DIR   = html
+SRC_DIR    = src
+
+ARPS_DIR   = $(SRC_DIR)/arps
+ADAS_DIR   = $(SRC_DIR)/adas
+AGRI_DIR   = $(SRC_DIR)/agri
+CVT_DIR    = $(SRC_DIR)/arpscvt
+DIF_DIR    = $(SRC_DIR)/arpsdiff
+E2A_DIR    = $(SRC_DIR)/ext2arps
+EXTSND_DIR = $(SRC_DIR)/arpsextsnd
+INTRP_DIR  = $(SRC_DIR)/arpsintrp
+WTRETCOL_DIR = $(SRC_DIR)/wtretcol
+MP_DIR     = $(SRC_DIR)/arps_mp
+PLT_DIR    = $(SRC_DIR)/arpsplt
+PRT_DIR    = $(SRC_DIR)/arpsprt
+SFC_DIR    = $(SRC_DIR)/arpssfc
+SOIL_DIR   = $(SRC_DIR)/arpssoil
+TRN_DIR    = $(SRC_DIR)/arpstern
+88D_DIR    = $(SRC_DIR)/88d2arps
+SHIFT_DIR  = $(SRC_DIR)/shift
+
+INCLDIR  = $(TOPDIR)/$(INCL_DIR)
+DATADIR  = $(TOPDIR)/$(DATA_DIR)
+VALDIR   = $(TOPDIR)/$(VAL_DIR)
+DOCDIR   = $(TOPDIR)/$(DOC_DIR)
+INPUTDIR = $(TOPDIR)/$(INPUT_DIR)
+SCRPTDIR = $(TOPDIR)/$(SCRPT_DIR)
+SNDDIR   = $(TOPDIR)/$(SND_DIR)
+HTMLDIR  = $(TOPDIR)/$(HTML_DIR)
+
+ADASDIR  = $(TOPDIR)/$(ADAS_DIR)
+AGRIDIR  = $(TOPDIR)/$(AGRI_DIR)
+ARPSDIR  = $(TOPDIR)/$(ARPS_DIR)
+CVTDIR   = $(TOPDIR)/$(CVT_DIR)
+DIFDIR   = $(TOPDIR)/$(DIF_DIR)
+E2ADIR   = $(TOPDIR)/$(E2A_DIR)
+EXTSNDIR = $(TOPDIR)/$(EXTSND_DIR)
+INTRPDIR = $(TOPDIR)/$(INTRP_DIR)
+WTRETCOLDIR = $(TOPDIR)/$(WTRETCOL_DIR)
+MPDIR    = $(TOPDIR)/$(MP_DIR)
+PLTDIR   = $(TOPDIR)/$(PLT_DIR)
+PRTDIR   = $(TOPDIR)/$(PRT_DIR)
+SFCDIR   = $(TOPDIR)/$(SFC_DIR)
+SOILDIR  = $(TOPDIR)/$(SOIL_DIR)
+TRNDIR   = $(TOPDIR)/$(TRN_DIR)
+88DDIR   = $(TOPDIR)/$(88D_DIR)
+SHIFTDIR = $(TOPDIR)/$(SHIFT_DIR)
+
+VPATH = $(ARPSDIR):$(ADASDIR):$(AGRIDIR):$(CVTDIR):$(DIFDIR):$(E2ADIR):$(EXTSNDIR):$(INTRPDIR):$(WTRETCOLDIR):$(MPDIR):$(PLTDIR):$(PRTDIR):$(SFCDIR):$(SOILDIR):$(TRNDIR):$(88DDIR):$(SHIFTDIR):$(INCLDIR)
+
+#-----------------------------------------------------------------------
+#
+# Compiler Flag of Options
+#
+#-----------------------------------------------------------------------
+
+FFLAGS =
+CFLAGS =
+LDFLAGS =
+ICEFLAG =
+RADFLAG =
+THMFLAG =
+MAKEOPT =
+
+#-----------------------------------------------------------------------
+#
+# Define HDF, Savi3D, NetCDF, PVM, and MPI libraries
+#
+#-----------------------------------------------------------------------
+
+SVILIBS = -munch /usr/local/MeRAF/bin            \
+          -start /usr/local/MeRAF/lib            \
+          -L/usr/lib -L/usr/local/MeRAF/lib      \
+          /usr/local/MeRAF/lib/libMERAF.a        \
+          -lssC /usr/local/MeRAF/lib/libnetcdf.a \
+          /usr/local/MeRAF/lib/libCns.a -lxlf
+
+HDFLIBS = -ldf -lmfhdf -lz -ljpeg
+NETLIBS = -lnetcdf
+
+88D2A_A2LIBS = /usr1/a2io/liba2tp.a \
+               /usr1/tpio/libtpio.a
+
+88D2A_RTLIBS = -la2rt -lnexrad -lnssl
+
+LIBS = $(SVILIBS) $(HDFLIBS) $(NETLIBS) $(88D2A_A2LIBS) $(88D2A_RTLIBS)
+
+MPILIBS = -lmpi
+
+#
+#-----------------------------------------------------------------------
+#
+# Executable commands to be generated by this make file:
+#
+# ADASEXE      = adas          ADAS - ARPS Data Analysis System
+# ARPSEXE      = arps          ARPS model executable
+# AGRIEXE      = arpsagri      AGRI - Adaptive Grid Refinement Interface
+# ARPSCVTEXE   = arpscvt       History data dump format convesion exec.
+# INTRPEXE     = arpsintrp     Program to interpolate between ARPS gridded data
+# INTRP_LSEXE  = arpsintrp_ls  Program to interpolate large size ARPS data
+# PLTMAXEXE    = arpspltmax    ZXPLOT based graphic analysis program exec.
+# PLTNCAREXE   = arpspltncar   ZXPLOT based graphic analysis program exec.
+#                              GKS metafile will be generated.
+# PLTPOSTEXE   = arpspltpost   ZXPLOT based graphic analysis program exec.
+#                              Postscript file will be generated.
+# PLTGRIDEXE   = pltgrid       ZXPLOT based graphic tool to plot grid boxes
+# PRTEXE       = arpsprt       Formatted table printing prog. exec.
+# DIFFEXE      = arpsdiff      Difference of ARPS history files
+# EXTSNDEXE    = extsnd        Extracts a sounding from ARPS history file
+# SFCEXE       = arpssfc       ARPS surface data pre-processor
+# SOILEXE      = arpssoil      ARPS soil data pre-processor
+# TRNEXE       = arpstern      ARPS terrain data pre-processor
+# MERGETRNEXE  = mergetrn      ARPS terrain data merger/smoother
+# DIR1DEGEXE   = dir1deg       Convertor of terrain data to direct
+#                              access file for 1 degree resolution
+# DIR5MINEXE   = dir5min       Convertor for 5 minutes resolution
+# DIR30SECEXE  = dir30sec      Convertor for 30 seconds resolution
+# E2AEXE       = ext2arps        Convertor of external data to ARPS grid
+# L2AEXE       = ext2arps.laps   Convertor of OLAPS data to ARPS grid
+# G2AEXE       = ext2arps.gempak Convertor of GEMPAK data to ARPS grid
+# 88D2ARPS_A2  = 88d2arps_a2   Remap archive WSR-88D radar data to ARPS grid
+# 88D2ARPS_RT  = 88d2arps_rt   Remap realtime WSR-88D radar data to ARPS grid
+# 88D2ARPS_FAKE= 88d2arps_fake Remap fake radar data to ARPS grid
+# NIDS2ARPS    = nids2arps     Remap NIDS format 88D radar data to ARPS grid
+# MCI2ARPS     = mci2arps
+# WTRETCOLEXE  = wtretcol
+# A2GEXE       = arps2gem      Convert ARPS history file to GEMPAK format
+#
+# ARPSREADEXE  = arpsread      Sample program to read ARPS history file
+#
+#-----------------------------------------------------------------------
+#
+
+ADASEXE      = adas
+ARPSEXE      = arps
+AGRIEXE      = arpsagri
+ARPSCVTEXE   = arpscvt
+INTRPEXE     = arpsintrp
+INTRP_LSEXE  = arpsintrp_ls
+PLTMAXEXE    = arpspltmax
+PLTNCAREXE   = arpspltncar
+PLTPOSTEXE   = arpspltpost
+PLTGRIDEXE   = pltgrid
+PRTEXE       = arpsprt
+A2GEXE       = arps2gem
+DIFFEXE      = arpsdiff
+EXTSNDEXE    = arpsextsnd
+SFCEXE       = arpssfc
+SOILEXE      = arpssoil
+TRNEXE       = arpstern
+MERGETRNEXE  = mergetrn
+DIR1DEGEXE   = dir1deg
+DIR5MINEXE   = dir5min
+DIR30SECEXE  = dir30sec
+E2AEXE       = ext2arps
+L2AEXE       = ext2arps.laps
+G2AEXE       = ext2arps.gempak
+88D2AEXE_A2  = 88d2arps_a2
+88D2AEXE_RT  = 88d2arps_rt
+88D2AEXE_FAKE= 88d2arps_fake
+NIDS2AEXE    = nids2arps
+MCI2AEXE     = mci2arps
+WTRETCOLEXE  = wtretcol
+
+ARPSREADEXE  = arpsread
+
+SPLITEXE     = splitfiles
+JOINSEXE     = joinfiles
+JOINEXE      = joinfile
+
+#-----------------------------------------------------------------------
+#
+# Object library to be generated for ARPS solver:
+#
+# ARPSSOLVER  = arpssolver    ARPS solver library
+# LIBARPS     = libarps       ARPS shared library
+#
+#-----------------------------------------------------------------------
+
+ARPSSOLVER = arpssolver
+LIBARPS    = libarps
+LIBADAS    = libadas
+
+#-----------------------------------------------------------------------
+#
+# Tar archive files to generated by this make file:
+#
+# ALLFILESTAR = Allfiles.tar    Archive all files of ARPS model
+# ADASTAR     = adas.tar        ADAS analysis
+# ARPSTAR     = arps.tar        ARPS model executable
+# AGRITAR     = arpsagri.tar    AGRI executable
+# CVTTAR      = arpscvt.tar     History data dump format convesion
+# INTRPTAR    = arpsintrp.tar   Gridded data interpolation
+# PLTTAR      = arpsplt.tar     ZXPLOT based graphic analysis program
+# PRTTAR      = arpsprt.tar     Formatted table printing program
+# A2GTAR      = arps2gem.tar    Convert history files to GEMPAK format
+# DIFFTAR     = arpsdiff.tar    Difference of ARPS history files
+# EXTSNDTAR   = extsnd.tar      External data to ARPS sounding file
+# SFCTAR      = arpssfc.tar     ARPS surface data pre-processor
+# SOILTAR     = arpssoil.tar    ARPS soil data pre-processor
+# TRNTAR      = arpstern.tar    ARPS terrain data pre-processor
+# E2ATAR      = ext2arps.tar    External data to ARPS grid
+# ARPSMPTAR   = arps_mp.tar     Parallel ARPS executable
+#
+# READTAR     = arpsread.tar    ARPSREAD
+# A2GTAR      = arps2gem.tar    ARPS2GEM
+# MERGETRNTAR = mergetrn.tar    ARPS terrain data merger/smoother
+#
+#-----------------------------------------------------------------------
+
+ALLTAR      = all-tar
+ALLFILESTAR = Allfiles.tar
+ARPSTAR     = arps.tar
+AGRITAR     = agri.tar
+ADASTAR     = adas.tar
+CVTTAR      = arpscvt.tar
+INTRPTAR    = arpsintrp.tar
+PLTTAR      = arpsplt.tar
+PRTTAR      = arpsprt.tar
+A2GTAR      = arps2gem.tar
+DIFFTAR     = arpsdiff.tar
+EXTSNDTAR   = extsnd.tar
+SFCTAR      = arpssfc.tar
+SOILTAR     = arpssoil.tar
+TRNTAR      = arpstern.tar
+E2ATAR      = ext2arps.tar
+ARPSMPTAR   = arps_mp.tar
+
+READTAR     = arpsread.tar
+A2GTAR      = arps2gem.tar
+MERGETRNTAR = mergetrn.tar
+WTRETCOLTAR = wtretcol.tar
+
+#-----------------------------------------------------------------------
+#
+# List of machine-dependent object codes
+#
+#-----------------------------------------------------------------------
+
+GRADSOBJ = gradsio3d.o
+GRIBOBJS = gribio3d.o gribdec3d.o gribenc3d.o
+
+MPIOBJ_ON = mpisubs.o
+
+HDFOBJ_ON = hdfio3d.o
+NETOBJ_ON = netio3d.o
+PAKOBJ_ON = pakio3d.o
+SVIOBJ_ON = sviio3d.o
+V5DOBJ_ON = binio.o v5dio3d.o v5d.o
+IOOBJS_ON = $(GRADSOBJ)  $(GRIBOBJS) $(HDFOBJ_ON) $(PAKOBJ_ON) \
+            $(NETOBJ_ON) $(SVIOBJ_ON) $(V5DOBJ_ON)
+
+MPIOBJ_OFF = nompsubs.o
+
+HDFOBJ_OFF = nohdfio3d.o
+PAKOBJ_OFF = nopakio3d.o
+NETOBJ_OFF = nonetio3d.o
+SVIOBJ_OFF = nosviio3d.o
+V5DOBJ_OFF = nov5dio3d.o
+IOOBJS_OFF = $(HDFOBJ_OFF) $(PAKOBJ_OFF) $(SVIOBJ_OFF) $(NETOBJ_OFF) \
+             $(V5DOBJ_OFF)
+
+IOOBJS1 = iolib3d.o dump3d.o exbcio3d.o read3d.o
+
+MPIOBJ = $($(MPIDEP))
+
+HDFOBJ = $($(HDFDEP))
+PAKOBJ = $($(PAKDEP))
+SVIOBJ = $($(SVIDEP))
+NETOBJ = $($(NETDEP))
+V5DOBJ = $($(V5DDEP))
+
+IOOBJS2 = $(GRADSOBJ) $(GRIBOBJS) $(HDFOBJ)  $(PAKOBJ) \
+          $(SVIOBJ)   $(NETOBJ)   $(V5DOBJ)
+
+IOOBJS  = $(IOOBJS1) $(IOOBJS2)
+
+CRAYLIBOBJ = craylib3d.o
+HTCHLIBOBJ = htchlib3d.o
+LNXLIBOBJ  = lnxlib3d.o
+GENLIBOBJ  = genlib3d.o
+IBMLIBOBJ  = ibmlib3d.o
+IRIXLIBOBJ = irixlib3d.o
+SUNLIBOBJ  = sunlib3d.o
+TRU64LIBOBJ = tru64lib3d.o
+
+MACHLIBOBJS = $(CRAYLIBOBJ) $(GENLIBOBJ) $(HTCHLIBOBJ) $(IBMLIBOBJ) \
+              $(SUNLIBOBJ)  $(LNXLIBOBJ) $(IRIXLIBOBJ) $(TRU64LIBOBJ)
+
+LIBOBJS1 = arpslib3d.o  outlib3d.o timelib3d.o thermolib3d.o
+
+MACHLIBOBJ = $($(MACHDEPLIB))
+LIBOBJS = $(LIBOBJS1) $(MACHLIBOBJ)
+
+LIBARPSOBJS1 = bc3d.o celtrk3d.o fft99f.o force3d.o grdtrns3d.o     \
+               img3d.o inibase3d.o init3d.o initpara3d.o maproj3d.o \
+               operat3d.o rst3d.o setbdt3d.o vfftpack.o
+
+NCARGOBJ_ON  = ncarg3d.o
+NCARGOBJ_OFF = noncarg3d.o
+
+NCARGOBJS = $(NCARGOBJ_ON) $(NCARGOBJ_OFF)
+
+NCARGOBJ = $($(NCARGDEP))
+
+LIBARPSOBJS = $(LIBARPSOBJS1) $(IOOBJS) $(LIBOBJS) $(NCARGOBJ)
+
+#-----------------------------------------------------------------------
+#
+# List of ARPS object files
+#
+#-----------------------------------------------------------------------
+
+ARPSMAINOBJ = arps.o
+
+ARPSOBJS1 = advct3d.o advfct3d.o bc3d.o bcdif3d.o chksym3d.o cmix3d.o \
+            cumulus3d.o energy3d.o exbc3d.o fft99f.o force3d.o        \
+            grdtrns3d.o celtrk3d.o img3d.o initpara3d.o init3d.o      \
+            inibase3d.o irrad3d.o kfinterfc.o kfpara.o maproj3d.o     \
+            micro3d.o micro_ice3d.o micro_nem3d.o operat3d.o          \
+            out3d.o raddata3d.o radfrc3d.o radlib3d.o radtrns3d.o     \
+            raydmp3d.o rst3d.o setbdt3d.o sfcphy3d.o soildiag3d.o     \
+            soilebm3d.o solve3d.o sorad3d.o tinteg3d.o tke3d.o        \
+            tmix3d.o vfftpack.o wwcont3d.o nudge.o
+
+ARPSOBJS  = $(ARPSOBJS1) $(IOOBJS) $(LIBOBJS)
+
+ARPSREADOBJ = arpsread.o
+
+#-----------------------------------------------------------------------
+#
+# List of ADAS object files
+#
+#-----------------------------------------------------------------------
+
+ADASMAINOBJ = adas.o
+
+ADASOBJS1 = initadas.o anxiter.o grd2obsth.o prepradar.o prepretr.o \
+            prepsfc.o prepsng.o prepua.o radarlib3d.o rdprofiles.o    \
+            rdacars.o rdradcol.o rdretcol.o rdsfcobs.o dummyadas.o
+
+ADASCLDOBJS = cloud_cv.o cloud_lwc.o cmpclddrv.o cmpcldlib.o \
+              cldinsert.o rdsatfld.o rdwrtcld22.o sunfuncs.o
+
+LIBADASOBJS = anxlib3d.o smooth3d.o adjuvw3d.o intfield21.o \
+              thermo3d.o mthermo.o
+
+ADASOBJS = $(ADASMAINOBJ) $(ADASOBJS1) $(ADASCLDOBJS) $(LIBADASOBJS)
+
+#-----------------------------------------------------------------------
+#
+# List of AGRI machine-dependent object codes
+#
+#-----------------------------------------------------------------------
+
+AGRI_CRAYLIBOBJ = packcray.o cpucray.o
+AGRI_GENLIBOBJ  = packgen.o cpugen.o
+AGRI_IBMLIBOBJ  = packibm.o cpuibm.o
+AGRI_SUNLIBOBJ  = packsun.o cpusun.o
+
+AGRI_LNXLIBOBJ  = $(AGRI_GENLIBOBJ)
+AGRI_IRSILIBOBJ = $(AGRI_GENLIBOBJ)
+
+AGRI_MACHLIBOBJS = $(AGRI_CRAYLIBOBJ) $(AGRI_GENLIBOBJ) \
+                   $(AGRI_IBMLIBOBJ)  $(AGRI_SUNLIBOBJ)
+
+AGRI_MACHLIBOBJ = $(AGRI_$(MACHDEPLIB))
+
+#-----------------------------------------------------------------------
+#
+# List of AGRI object files:
+#
+#-----------------------------------------------------------------------
+
+AGRIMAINOBJ = arpsagri.o
+
+AGRIOBJS1 = manage.o setstr.o arpstgrid.o pointf.o initcgrd.o    \
+            util1.o regrid.o fill.o filgrd.o inivar.o updgrd.o   \
+            updbc.o tick.o arpsinit.o arpsolve.o arpscnst.o      \
+            arpsout.o usrout.o change_cnst.o updexbc.o
+
+AGRIOBJS = $(AGRIMAINOBJ) $(AGRIOBJS1) $(AGRI_MACHLIBOBJ)
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSCVT object codes
+#
+#-----------------------------------------------------------------------
+
+CVTMAINOBJ = arpscvt.o
+CVTOBJ1    = dummycvt.o
+CVTOBJ     = $(CVTMAINOBJ) $(CVTOBJ1)
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSDIFF object codes
+#
+#-----------------------------------------------------------------------
+
+DIFFOBJ = arpsdiff.o
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSEXTSND object codes
+#
+#-----------------------------------------------------------------------
+
+EXTSNDOBJ = arpsextsnd.o
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSINTRP object codes
+#
+#-----------------------------------------------------------------------
+
+INTRPOBJ    = arpsintrp.o
+INTRP_LSOBJ = arpsintrp_ls.o
+
+INTRPDUMOBJ = dummyintrp.o
+
+INTRPOBJS    = $(INTRPOBJ)    $(INTRPDUMOBJ)
+INTRP_LSOBJS = $(INTRP_LSOBJ) $(INTRPDUMOBJ)
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSPLT object codes
+#
+#-----------------------------------------------------------------------
+
+PLTMAINOBJ = arpsplt.o
+PLTMAXOBJ  = arpspltmax.o
+PLTGRIDOBJ = pltgrid.o
+
+PLTOBJS = arpspltlib.o read_surface_obs.o barb.o get_contour.o \
+          zxplot_add.o  dummyplt.o
+
+WIREFRMOBJ_ON  = wirfrm.o
+WIREFRMOBJ_OFF = wirfrmstub.o
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSPRT object codes
+#
+#-----------------------------------------------------------------------
+
+PRTMAINOBJ = arpsprt.o
+
+PRTOBJ = arpsprtlib.o dummyprt.o
+
+PRTOBJS = $(PRTMAINOBJ) $(PRTOBJ)
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSSFC object codes
+#
+#-----------------------------------------------------------------------
+
+SFCMAINOBJ = arpssfc.o
+
+SFCOBJS1 = arpssfclib.o
+
+SFCOBJS = $(SFCMAINOBJ) $(SFCOBJS1)
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSSOIL object codes
+#
+#-----------------------------------------------------------------------
+
+SOILMAINOBJ = arpssoil.o
+
+SOILOBJS1 = mksoilvar.o dummysoil.o
+
+SOILOBJS = $(SOILMAINOBJ) $(SOILOBJS1)
+
+#-----------------------------------------------------------------------
+#
+# List of ARPSTERN object codes
+#
+#-----------------------------------------------------------------------
+
+TRNOBJ = arpstern.o
+
+DIR1DEGOBJ  = dir1deg.o
+DIR5MINOBJ  = dir5min.o
+DIR30SECOBJ = dir30sec.o
+
+MERGETRNOBJ = mergetrn.o
+
+#-----------------------------------------------------------------------
+#
+# List of EXT2ARPS object codes
+#
+#-----------------------------------------------------------------------
+
+E2AMAINOBJ = ext2arps.o
+
+E2AOBJS1 = getextd3d.o gribio_c.o griblib3d.o rdnmcgrb3d.o \
+           nmcdecode.o getcoamps.o dummye2a.o
+
+GETLAPSOBJ   = getlaps3d.o
+GETGEMPAKOBJ = getgempak3d.o
+NOLAPSOBJ    = nolaps3d.o
+NOGEMPAKOBJ  = nogempak3d.o
+
+E2AOBJS = $(E2AMAINOBJ) $(E2AOBJS1) $(NOGEMPAKOBJ)  $(NOLAPSOBJ)
+L2AOBJS = $(E2AMAINOBJ) $(E2AOBJS1) $(NOGEMPAKOBJ)  $(GETLAPSOBJ)
+G2AOBJS = $(E2AMAINOBJ) $(E2AOBJS1) $(GETGEMPAKOBJ) $(NOLAPSOBJ)
+
+A2GOBJS = arps2gem.o v2dint.o
+
+#-----------------------------------------------------------------------
+#
+# List of 88D2ARPS object codes
+#
+#-----------------------------------------------------------------------
+
+88D2AMAINOBJ = 88d2arps.o
+
+88D2AOBJS1 = remaptilt.o remaplib.o remapdummy.o
+
+88D2AOBJS = $(88D2AMAINOBJ) $(88D2AOBJS1)
+
+88D2A_FKOBJS = fakeio.o
+
+NIDS2AMAINOBJ = nids2arps.o wsibase.o radarinfo.o
+
+NIDS2AOBJS = $(NIDS2AMAINOBJ) $(88D2AOBJS1)
+
+PLTRADMAINOBJ = pltradcol.o
+
+PLTRADOBJS1 = pltmap.o
+
+PLTRADCOLOBJS = $(PLTRADMAINOBJ) $(PLTRADOBJS1)
+
+#-----------------------------------------------------------------------
+#
+# List of object codes
+#
+#-----------------------------------------------------------------------
+
+M2AMAINOBJ = mci2arps.o
+
+M2AOBJS1 = sat_read.o sat_tran.o maptran.o gldtonat.o calib.o \
+           solcor.o sunfuncs.o inisatarps.o wtsatfld.o
+
+M2AOBJS = $(M2AMAINOBJ) $(M2AOBJS1)
+
+PLTSATMAINOBJ = pltsatfld.o
+
+PLTSATOBJS1 = pltmap.o
+
+PLTSATCOLOBJS = $(PLTSATMAINOBJ) $(PLTSATOBJS1)
+
+#-----------------------------------------------------------------------
+#
+# List of WTRETCOL object codes
+#
+#-----------------------------------------------------------------------
+
+WTRETCOLOBJ = wtretcol.o dummywtr.o
+
+#-----------------------------------------------------------------------
+#
+# List of splitter and joiner object files
+#
+#-----------------------------------------------------------------------
+
+SPLITOBJS = splitfiles.o fsplitdump.o fsplitexbc.o fsplitterrain.o \
+            fsplitsoil.o fsplitsoilini.o
+
+JOINOBJS  = joinfile.o fjoindumps.o
+
+JOINSOBJS = joinfiles.o fjoindumps.o
+
+#-----------------------------------------------------------------------
+#
+# Set Default
+#
+#-----------------------------------------------------------------------
+
+default: $(ARPSEXE)
+
+.f.o:
+	$(F77) $(FFLAGS) -c $<
+.c.o:
+	$(CC)  $(CFLAGS) -c $<
+
+#-----------------------------------------------------------------------
+#
+# Make all executables except arps_mp
+#
+#-----------------------------------------------------------------------
+
+all: $(ARPSEXE) $(ARPSREADEXE) $(AGRIEXE) $(ADASEXE) $(ARPSCVTEXE) \
+     $(DIFFEXE) $(EXTSNDEXE) $(INTRPEXE) $(INTRP_LSEXE)            \
+     $(PRTEXE) $(SFCEXE) $(SOILEXE) $(E2AEXE) $(TRNEXE)            \
+     $(DIR1DEGEXE) $(DIR5MINEXE)  $(DIR30SECEXE) $(WTRETCOLEXE)    \
+     $(PLTRADCOLEXE) $(RADSHIFT_EXE)                               \
+     $(SPLITEXE) $(JOINSEXE) $(JOINEXE)
+
+all_plot: $(PLTMAXEXE) $(PLTNCAREXE) $(PLTPOSTEXE) $(PLTGRIDEXE)
+
+all_gempak: $(A2GEXE) $(G2AEXE)
+
+#-----------------------------------------------------------------------
+#
+# Compile and link ARPS model executable, arps
+#
+#-----------------------------------------------------------------------
+
+$(ARPSEXE): $(ARPSMAINOBJ) $(ARPSOBJS)
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(ARPSMAINOBJ) $(ARPSOBJS) $(LIBS)
+
+#-----------------------------------------------------------------------
+#
+# Sample program to read ARPS history dump.
+#
+#-----------------------------------------------------------------------
+
+$(ARPSREADEXE): $(ARPSREADOBJ) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(ARPSREADOBJ) $(LIBARPS).a
+
+#-----------------------------------------------------------------------
+#
+# Make arpssolver.a, libarps.a, and shared.a
+#
+#-----------------------------------------------------------------------
+
+$(ARPSSOLVER).a: $(ARPSSOLVER)
+$(ARPSSOLVER): $(ARPSOBJS)
+	rm -f $(ARPSSOLVER).a
+	ar rc $(ARPSSOLVER).a $(ARPSOBJS)
+
+$(LIBARPS).a: $(LIBARPS)
+$(LIBARPS): $(LIBARPSOBJS)
+	rm -f $(LIBARPS).a
+	ar rc $(LIBARPS).a $(LIBARPSOBJS)
+
+#-----------------------------------------------------------------------
+#
+# Compile the ARPS Data Analysis System.
+#
+# The executable is  adas
+#
+#-----------------------------------------------------------------------
+
+$(ADASEXE): $(ADASOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(ADASOBJS) $(LIBARPS).a
+
+$(LIBADAS): $(LIBADAS).a
+$(LIBADAS).a: $(LIBADASOBJS)
+	ar rc $@ $(LIBADASOBJS)
+
+#-----------------------------------------------------------------------
+#
+# Compile and link ARPS AGRI executable, agri
+#
+#-----------------------------------------------------------------------
+
+$(AGRIEXE): $(AGRIOBJS) $(ARPSSOLVER).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(AGRIOBJS) $(ARPSSOLVER).a
+
+#-----------------------------------------------------------------------
+#
+# Compile and link data conversion program, arpscvt
+#
+#-----------------------------------------------------------------------
+
+$(ARPSCVTEXE): $(CVTOBJ) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(CVTOBJ) $(LIBARPS).a $(LIBS)
+
+#-----------------------------------------------------------------------
+#
+# Compare two data dumps and write out the difference in the
+# history dump format.
+#
+#-----------------------------------------------------------------------
+
+$(DIFFEXE): $(DIFFOBJ) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(DIFFOBJ) $(LIBARPS).a $(LIBADAS).a \
+                               $(LIBS)
+
+#-----------------------------------------------------------------------
+#
+# Compile and link the program that extracts a sounding profile at
+# a given column in the model history data.
+#
+# The executable is arpsextsnd
+#
+#-----------------------------------------------------------------------
+
+$(EXTSNDEXE): $(EXTSNDOBJ) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(EXTSNDOBJ) \
+                               $(LIBARPS).a $(LIBADAS).a
+
+#-----------------------------------------------------------------------
+#
+# Compile and link gridded data interpolation program - arpsintrp. 
+#
+#-----------------------------------------------------------------------
+
+$(INTRPEXE): $(INTRPOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(INTRPOBJS) $(LIBARPS).a $(LIBS)
+
+$(INTRP_LSEXE): $(INTRP_LSOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(INTRP_LSOBJS) $(LIBARPS).a $(LIBS)
+
+#-----------------------------------------------------------------------
+#
+# Graphic plotting:
+#
+#-----------------------------------------------------------------------
+
+$(PLTMAXEXE): $(PLTMAXOBJ) $(PLTOBJS) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(PLTMAXOBJ) $(PLTOBJS) \
+                               $(LIBARPS).a $(LIBADAS).a
+
+$(PLTNCAREXE): $(PLTMAINOBJ) $(PLTOBJS) $(WIREFRMOBJ_ON) \
+                         $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(PLTMAINOBJ) $(PLTOBJS) \
+                               $(WIREFRMOBJ_ON)         \
+                               $(LIBARPS).a $(LIBADAS).a
+
+$(PLTPOSTEXE): $(PLTMAINOBJ) $(PLTOBJS) $(WIREFRMOBJ_OFF) \
+                         $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(PLTMAINOBJ) $(PLTOBJS) \
+                               $(WIREFRMOBJ_OFF)        \
+                               $(LIBARPS).a $(LIBADAS).a
+
+$(PLTGRIDEXE): $(PLTGRIDOBJ) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(PLTGRIDOBJ) $(LIBARPS).a
+
+#-----------------------------------------------------------------------
+#
+# Compile and link data conversion program for systems
+# and generate executable arpsprt
+#
+#-----------------------------------------------------------------------
+
+$(PRTEXE): $(PRTOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(PRTOBJS) $(LIBARPS).a
+
+#-----------------------------------------------------------------------
+#
+# Compile surface data pre-processing program arpssfc
+#
+# The executable is  arpssfc
+#
+#-----------------------------------------------------------------------
+
+$(SFCEXE): $(SFCOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(SFCOBJS) $(LIBARPS).a
+
+#-----------------------------------------------------------------------
+#
+# Compile and link soil conversion program, arpssoil
+#
+#-----------------------------------------------------------------------
+
+$(SOILEXE): $(SOILOBJS) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(SOILOBJS) $(LIBARPS).a
+
+#-----------------------------------------------------------------------
+#
+# Compile and link terrain data preprocessing program arpstern.
+#
+# The executable is arpstern.
+#
+#-----------------------------------------------------------------------
+
+$(TRNEXE): $(TRNOBJ) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(TRNOBJ) $(LIBARPS).a
+
+$(DIR1DEGEXE): $(DIR1DEGOBJ)
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(DIR1DEGOBJ)
+
+$(DIR5MINEXE): $(DIR5MINOBJ)
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(DIR5MINOBJ)
+
+$(DIR30SECEXE): $(DIR30SECOBJ)
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(DIR30SECOBJ)
+
+$(MERGETRNEXE): $(MERGETRNOBJ) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(MERGETRNOBJ) $(LIBARPS).a $(LIBADAS).a
+
+#-----------------------------------------------------------------------
+#
+# Program ext2arps to convert external data set to the ARPS grid.
+#
+#-----------------------------------------------------------------------
+
+$(E2AEXE): $(E2AOBJS) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(E2AOBJS) $(LIBARPS).a $(LIBADAS).a \
+                               $(LIBS)
+
+$(L2AEXE): $(L2AOBJS) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(L2AOBJS) $(LIBARPS).a $(LIBADAS).a \
+                               $(LIBS)
+
+$(G2AEXE): $(G2AOBJS) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(G2AOBJS) $(LIBARPS).a $(LIBADAS).a \
+                               $(GEMLIB) $(APPL) $(SYSLIB) $(LIBS)
+
+$(A2GEXE): $(A2GOBJS) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(A2GOBJS) $(LIBARPS).a $(LIBADAS).a \
+                               $(GEMLIB) $(APPL) $(SYSLIB) $(LIBS)
+
+#-----------------------------------------------------------------------
+#
+# Compile and link 88d2arps
+#
+#-----------------------------------------------------------------------
+
+$(88D2AEXE_A2): $(88D2AOBJS) $(LIBARPS).a $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(88D2AOBJS) $(LIBARPS).a $(LIBADAS).a \
+                               $(LIBS)
+
+$(88D2AEXE_RT): $(88D2AOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(88D2AOBJS) $(LIBARPS).a \
+                               $(LIBS)
+
+$(88D2AEXE_FAKE): $(88D2AOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(88D2AOBJS) $(88D2A_FKOBJS) \
+                               $(LIBARPS).a $(LIBS)
+
+$(NIDS2AEXE): $(NIDS2AOBJS) $(LIBARPS).a \
+                            $(LIBADAS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(NIDS2AOBJS) \
+                               $(LIBARPS).a \
+                               $(LIBADAS).a $(LIBS)
+
+$(PLTRADCOLEXE): $(PLTRADCOLOBJS) $(LIBARPS).a
+	$(LDNCARF77) $(LDFLAGS) -o $@ $(PLTRADCOLOBJS) \
+                                      $(LIBARPS).a $(LIBS)
+
+#-----------------------------------------------------------------------
+#
+# Compile and link program mci2arps
+#
+#-----------------------------------------------------------------------
+
+$(MCI2AEXE): $(M2AOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(M2AOBJS) $(LIBARPS).a $(LIBS)
+
+$(PLTSATFLDEXE): $(PLTSATFLDOBJS) $(LIBARPS).a
+	$(LDNCARF77) $(LDFLAGS) -o $@ $(PLTSATFLDOBJS) \
+                                      $(LIBARPS).a $(LIBS)
+
+#-----------------------------------------------------------------------
+#
+# Compile and link program to write retrieval output
+#
+#-----------------------------------------------------------------------
+
+$(WTRETCOLEXE): $(WTRETCOLOBJ) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(WTRETCOLOBJ) $(LIBARPS).a
+
+#-----------------------------------------------------------------------
+#
+# Create data file splitter and joiner for general arps_mp
+#
+#-----------------------------------------------------------------------
+
+$(SPLITEXE): $(SPLITOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(SPLITOBJS) $(LIBARPS).a
+
+$(JOINSEXE): $(JOINOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(JOINOBJS) $(LIBARPS).a
+
+$(JOINEXE): $(JOINSOBJS) $(LIBARPS).a
+	$(ARPS_LD) $(LDFLAGS) -o $@ $(JOINSOBJS) $(LIBARPS).a
+
+#-----------------------------------------------------------------------
+#
+# Archive the source code, data, and input files for each individule
+# programs as well as the tar file including everything
+#
+#-----------------------------------------------------------------------
+
+$(ALLTAR): $(ALLFILESTAR) $(ARPSTAR) $(AGRITAR) $(CVTTAR) $(PLTTAR) \
+           $(PRTTAR) $(DIFFTAR) $(ADASTAR) $(SFCTAR) $(SOILTAR)     \
+           $(TRNTAR) $(EXTSNDTAR) $(ARPSMPTAR) $(READTAR) $(A2GTAR) \
+           $(MERGETRNTAR)
+
+#-----------------------------------------------------------------------
+#
+# Archive all the source code, data, and input files into one tar file
+#
+#-----------------------------------------------------------------------
+
+$(ALLFILESTAR):
+	@echo ""
+	@echo "Sorry, can not make Allfiles.tar"
+	@echo ""
+
+#-----------------------------------------------------------------------
+#
+# Archive all the source code, data, and input files into one tar file
+#
+#-----------------------------------------------------------------------
+
+$(ARPSTAR):
+	@echo ""
+	@echo "Sorry, can not make arps.tar"
+	@echo ""
+
+$(READTAR):
+	@echo ""
+	@echo "Sorry, can not make arpsread.tar"
+	@echo ""
+
+$(ADASTAR):
+	@echo ""
+	@echo "Sorry, can not make adas.tar"
+	@echo ""
+
+$(AGRITAR):
+	@echo ""
+	@echo "Sorry, can not make arpsagri.tar"
+	@echo ""
+
+$(CVTTAR):
+	@echo ""
+	@echo "Sorry, can not make arpscvt.tar"
+	@echo ""
+
+$(INTRPTAR):
+	@echo ""
+	@echo "Sorry, can not make arpsintrp.tar"
+	@echo ""
+
+$(PLTTAR):
+	@echo ""
+	@echo "Sorry, can not make arpsplt.tar"
+	@echo ""
+
+$(PRTTAR):
+	@echo ""
+	@echo "Sorry, can not make arpsprt.tar"
+	@echo ""
+
+$(DIFFTAR):
+	@echo ""
+	@echo "Sorry, can not make arpsdiff.tar"
+	@echo ""
+
+$(SFCTAR):
+	@echo ""
+	@echo "Sorry, can not make arpssfc.tar"
+	@echo ""
+
+$(SOILTAR):
+	@echo ""
+	@echo "Sorry, can not make arpssoil.tar"
+	@echo ""
+
+$(TRNTAR):
+	@echo ""
+	@echo "Sorry, can not make arpstern.tar"
+	@echo ""
+
+$(E2ATAR):
+	@echo ""
+	@echo "Sorry, can not make ext2arps.tar"
+	@echo ""
+
+$(EXTSNDTAR):
+	@echo ""
+	@echo "Sorry, can not make arpsextsnd.tar"
+	@echo ""
+
+$(ARPSMPTAR):
+	@echo ""
+	@echo "Sorry, can not make arps_mp.tar"
+	@echo ""
+
+$(A2GTAR):
+	@echo ""
+	@echo "Sorry, can not make arps2gem.tar"
+	@echo ""
+
+$(MERGETRNTAR):
+	@echo ""
+	@echo "Sorry, can not make mergetrn.tar"
+	@echo ""
+#-----------------------------------------------------------------------
+#
+# Remove the object code for individual programs
+#
+#-----------------------------------------------------------------------
+
+clean: clean.arps clean.solver clean.libarps clean.arpsread         \
+       clean.arpscvt clean.arpsdiff clean.arpsplt clean.arpsintrp   \
+       clean.arpsprt clean.arpssfc clean.arpstern clean.dirtern     \
+       clean.ext2arps clean.arpsextsnd clean.adas clean.arps2gem    \
+       clean.mergetrn clean.arpsagri clean.arpssoil clean.wtretcol  \
+       clean.arps_mp clean.source_mp clean.split clean.join         \
+       clean.joins clean.mptrans clean.libadas clean.88d2arps       \
+       clean.tar clean.mci2arps
+
+clean.exe:
+	$(RM) -f $(ARPSEXE)      $(ARPSREADEXE)  \
+	         $(ADASEXE)      $(AGRIEXE)      \
+	         $(ARPSCVTEXE)   $(DIFFEXE)      \
+	         $(INTRPEXE)     $(INTRP_LSEXE)  \
+	         $(EXTSNDEXE)    $(PLTGRIDEXE)   \
+	         $(PLTNCAREXE)   $(PLTPOSTEXE)   \
+                 $(PLTMAXEXE)    $(PRTEXE)       \
+	         $(SFCEXE)       $(SOILEXE)      \
+	         $(TRNEXE)       $(DIR1DEGEXE)   \
+                 $(DIR5MINEXE)   $(DIR30SECEXE)  \
+	         $(MERGETRNEXE)  $(E2AEXE)       \
+                 $(L2AEXE)       $(G2AEXE)       \
+	         $(A2GEXE)       $(WTRETCOLEXE)  \
+                 $(SPLITEXE)     \
+	         $(JOINEXE)      $(JOINSEXE)     \
+                 $(88D2AEXE_A2)  $(88D2AEXE_RT)  \
+                 $(88D2AEXE_FAKE) $(PLTRADCOLEXE) \
+                 $(MCI2AEXE)     $(PLTSATFLDEXE)
+
+clean.arps: clean.solver clean.libarps
+	$(RM) -f $(ARPSEXE) $(ARPSMAINOBJ) $(ARPSOBJS) \
+                 $(IOOBJS_ON) $(IOOBJS_OFF) $(MACHLIBOBJS) \
+                 $(NCARGOBJS)
+
+clean.solver:
+	$(RM) -f $(ARPSOBJS) $(ARPSSOLVER).a
+
+clean.libarps:
+	$(RM) -f $(LIBARPSOBJS) $(LIBARPS).a
+
+clean.arpsread:
+	$(RM) -f $(ARPSREADEXE) $(ARPSREADOBJ)
+
+clean.adas: clean.libadas
+	$(RM) -f $(ADASEXE) $(ADASMAINOBJ) $(ADASOBJS)
+
+clean.libadas:
+	$(RM) -f $(LIBADASOBJ) $(LIBADAS).a
+
+clean.arpsagri: clean.solver
+	$(RM) -f $(AGRIEXE) $(AGRIOBJS) $(AGRI_MACHLIBOBJS)
+
+clean.arpscvt: clean.libarps
+	$(RM) -f $(ARPSCVTEXE) $(CVTOBJ)
+
+clean.arpsdiff: clean.libarps clean.libadas
+	$(RM) -f $(DIFFEXE) $(DIFFOBJ)
+
+clean.arpsextsnd: clean.libarps clean.libadas
+	$(RM) -f $(EXTSNDEXE) $(EXTSNDOBJ)
+
+clean.arpsintrp: clean.libarps
+	$(RM) -f $(INTRPEXE)    $(INTRPOBJ)    \
+                 $(INTRP_LSEXE) $(INTRP_LSOBJ) \
+                 $(INTRPDUMOBJ)
+
+clean.arpsplt: clean.libarps clean.libadas
+	$(RM) -f $(PLTNCAREXE) $(WIREFRMOBJ_ON)  \
+                 $(PLTPOSTEXE) $(WIREFRMOBJ_OFF) \
+                 $(PLTMAXEXE)  $(PLTMAXOBJ)      \
+                 $(PLTMAINOBJ) $(PLTOBJS)        \
+                 $(PLTGRIDOBJ)
+
+clean.arpsprt: clean.libarps
+	$(RM) -f $(PRTEXE) $(PRTOBJS)
+
+clean.arpssfc: clean.libarps clean.libadas
+	$(RM) -f $(SFCEXE) $(SFCOBJS)
+
+clean.arpssoil: clean.libarps
+	$(RM) -f $(SOILEXE) $(SOILOBJS)
+
+clean.arpstern: clean.libarps
+	$(RM) -f $(TRNEXE) $(TRNOBJ)
+
+clean.dirtern:
+	$(RM) -f $(DIR1DEGEXE)  $(DIR1DEGOBJ)  \
+                 $(DIR5MINEXE)  $(DIR5MINOBJ)  \
+                 $(DIR30SECEXE) $(DIR30SECOBJ)
+
+clean.mergetrn: clean.libarps clean.libadas
+	$(RM) -f $(MERGETRNEXE) $(MERGETRNOBJ)
+
+clean.ext2arps: clean.libarps clean.libadas
+	$(RM) -f $(E2AEXE) $(E2AOBJS)      \
+                 $(L2AEXE) $(GETGEMPAKOBJ) \
+                 $(G2AEXE) $(GETLAPSOBJ)   \
+                 GEMINC:GEMPRM.PRM
+
+clean.88d2arps: clean.libarps clean.libadas
+	$(RM) -f $(88D2AEXE_A2)   $(88D2AEXE_RT)  \
+                 $(88D2AEXE_FAKE) $(PLTRADCOLEXE) \
+                 $(NIDS2AEXE) $(NIDS2AOBJS) \
+                 $(88D2AOBJS) $(88D2A_FKOBJS) $(PLTRADCOLOBJS)
+
+clean.mci2arps:
+	-$(RM) -f $(MCI2AEXE) $(PLTSATFLDEXE)  \
+                  $(M2AOBJS) $(PLTSATFLDOBJS)
+
+clean.arps2gem: clean.libarps clean.libadas
+	$(RM) -f $(A2GEXE) $(A2GOBJS) GEMINC:GEMPRM.PRM
+
+clean.wtretcol: clean.libarps
+	$(RM) -f $(WTRETCOLEXE) $(WTRETCOLOBJ)
+
+clean.arps_mp: clean.split clean.join clean.joins 
+
+clean.split:
+	$(RM) -f $(SPLITEXE) $(SPLITOBJS)
+
+clean.join:
+	$(RM) -f $(JOINEXE)  $(JOINOBJS)
+
+clean.joins:
+	$(RM) -f $(JOINSEXE) $(JOINSOBJS)
+
+clean.tar:
+	$(RM) -f $(ALLFILESTAR) $(ARPSTAR) $(AGRITAR) $(CVTTAR)  \
+                 $(PLTTAR) $(PRTTAR) $(DIFFTAR) $(ADASTAR)       \
+                 $(SFCTAR) $(SOILTAR) $(TRNTAR) $(EXTSNDTAR)     \
+                 $(ARPSMPTAR) $(READTAR) $(A2GTAR) $(MERGETRNTAR)
+
+#-----------------------------------------------------------------------
+#
+# Object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------
+#
+# ARPS object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+advct3d.o    : advct3d.f     bndry.inc globcst.inc phycst.inc
+advfct3d.o   : advfct3d.f    bndry.inc globcst.inc
+arps.o       : arps.f        bndry.inc dims.inc globcst.inc \
+                             radcst.inc phycst.inc
+arpslib3d.o  : arpslib3d.f
+bc3d.o       : bc3d.f        bndry.inc
+bcdif3d.o    : bcdif3d.f     globcst.inc
+binio.o      : binio.c       binio.h
+celtrk3d.o   : celtrk3d.f    globcst.inc
+chksym3d.o   : chksym3d.f
+cmix3d.o     : cmix3d.f      bndry.inc globcst.inc phycst.inc
+craylib3d.o  : craylib3d.f
+cumulus3d.o  : cumulus3d.f   cumucst.inc globcst.inc phycst.inc
+dump3d.o     : dump3d.f      bndry.inc exbc.inc globcst.inc
+energy3d.o   : energy3d.f    globcst.inc phycst.inc
+exbc3d.o     : exbc3d.f      exbc.inc globcst.inc
+exbcio3d.o   : exbcio3d.f    exbc.inc globcst.inc
+fft99f.o     : fft99f.f
+force3d.o    : force3d.f     bndry.inc globcst.inc phycst.inc
+lnxlib3d.o   : lnxlib3d.f
+genlib3d.o   : genlib3d.f
+gradsio3d.o  : gradsio3d.f   globcst.inc indtflg.inc
+gribdec3d.o  : gribdec3d.f   globcst.inc
+gribenc3d.o  : gribenc3d.f   globcst.inc
+gribio3d.o   : gribio3d.f    globcst.inc indtflg.inc
+grdtrns3d.o  : grdtrns3d.f   bndry.inc globcst.inc
+mpisubs.o    : mpisubs.f     globcst.inc bndry.inc 
+hdfio3d.o    : hdfio3d.f     globcst.inc indtflg.inc
+htchlib3d.o  : htchlib3d.f
+ibmlib3d.o   : ibmlib3d.f
+img3d.o      : img3d.f
+inibase3d.o  : inibase3d.f thermolib3d.f globcst.inc phycst.inc
+	$(F77) $(FFLAGS) $(THMFLAG) -c $<
+init3d.o     : init3d.f thermolib3d.f \
+                             bndry.inc exbc.inc globcst.inc \
+                             phycst.inc indtflg.inc soilcst.inc
+	$(F77) $(FFLAGS) $(THMFLAG) -c $<
+initpara3d.o : initpara3d.f  bndry.inc exbc.inc globcst.inc \
+                             phycst.inc soilcst.inc
+iolib3d.o    : iolib3d.f     globcst.inc
+irixlib3d.o  : irixlib3d.f
+irrad3d.o    : irrad3d.f radlib3d.f
+	$(F77) $(FFLAGS) $(RADFLAG) -c $<
+kfinterfc.o  : kfinterfc.f   globcst.inc
+kfpara.o     : kfpara.f
+maproj3d.o   : maproj3d.f
+micro3d.o    : micro3d.f thermolib3d.f globcst.inc phycst.inc
+	$(F77) $(FFLAGS) $(THMFLAG) -c $<
+micro_ice3d.o: micro_ice3d.f globcst.inc phycst.inc
+	$(F77) $(FFLAGS) $(ICEFLAG) -c $<
+micro_nem3d.o: micro_nem3d.f thermolib3d.f \
+                             globcst.inc nemcst.inc phycst.inc
+	$(F77) $(FFLAGS) $(THMFLAG) -c $<
+netio3d.o    : netio3d.f     globcst.inc indtflg.inc netcdf.inc
+nompsubs.o   : nompsubs.f
+nohdfio3d.o  : nohdfio3d.f
+nonetio3d.o  : nonetio3d.f
+nopakio3d.o  : nopakio3d.f
+nosviio3d.o  : nosviio3d.f
+nov5dio3d.o  : nov5dio3d.f
+operat3d.o   : operat3d.f    bndry.inc
+out3d.o      : out3d.f       bndry.inc exbc.inc globcst.inc phycst.inc
+outlib3d.o   : outlib3d.f    globcst.inc
+pakio3d.o    : pakio3d.f     indtflg.inc globcst.inc
+thermolib3d.o: thermolib3d.f globcst.inc
+raddata3d.o  : raddata3d.f
+radfrc3d.o   : radfrc3d.f    globcst.inc phycst.inc radcst.inc \
+                             bndry.inc soilcst.inc
+radlib3d.o   : radlib3d.f
+radtrns3d.o  : radtrns3d.f   globcst.inc phycst.inc radcst.inc
+raydmp3d.o   : raydmp3d.f    globcst.inc exbc.inc
+read3d.o     : read3d.f      globcst.inc indtflg.inc phycst.inc
+rst3d.o      : rst3d.f       bndry.inc globcst.inc exbc.inc
+setbdt3d.o   : setbdt3d.f    bndry.inc globcst.inc
+sfcphy3d.o   : sfcphy3d.f    globcst.inc phycst.inc sfcphycst.inc
+soildiag3d.o : soildiag3d.f  globcst.inc phycst.inc soilcst.inc
+soilebm3d.o  : soilebm3d.f thermolib3d.f \
+                             bndry.inc globcst.inc phycst.inc \
+                             soilcst.inc
+	$(F77) $(FFLAGS) $(THMFLAG) -c $<
+solve3d.o    : solve3d.f     bndry.inc exbc.inc globcst.inc phycst.inc
+sorad3d.o    : sorad3d.f radlib3d.f
+	$(F77) $(FFLAGS) $(RADFLAG) -c $<
+sunlib3d.o   : sunlib3d.f
+sviio3d.o    : sviio3d.f     globcst.inc meraf.inc
+timelib3d.o  : timelib3d.f
+tinteg3d.o   : tinteg3d.f    bndry.inc exbc.inc globcst.inc \
+                             radcst.inc phycst.inc
+tke3d.o      : tke3d.f       bndry.inc globcst.inc phycst.inc
+tmix3d.o     : tmix3d.f      bndry.inc globcst.inc phycst.inc
+v5d.o        : v5d.c         v5d.h vis5d.h
+v5dio3d.o    : v5dio3d.f     globcst.inc v5df.h
+vfftpack.o   : vfftpack.f
+wwcont3d.o   : wwcont3d.f    globcst.inc
+nudge.o      : nudge.f       globcst.inc nudging.inc
+
+arpsread.o   : arpsread.f    dims.inc globcst.inc
+
+ncarg3d.o    : ncarg3d.f
+noncarg3d.o  : noncarg3d.f
+
+#-----------------------------------------------------------------------
+#
+# ADAS object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+adas.o       : adas.f          adas.inc    \
+                               bndry.inc   \
+                               dims.inc    \
+                               globcst.inc \
+                               phycst.inc
+initadas.o   : initadas.f      adas.inc
+anxiter.o    : anxiter.f
+grd2obsth.o  : grd2obsth.f
+prepsfc.o    : prepsfc.f       phycst.inc
+prepradar.o  : prepradar.f     phycst.inc
+prepua.o     : prepua.f
+radarlib3d.o : radarlib3d.f    remap.inc remaptab.inc \
+                               globcst.inc
+prepretr.o   : prepretr.f
+
+prepsng.o    : prepsng.f       phycst.inc
+rdacars.o    : rdacars.f
+rdprofiles.o : rdprofiles.f    phycst.inc
+rdradcol.o   : rdradcol.f
+rdretcol.f   : rdretcol.f
+rdsfcobs.o   : rdsfcobs.f
+dummyadas.o  : dummyadas.f
+
+#-----------------------------------------------------------------------
+#
+# Object code dependency for ADAS cloud analysis
+#
+#-----------------------------------------------------------------------
+
+cloud_cv.o   : cloud_cv.f      adas.inc dims.inc
+cmpclddrv.o  : cmpclddrv.f     adas.inc dims.inc globcst.inc phycst.inc
+cldinsert.o  : cldinsert.f     adas.inc dims.inc
+cloud_lwc.o  : cloud_lwc.f     adas.inc dims.inc
+cmpcldlib.o  : cmpcldlib.f     adas.inc dims.inc
+rdsatfld.o   : rdsatfld.f
+rdwrtcld22.o : rdwrtcld22.f
+sunfuncs.o   : sunfuncs.f
+
+#-----------------------------------------------------------------------
+#
+# Object code dependency for libadas library:
+#
+#-----------------------------------------------------------------------
+
+anxlib3d.o   : anxlib3d.f      phycst.inc
+adjuvw3d.o   : adjuvw3d.f
+intfield21.o : intfield21.f
+smooth3d.o   : smooth3d.f
+thermo3d.o   : thermo3d.f
+mthermo.o    : mthermo.f
+
+#-----------------------------------------------------------------------
+#
+# AGRI object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpsagri.o:  arpsagri.f      agricst.h alloc.h cpu.h grddsc.h \
+                             grid.h nodal.h manage.h          \
+                             globcst.inc
+
+arpscnst.o:    arpscnst.f    agricst.h \
+                             bndry.inc     \
+                             cumucst.inc   \
+                             globcst.inc   \
+                             phycst.inc    \
+                             sfcphycst.inc \
+                             soilcst.inc
+
+arpsinit.o:    arpsinit.f    agricst.h alloc.h cpu.h  \
+                             grddsc.h grid.h nodal.h  \
+                             bndry.inc     \
+                             cumucst.inc   \
+                             globcst.inc   \
+                             phycst.inc    \
+                             sfcphycst.inc \
+                             soilcst.inc
+
+arpsolve.o:    arpsolve.f    alloc.h cpu.h grid.h nodal.h \
+                             globcst.inc
+
+arpsout.o:     arpsout.f     alloc.h cpu.h grid.h nodal.h \
+                             bndry.inc         \
+                             cumucst.inc       \
+                             globcst.inc       \
+                             phycst.inc        \
+                             sfcphycst.inc     \
+                             radcst.inc
+
+arpsplot.o:    arpsplot.f    alloc.h grddsc.h grid.h nodal.h
+arpstgrid.o:   arpstgrid.f   grddsc.h grid.h
+change_cnst.o: change_cnst.f alloc.h grid.h nodal.h
+filgrd.o:      filgrd.f      agricst.h alloc.h grddsc.h nodal.h
+fill.o:        fill.f        agricst.h alloc.h nodal.h
+initcgrd.o:    initcgrd.f    alloc.h grid.h nodal.h
+inivar.o:      inivar.f      agricst.h alloc.h grddsc.h grid.h nodal.h
+manage.o:      manage.f      agricst.h alloc.h manage.h nodal.h
+pointf.o:      pointf.f      alloc.h grddsc.h grid.h nodal.h
+regrid.o:      regrid.f      agricst.h cpu.h nodal.h
+setstr.o:      setstr.f      alloc.h grddsc.h grid.h nodal.h
+stgrid.o:      stgrid.f      grddsc.h grid.h
+tick.o:        tick.f        alloc.h cpu.h nodal.h
+updbc.o:       updbc.f       agricst.h alloc.h cpu.h grddsc.h grid.h \
+                             nodal.h
+updexbc.o:     updexbc.f     agricst.h alloc.h cpu.h \
+                             grddsc.h grid.h nodal.h \
+                             globcst.inc  \
+                             exbc.inc
+updgrd.o:      updgrd.f      agricst.h alloc.h grddsc.h grid.h nodal.h
+usrout.o:      usrout.f      alloc.h cpu.h grid.h nodal.h
+util1.o:       util1.f       agricst.h alloc.h cpu.h \
+                             grddsc.h grid.h nodal.h \
+                             globcst.inc
+
+packcray.o:    packcray.f    cpu.h
+packgen.o:     packgen.f
+packibm.o:     packibm.f
+packsun.o:     packsun.f
+cpucray.o:     cpucray.f
+cpugen.o:      cpugen.f
+cpuibm.o:      cpuibm.f
+cpusun.o:      cpusun.f
+
+#-----------------------------------------------------------------------
+#
+# ARPSCVT object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpscvt.o  : arpscvt.f     dims.inc globcst.inc indtflg.inc
+dummycvt.o : dummycvt.f
+
+#-----------------------------------------------------------------------
+#
+# ARPSDIFF object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpsdiff.o: arpsdiff.f    dims.inc globcst.inc indtflg.inc
+
+#-----------------------------------------------------------------------
+#
+# ARPSEXTSND object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpsextsnd.o : arpsextsnd.f   dims.inc globcst.inc phycst.inc
+
+#-----------------------------------------------------------------------
+#
+# ARPSINTRP Object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpsintrp.o   : arpsintrp.f          dims.inc intrpdims.inc  \
+                                     globcst.inc indtflg.inc
+
+arpsintrp_ls.o: arpsintrp_ls.f       dims.inc intrpdims.inc  \
+                                     globcst.inc indtflg.inc
+
+dummyintrp.o    : dummyintrp.f
+
+#-----------------------------------------------------------------------
+#
+# ARPSPLT object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpspltmax.o : arpspltmax.f  dims.inc
+pltgrid.o    : pltgrid.f     dims.inc intrpdims.inc globcst.inc
+
+arpsplt.o    : arpsplt.f thermolib3d.f arpsplt.inc \
+                             dims.inc globcst.inc indtflg.inc
+arpspltlib.o : arpspltlib.f  phycst.inc
+xncar.o      : xncar.f
+xpost.o      : xpost.f
+barb.o       : barb.f
+get_contour.o: get_contour.f
+zxplot_add.o : zxplot_add.f
+read_surface_obs.o : read_surface_obs.f
+wirfrm.o     : wirfrm.f
+wirfrmstub.o : wirfrmstub.f
+
+dummyplt.o   : dummyplt.f
+
+#-----------------------------------------------------------------------
+#
+# ARPSPRT object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpsprt.o  : arpsprt.f       dims.inc globcst.inc indtflg.inc
+arpsprtlib.o : arpsprtlib.f
+dummyprt.o   : dummyprt.f
+
+#-----------------------------------------------------------------------
+#
+# ARPSSFC object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpssfc.o     : arpssfc.f        arpssfc.inc dims.inc globcst.inc
+arpssfclib.o  : arpssfclib.f     arpssfc.inc globcst.inc phycst.inc
+
+#-----------------------------------------------------------------------
+#
+# ARPSSOIL object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpssoil.o    : arpssoil.f       dims.inc globcst.inc indtflg.inc
+mksoilvar.o   : mksoilvar.f
+barnes3d.o    : barnes3d.f
+dummysoil.o   : dummysoil.f
+
+#-----------------------------------------------------------------------
+#
+# ARPSTERN object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+arpstern.o  : arpstern.f     dims.inc globcst.inc indtflg.inc
+
+dir1deg.o   : dir1deg.f
+dir5min.o   : dir5min.f
+dir30sec.o  : dir30sec.f
+
+mergetrn.o  : mergetrn.f     extdims.inc dims.inc globcst.inc
+
+#-----------------------------------------------------------------------
+#
+# Object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+ext2arps.o   : ext2arps.f     extdims.inc bndry.inc dims.inc \
+extlib.o     : extlib.f       phycst.inc
+getcoamps.o  : getcoamps.f    extdims.inc
+getextd3d.o  : getextd3d.f    extdims.inc gribcst.inc
+getgempak3d.o: getgempak3d.f  extdims.inc
+	$(RM) -f GEMINC:GEMPRM.PRM
+	$(LN) -s $(INCDIR)/$(GEMINC) GEMINC:GEMPRM.PRM
+	$(F77) $(FFLAGS) -c $<
+getlaps3d.o  : getlaps3d.f    extdims.inc lapsparms.cmn
+gribio_c.o   : gribio_c.c
+griblib3d.o  : griblib3d.f    gribcst.inc
+nmcdecode.o  : nmcdecode.f
+nogempak3d.o : nogempak3d.f
+nolaps3d.o   : nolaps3d.f
+rdnmcgrb3d.o : rdnmcgrb3d.f   gribcst.inc
+
+dummye2a.o   : dummye2a.f
+
+arps2gem.o   : arps2gem.f     dims.inc globcst.inc phycst.inc \
+                              arps2gem.inc
+	$(RM) -f GEMINC:GEMPRM.PRM
+	$(LN) -s $(INCDIR)/$(GEMINC) GEMINC:GEMPRM.PRM
+	$(F77) $(FFLAGS) -c $<
+v2dint.o     : v2dint.f
+
+gribcst.inc: extdims.inc
+
+#-----------------------------------------------------------------------
+#
+# WTRETCOL object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+wtretcol.o: wtretcol.f       dims.inc globcst.inc indtflg.inc
+dummywtr.o: dummywtr.f
+
+#-----------------------------------------------------------------------
+#
+# 88D2ARPS object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+88d2arps.o  : 88d2arps.c
+fakeio.o    : fakeio.c
+fakerad.o   : fakerad.f        dims.inc globcst.inc indtflg.inc \
+                               remap.inc
+nids2arps.o : nids2arps.c      wsi.h
+pltmap.o    : pltmap.f
+pltradcol.o : pltradcol.f      dims.inc globcst.inc
+radarinfo.o : radarinfo.c
+remapdummy.o: remapdummy.f
+remaplib.o  : remaplib.f       dims.inc globcst.inc remap.inc \
+                               remaptab.inc remapsum.inc
+remaptilt.o : remaptilt.f      dims.inc globcst.inc remap.inc \
+                               remaptab.inc remapsum.inc
+wsibase.o   : wsibase.c        cfortran.h ulog.h alarm.h wsi.h
+wtradcol.o  : wtradcol.f       dims.inc globcst.inc remap.inc
+
+#-----------------------------------------------------------------------
+#
+# ARPS_MP object code dependency list:
+#
+#-----------------------------------------------------------------------
+
+fjoindumps.o    : fjoindumps.f       dims.inc
+fsplitdump.o    : fsplitdump.f       dims.inc
+fsplitexbc.o    : fsplitexbc.f       dims.inc
+fsplitsoil.o    : fsplitsoil.f       dims.inc
+fsplitsoilini.o : fsplitsoilini.f    dims.inc
+fsplitterrain.o : fsplitterrain.f    dims.inc
+joinfile.o      : joinfile.f         dims.inc
+joinfiles.o     : joinfiles.f        dims.inc bndry.inc exbc.inc \
+                                     globcst.inc phycst.inc
+splitfiles.o    : splitfiles.f
+

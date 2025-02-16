@@ -1,0 +1,418 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR RADAREMUL IN NAMELIST FORMAT     ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!
+!   AUTHOR:
+!
+!   Keith Brewster, CAPS 
+!   02/10/2004
+!
+!-----------------------------------------------------------------------
+!
+!
+!  This namelist block sets the input history data format and
+!  history data files.
+!
+!  hinfmt  History data dump format option. The available options are:
+!          = 0, no data dump is produced;
+!          = 1, unformatted binary data dump;
+!          = 2, formatted ascii data dump;
+!          = 3, NCSA HDF4 format data dump;
+!          = 4, Packed binary data dump;
+!          = 5, dump for Savi3D visualization package;
+!          = 6, binary allowing data point skip;
+!          = 7, NetCDF format (no longer supported starting from 4.1.5);
+!          = 8, Packed NetCDF format (no longer supported since from 4.1.5);
+!          = 9, GrADS data dump;
+!          = 10, GRIB data dump.
+!          = 11, Vis5D data dump.
+!
+!  hdmpinopt = Indicate the way history data files are specified.
+!            = 1, Data are at a constant time interval given start and
+!                 end times.  The files names are constucted using ARPS
+!                 history data naming convention given file header
+!                 (runname plus directory name in arps).
+!            = 2, Data files are explicitly listed.
+!
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               corresponding to runname plus directory name.
+!               e.g., hdmpfheader='./may20'.  (For hdmpinopt=1.)
+!
+!  hdmpftrailer Whatever character string following the time in the history
+!               file name. Usually it is for version number, grid number etc.
+!               E.g., hdmpftrailer='.g01.01'. If none, set to ''.
+!               Note: DO NOT include '.gz' associated with file compression.
+!               (For hdmpinopt=1.)
+!
+!  tintvdmpin  Time interval between history data dumps used (hdmpinopt=1).
+!  tbgndmpin   Time at which input history data begins (hdmpinopt=1).
+!  tenddmpin   Time at which input history data ends (hdmpinopt=1).
+!
+!  grdbasfn    Name of base-state and grid data file (hdmpinopt=2).
+!  nhisfile    Number of history files to be processed (hdmpinopt=2).
+!  hisfile(i)  History data files to be processed (hdmpinopt=2).
+!
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!-----------------------------------------------------------------------
+!
+
+ &history_data
+   hinfmt = 3,
+   hdmpinopt    = 1,
+     hdmpfheader = './may20',
+     hdmpftrailer= '',
+     tintv_dmpin = 60.0,
+     tbgn_dmpin  = 0.0,
+     tend_dmpin  = 4200.0,
+
+     grdbasfn = './may20.hdfgrdbas',
+
+     nhisfile = 3,
+     hisfile(1)  = './may20.hdf000000',
+     hisfile(2)  = './may20.hdf001800',
+     hisfile(2)  = './may20.hdf003600',
+ /
+!
+!-----------------------------------------------------------------------
+!
+!  Grid adjustment options
+!
+!  adjctr    Adjust center of grid
+!            =0 Use ctrlat and ctrlon from data file
+!            =1 Use ctrlatem and ctrlonem specified here
+!
+!            Note that the specified grid center is valid at time=0, if
+!            there is a umove, vmove associated with the model data,
+!            that grid movement will be applied after the ctrlat
+!            adjustment to allow storm movement with time.
+!
+!  ctrlatem  New ctrlat for adjctr = 1  Degrees North Latitude
+!  crtlonem  New ctrlon for adjctr = 1  Degrees East Longitude
+!
+!  adjhgt    Adjust grid point heights
+!            =0 Use ctrlat and ctrlon from data file
+!            =1 Use ctrlatem and ctrlonem specified here
+!  hgtoffset Offset to add to model grid heights for adjhgt = 1 (m)
+!
+!  adjmove   Adjust grid movement
+!            =0 Use umove and vmove from data file
+!            =1 Use umovein and vmovein specified here
+!  umovein   West-to-East component of grid movement (m/s)
+!  vmovein   South-to-North component of grid movement (m/s)
+!-----------------------------------------------------------------------
+!
+ &grid_adj
+  adjctr = 0,
+  ctrlatem = 35.80,
+  ctrlonem = -98.49,
+  adjhgt= 0,
+  hgtoffset = 164.,
+  adjmove = 0,
+  umovein = 3.,
+  vmovein = 14.,
+ /
+
+!
+!-----------------------------------------------------------------------
+!
+!  Output Options
+!
+!  ifmt      Format of output
+!            =1 Binary dump for plotting
+!            =2 NetCDF file for WDS-II Input (compile with -io net)
+!  creidx    Create Index File Containing NetCDF filenames? (for ifmt=2)
+!            =0 No
+!            =1 Yes
+!  ipktyp    netCDF packing type, use ipktyp=1
+!  nbits     netCDF pack bits, use nbits=16
+!  outdir    directory name
+!  nsmvort   Number of times to apply 1-2-1 filter to vorticity field
+!  wrtuaref  Write unattenuated reflectivity?
+!            =0 No
+!            =1 Yes
+!  wrtuavel  Write unattenuated velocity?
+!            =0 No
+!            =1 Yes
+!  wrtvort   Write vorticity interpolated from grid to gate center?
+!            =0 No
+!            =1 Yes
+!  wrtdualp  Write dual-pol variables?  Be sure to set dualpol in the
+!            radar_specs namelist below.
+!            =0 No
+!            =1 Yes
+!  wrtqx     Write qr, qs and qh variables? For checking species 
+!            diagnosis algorithms from dual-pol variables.
+!            Currently only works for binary format data.
+!            =0 No
+!            =1 Yes
+!
+!  wrtuvwt   Write u,v,w,t variables? For checking species 
+!            diagnosis algorithms from dual-pol variables.
+!            Currently only works for binary format data.
+!            =0 No
+!            =1 Yes
+!
+!-----------------------------------------------------------------------
+!
+ &output_opts
+   ifmt    = 1,
+   creidx  = 1,
+   ipktyp  = 1,
+   nbits   = 16,
+   outdir = './',
+   nsmvort = 1,
+   wrtuaref = 0,
+   wrtuavel = 0,
+   wrtvort = 1,
+   wrtdualp = 1,
+   wrtqx = 1,
+   wrtuvwt = 1,
+ /
+
+!
+!-----------------------------------------------------------------------
+!
+!  radname   radar name
+!  locopt    Location Specification Option:
+!            1: use radar lat,lon to get x,y
+!            2: use radar x,y to get lat,lon
+!  radlat    latitude (degrees N) of radar
+!  radlon    longitude (degrees E) of radar
+!  xrad      x location of radar (km)
+!  yrad      y location of radar (km)
+!  radelv    radar feedhorn elevation MSL (m)
+!
+!  Radar                      radlat     radlon    radelv
+!  KTLX (NEXRAD OKC)          35.3331   -97.2778    389.4
+!  KFDR (NEXRAD Frederick)    34.3622   -98.9764    400.9
+!  KVNX (NEXRAD Enid)         36.7408   -98.1275    378.9
+!  FAA OKC TDWR               35.2759   -97.5104    373.4
+!  KWTV-TV9                   35.5483   -97.4967    364.3
+!  NetRad Chickasha KSAO      35.0314   -97.9561    355.4
+!  NetRad Rush Springs KRSP   34.8128   -97.9305    435.9
+!  NetRad Cyril KCYR          34.8739   -98.2522    448.4
+!  NetRad Lawton-E KLWE       34.6239   -98.2708    396.2
+!
+!  dualpol   Dual-polarization radar
+!            0:no 1:yes
+!  wavelen   Radar wavelength (cm)
+!            NEXRAD 10.5     CASA NetRad 3.2
+!  beamwid   Half-power beamwidth (degrees)
+!            NEXRAD 0.89     CASA NetRad 1.8
+!  pwrxmt    Peak transmitter power (W)
+!            NEXRAD 475000.  CASA NetRad 25000.
+!  gaindb    Antenna gain (dB)
+!            NEXRAD 44.5     CASA NetRad 38.0
+!  lossdb    Receiver loss (dB)
+!            NEXRAD 5.0      CASA NetRad 5.0
+!  noisedbm  Receiver noise-level (dBm)
+!            NEXRAD -113.0   CASA NetRad -106.5
+!
+!-----------------------------------------------------------------------
+
+ &radar_specs
+   radname = 'ACFT'
+   locopt = 1,
+   mobileopt = 1,
+   mobilefile = 'aircraft_locs3.txt',
+   xrad = 165.5135,
+   yrad = 139.5150,
+   radlat = 35.55,
+   radlon = -97.65,
+   radelv = 2380.,
+   dualpol = 1,
+   wavelen = 3.2,
+   beamwid = 3.0,
+   pwrxmt = 500.,
+   gaindb = 38.0,
+   lossdb = 5.,
+   noisedbm = -106.5,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  ntilt     Number of elevation angles
+!  vcp       NEXRAD VCP number (i.e., 11,12,31 or 32)
+!            vcp=0, use custom elevation angles as specified below
+!  elev      Elevation angles (one per elev angle)
+!  ngate     number of gates
+!  gatesp    Gate spacing (m)
+!  rotdir    Rotation direction
+!             1 = Clockwise
+!            -1 = Counterclockwise
+!             2 = Alternating, beginning clockwise
+!            -2 = Alternating, beginning counter-clockwise
+!  rotropt   Rotation Rate Calculation Option
+!            1: Fixed rotation rate specified by rotrate,
+!               and delaz calculated from rotrate, PRT and npulse
+!            2: Fixed azimuthal sampling (delaz) with
+!               rotation rate calculated from PRT and npulse
+!  rotrate   Antenna rotation rate (degrees/sec)  
+!            18   NEXRAD typical
+!  delaz     Azimuth sampling interval (degrees)
+!            Used only when rotropt=2
+!  azim1     Beginning azimuth of sector scan (0. to 360.)
+!  azim2     Ending azimuth of sector scan (0. to 360.)
+!            azim1 and azim2 must be specified in a clockwise order
+!            even if scanning is done counterclockwise.
+!            Use azim2=azim1 to scan entire circle.
+!  unifpuls  Uniform Pulse Form Option
+!            0: Pulse forms specified individually by tilt number
+!            1: Uniform pulse form for all tilts specfied in index 1
+!            Applies to pulse length, width, PRT and npulse
+!  dualprf   Dual PRF Option
+!            0: Single PRF
+!            1: Dual PRF
+!  pulseopt  Pulse Specification Option
+!            1: Specify pulse length in seconds
+!            2: Specify pulse width in meters
+!  pulselen1 Pulse length (s) (first PRF) 
+!            One for each elevation angle, unless unifpuls=1
+!  pulselen2 Pulse length (s) (second PRF, if dualprf=1)
+!            One for each elevation angle, unless unifpuls=1
+!  pulsewid1 Pulse width (m) (first PRF) 
+!            One for each elevation angle, unless unifpuls=1
+!  pulsewid2 Pulse width (m) (second PRF, if dualprf=1)
+!            One for each elevation angle, unless unifpuls=1
+!  prt1      Pulse repitition time (s)  1.06e-03 NEXRAD typical
+!  prt2      Pulse repitition time (s)  (second PRF, if dualprf=1)
+!  npulse1   Number of samples used to compute moments 76 NEXRAD typical
+!            One for each elevation angle, unless unifpuls=1
+!  npulse2   Number of samples used to compute moments (second PRF) 
+!            One for each elevation angle, unless unifpuls=1
+!-----------------------------------------------------------------------
+!
+
+ &radar_opmode
+   ntilt = 1,
+   vcp = 0,
+   elev = 0.0,1.5,2.5,3.5,5.5,7.5,9.5,11.5,13.5,
+   ngate = 100,
+   gatesp = 200.,
+   rotdir = 1,
+   rotropt = 1,
+   rotrate = 16.,
+   delazm= 1.0,
+   azim1 = 300.,
+   azim2 = 60.,
+   delelv= 1.0,
+   elev1 = 0.,
+   elev2 = 0.,
+   unifpuls = 1,
+   dualprf = 0,
+   pulseopt = 2,
+   pulselen1 = 1.57E-06,
+   pulselen2 = 1.57E-06,
+   pulsewid1 = 200.,
+   pulsewid2 = 200.,
+   prt1 = 0.625e-03,
+   prt2 = 0.4167e-03,
+   npulse1 = 128,
+   npulse2 = 128,
+ /
+!
+!-----------------------------------------------------------------------
+!  nptsazm   Number of integration pts in azimuth 
+!            nptsazm is odd, minimum 5 (9-11 recommended)
+!            Increasing nptsazm increases execution time
+!  nptselv   Number of integration pts in elevation
+!            nptselv is odd, minimum 5 (9-11 recommended)
+!            Increasing nptselv increases execution time
+!  nptsrng   Number of integration pts in range
+!            nptsrng is odd, minimum 5 (9-11 recommended)
+!            Increasing nptsrng increases execution time
+!  evalwid   Width of evaluation area as a multiple of 
+!            half-power (1-way) beamwidth.  
+!            1.0 < evalwid  < 3.0  Suggested evalwid=2.0
+!
+!  refmin    Minimum reflectivity to use for velocity calculation
+!  rngmin    Mimimum range of data to report (m)
+!  kntrmin   Minumum number of grid points for valid weighted avg
+!            of reflectivity (3 typical)
+!  kntvmin   Minumum number of grid points for valid weighted avg
+!            of radial velocity (3 typical)
+!  dualpopt  Method for calculating dual-pol variables
+!            =1 Using Rayleigh scatter S-band equation set
+!            =2 Using T-matrix X-band equation set
+!  attenopt  Attenuation option.
+!            0: No attenuation
+!            1: X-band attenuation
+!  senstvopt Data with attenuated signal strength less than estimated 
+!            radar sensitivity are set to missing.
+!            0: No sensitivity thresholding
+!            1: Apply X-band sensitivity thresholding
+!  rferropt  Reflectivity Error Option
+!            1: Use fixed reflectivity error, sigmarf
+!            2: Calculate reflectivity error based on SNR
+!  rferrloi  Level of independence of samples assumed for rferropt=2
+!            0.0 < rferrloi <= 1.0
+!            1.0 indicates samples are completely independent
+!  sigmarf   Standard deviation of error for reflectivity (dBZ)
+!            Use 0 for no added Gaussian error
+!  vrerropt  Radial Velocity Error Option
+!            1: Use fixed vr error, sigmavr
+!            2: Calculate vr based on estimated SNR, estimated
+!               spectrum width and number of samples.
+!  samploi   Level of independence of samples assumed for SNR-based error
+!            0.0 < samploi <= 1.0
+!            1.0 indicates pulse samples are completely independent
+!  stdvrmul  Multiplier converting standard deviation of velocities used
+!            in evaluating beam integral to an estimate of spectrum width
+!            for use in vrerropt=2.
+!  sigmavr   Standard deviation of error for velocity (m/s)
+!            Base standard deviation of error for velocity for vrerropt=2
+!            Use 0 for no added Gaussian error
+!  tmadvopt  Option to advance time with each tilt to simulate 
+!            time change during volume scan.
+!            0: time for all tilts same as forecast file time
+!            1: advance time by timeincr seconds for each tilt (default)
+!            2) advance time by number of seconds actual tilt scan would take
+!               function of sector size and rotation rate
+!  timeincr  Increment of time (seconds) for tmadvopt=1
+!  rmisval   Value to assign for missing data
+!  rngfval   Value to assign for range folded data
+!  nyqstopt  Nyquist Velocity Option
+!            1: Use fixed Nyquist Velocity
+!            2: Use actual Nyquist velocity, based on PRT
+!  vnyquist  Nyquist velocity (m/s) (one per elev angle)
+!
+!-----------------------------------------------------------------------
+
+ &emul_specs
+   int_method=2,
+   blockopt=0,
+   nptsazm=13,
+   nptselv=13,
+   nptsrng=9,
+   evalwid=1.9,
+   refmin=0.,
+   rngmin=100.,
+   kntrmin=3,
+   kntvmin=3,
+   dualpopt=2,
+   attenopt=0,
+   senstvopt=0,
+   rferropt=0,
+   sigmarf=0.0,
+   vrerropt=0,
+   sigmavr=0.0,
+   samploi=0.5,
+   stdvrmul=1.0,
+   tmadvopt=1,
+   timeincr=1.,
+   rmisval=-99900.,
+   rngfval=-99901.,
+   nyqstopt=1,
+   vnyquist = 100.,100.,100.,100.,100.,100.,100.,100.,100.,
+ /

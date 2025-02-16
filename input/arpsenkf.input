@@ -1,0 +1,1333 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ENKF IN NAMELIST FORMAT         ######
+!     ######                 ( Version arps5.3 )                  ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!  This file contains the input parameters in the NAMELIST format.
+!  used by ARPSENKF, OSSEDATA and other programs related to ARPSenkf system.
+!  test
+!
+!-----------------------------------------------------------------------
+!
+!  Author:
+!  Mingjing Tong (09/01/2002)
+!
+!  Modified history:
+!
+!  Youngsun Jung (07/20/2007)
+!  Added polarimetric variables
+!
+!  Youngsun Jung (03/18/2009)
+!  Merged radar assimilation option blocks
+!
+*-----------------------------------------------------------------------
+!
+!  Parameters for ARPS background input files
+!
+!  nproc_x_in  Number of patches of ARPS background file in X direction
+!  nproc_y_in  In Y direction.
+!
+!    This program handle the following 5 scenarios:
+!   1. Serial job reads one joined ARPS file;
+!   2. Serial job reads ARPS files in several patches;
+!   3. Parallel job reads one joined ARPS file;
+!   4. Parallel job reads the same number of patches of ARPS files
+!      nproc_x = nproc_x_in
+!      nproc_y = nproc_y_in
+!   5. Parallel job reads ARPS background file in smaller patches.
+!      nproc_x_in/nproc_x > 1
+!      nproc_y_in/nproc_y > 1
+!
+!  inidirname  Diretory pattern for the ARPS files. It accepts one pattern
+!              for accomodating multiple ensemble members '%xN' where
+!              'x' is one-digit number. For example,
+!              inidirname = './ENF%3N',
+!              The program will look for saparate diretory name for each
+!              ensemble member.
+!              './ENF001',
+!              './ENF002',
+!              ...
+!              etc.
+!
+!----------------------------------------------------------------------=*
+
+ &arps_input
+   nproc_x_in = 1,
+   nproc_y_in = 1,
+
+   inidirname = './',
+ /
+
+*-----------------------------------------------------------------------
+!
+!  Parameters associated with ensemble analysis method
+!
+!  nen     Number of Ensemble members
+!
+!  casenam Name of this run
+!
+!  assim_time   The model time of the current assimilation cycle.
+!
+!  anaopt  Option of analysis method
+!          = 1, EnKF
+!          = 2, EnSRF
+!          = 3, EAKF (Not available yet)
+!
+!  fatime  The model time of the first analysis
+!          used to determine if base-state and grid history file will be output
+!          (when time == fatime); and if covariance inflation will be
+!          applied (when time > fatime).
+!
+!  timeext Option to use time-extended sampling approach (Xu et. al. MWR 2008)
+!          = 0, no
+!          = 1, yes
+!    nr    Number of ensemble prediction runs
+!          (The first nr ensemble members are from prediction run)
+!
+!  Covariance inflation options:
+!
+!  mult_inflat    multiplicative inflation (prior to arps5.3, handled by covinflat = 1 or 2)
+!            = 0, no multiplicative inflation
+!            = 1, multiplicative inflation only in regions influenced by radar obs (**DEFAULT**)
+!            = 2, multiplicative inflation EVERYWHERE.
+!
+!       zcovinf   Reflectivity threshold used to find the region of
+!                 covariance inflation (when mult_inflat=1)
+!       cinf      Covariance inflation factor (a number larger than 1,
+!                 Anderson MWR 2001, for mult_inflat=1 or 2)
+!
+!       inf_h_width  Scale factor of transition zone width in horizontal direction
+!                    for mult_inflat = 1 (zone width = (1+inf_h_width)*r0hz)
+!       inf_v_width  Scale factor of transition zone depth in vertical direction
+!                    for mult_inflat = 1 (zone depth = (1+inf_h_width)*r0hz)
+!
+!    <Note> For mult_inflat = 1, covariance inflation mask function is used.
+!           Each grid point gets assigned a value between 0 and 1 (exclusively) depending
+!           on the distance from the observed radar echo.
+!           The value is equal to 1 in regions with full inflation and 0 in regions with
+!           no inflation, and in-between in transition region.
+!           Usually, regions directly influenced by radar data are set to 1, and regions
+!           no influenced by radar data is set to 0.
+!           The function decreases from 1 to 0 linearly in a transition zone.
+!
+!    add_inflat       additive inflation (prior to arps5.3, handled by covinflat = 3 or 4)
+!                = 0       no additive inflation (**DEFAULT**)
+!                = 1       adds random perturbations to prior ensemble
+!                = 2       adds random perturbations to posterior ensemble
+!                = 3       same as add_inflat = 1, but adds SMOOTHED perturbations.
+!                = 4       same as add_inflat = 2, but adds SMOOTHED perturbations.
+!
+!       pertdir   Directory saving random perturbations (when add_inflat = 3 or 4)
+!       mdeu      Std dev of random perturbation for u
+!       mdev      Std dev of random perturbation for v
+!       mdew      Std dev of random perturbation for w
+!       mdeptprt  Std dev of random perturbation for ptprt
+!       mdepprt   Std dev of random perturbation for pprt
+!       mdeqv     Std dev of random perturbation for qv
+!       mdeqc     Std dev of random perturbation for qc
+!       mdeqr     Std dev of random perturbation for qr
+!       mdeqi     Std dev of random perturbation for qi
+!       mdeqs     Std dev of random perturbation for qs
+!       mdeqg     Std dev of random perturbation for qg
+!       mdeqh     Std dev of random perturbation for qh
+!
+!    <Note> Do not use relax_inflat and adapt_inflat together.
+!
+!    relax_inflat       covariance relaxation method (prior to arps5.3, handled by covinflat = 5)
+!                = 0       relaxation not used (**DEFAULT**)
+!                = 1       uses covariance relaxation (Zhang et al., MWR 2004)
+!
+!    adapt_inflat       Adaptive covariance inflation following Whitaker.
+!                = 0    not used (**DEFAULT**)
+!                = 1    used
+!
+!    rlxf        Relaxation factor (a number in between 0 and 1,
+!                for relax_inflat = 1 or adapt_inflat == 1)
+!    taperf      Inflation factor for the tapering function for adapt_inflat
+!                inflation factor = rlxf + taper(distance dependent varaible)*taperf
+!                defult is 0.0 (off) but 0.2 is recommended if it is used.
+!    lnsigcovinfcutoff   length for vertical taper in inflation in ln(sigma)
+!
+!    infp  Option to apply covariance inflation to pressure
+!          = 0, no
+!          = 1, yes
+!
+!  Covariance localization options:
+!  filter  Option to use filter when computing Kalman gain
+!          = 0, grid points beyond the cutoff radius are not updated
+!          = 1, use the correlation function [Eq. (4.10) of Gaspari &
+!               Cohn 1999] that decreases monotonically with increasing
+!               3D distance between model grid and observation point
+!               (r0h should equal to r0v)
+!          = 2, use the same correlation function as 1, but
+!               the correlation fuction are used seperately
+!               in horizontal and vertical directions. (r0h \= r0v)
+!
+!    r0hvr Radius of influence in horizontal direction for Vr
+!    r0vvr Radius of influence in vertical direction for Vr
+!    r0hz  Radius of influence in horizontal direction for z
+!    r0vz  Radius of influence in vertical direction for z
+!
+!    covflgopt   Option to read in covariance inflation mask file.
+!             = 0 generate masking values on-the-fly or create mask dump file.
+!             = 1 read in pre-generated covariance inflation mask file.
+!             = 2 generate masking values on-the-fly but do not dump.
+!             = -1 neither compute mask coefficient nor read in.
+!                 (Use this setup for postinnov)
+!         Note: file name = hdmpdir//hdmpfheader//'.hdfwgt__u'//time
+!
+!  Options for updating model state variables:
+!
+!  The time beyond which particular model variables is updated
+!       when assimilating Vr or Z.
+!  If the update time is set to a negative value, the variable
+!       will not be updated.
+!
+!  If the update time is set to zero, the variable will always be updated.
+!
+!  Vr_updtime_uv     Time beyond which u and v are updated when assimilating Vr
+!  Vr_updtime_w      Time beyond which w is updated when assimilating Vr
+!  Vr_updtime_ptprt  Time beyond which ptprt is updated when assimilating Vr
+!  Vr_updtime_pprt   Time beyond which pprt is updated when assimilating Vr
+!  Vr_updtime_qv     Time beyond which qv is updated when assimilating Vr
+!  Vr_updtime_qcrish Time beyond which qc, qr, qi, qs, qh are updated when
+!                    assimilating Vr
+!  Vr_updtime_ncrish Time beyond which Nt(c,r,i,s,h) are updated when
+!                    assimilating Vr
+!
+!  Z_updtime_uv      Time beyond which u and v are updated when assimilating Z.
+!  Z_updtime_w       Time beyond which w is updated when assimilating Z.
+!  Z_updtime_ptprt   Time beyond which ptprt is updated when assimilating Z.
+!  Z_updtime_pprt    Time beyond which pprt is updated when assimilating Z.
+!  Z_updtime_qv      Time beyond which qv is updated when assimilating Z.
+!  Z_updtime_qc      Time beyond which qc is updated when assimilating Z.
+!  Z_updtime_qi      Time beyond which qi is updated when assimilating Z.
+!  Z_updtime_qrsh    Time beyond which qr, qs and qh are updated when assimilating Z.
+!  Z_updtime_ncrish  Time beyond which Nt(c,r,i,s,h) are updated when assimilating Z
+!
+!  <Below parameters are reserved but not implemented yet.>
+!  DP_updtime_uv      Time beyond which u and v are updated when assimilating DP.
+!  DP_updtime_w       Time beyond which w is updated when assimilating DP.
+!  DP_updtime_ptprt   Time beyond which ptprt is updated when assimilating DP.
+!  DP_updtime_pprt    Time beyond which pprt is updated when assimilating DP.
+!  DP_updtime_qv      Time beyond which qv is updated when assimilating DP.
+!  DP_updtime_qc      Time beyond which qc is updated when assimilating DP.
+!  DP_updtime_qi      Time beyond which qi is updated when assimilating DP.
+!  DP_updtime_qrsh    Time beyond which qr, qs and qh are updated when assimilating DP.
+!  DP_updtime_ncrish  Time beyond which Nt(c,r,i,s,h) are updated when assimilating DP.
+!
+!  DP_delay_opt      Option to delay the assimilaton of polarimetric data
+!  DP_update_delay   Time delayed for polarimetric data
+!
+!  vrqcopt         Option to apply simple QC to Vr observations
+!                  Only applied when {analysis time >= Vr_updtime_uv+Vr_QC_delay}.
+!                  Vr observations is discarded when
+!            = 1   ABS(Vr_enmean - Vr_obs) > Vr_factor*std(Vr_ensemble)
+!            = 2   The same as 1 but vrqcthr replaces Vr_factor*std(Vr_ensemble)
+!                  if Vr_factor*std(Vr_ensemble) < vrqcthr
+!                  where vrqcthr varies with height as defined in data/adas/vrerr.enkfstab.
+!    Vr_QC_delay   Time delayed for Vr QC
+!    Vr_factor     Multiplicative factor for Vr observation thresholding
+!    Vr_err_fn     File name that contains Vr error threshold.
+!
+!  updt_hgt    The upper bound of height, below which model state variables
+!              are updated (in meters)
+!
+!  enforcebc   Option to enforce zero-gradient lateral BC and rigid for
+!              top and bottom BCs on the analysis.
+!
+!              = 0, no
+!              = 1, yes
+!
+!  epsQ       Minimun mixing ratio to compensate spurious error growth
+!  epsN       Minimun number concentration to compensate spurious error growth
+!
+!  modopt        Option of forecast model
+!               = 1, ARPS
+!               = 2, WRF
+!
+!  time_filter   option to use filter for AEnSRF
+!  r0time        radius of influence in time dimension
+!
+!  hrchcl_filter   Option to use hierarchical filter (Anderson, 2007)
+!  grpnum          number of groups used for hierarchical filter
+!  ratio2dw        ratio between  hrchcl_filter and distance depend filter
+!
+!----------------------------------------------------------------------=*
+
+ &anapara
+   nen = 40,
+   casenam = 'may20',
+   assim_time = 1500.0,
+   anaopt = 2,
+   fatime = 1500.0,
+
+   timeext = 0,
+     nr = 0,
+
+   mult_inflat = 1,
+     zcovinf = 5.0,
+     cinf = 1.2,
+
+     inf_h_width = 0.0,
+     inf_v_width = 0.0,
+
+   add_inflat = 0,
+       pertdir = '/scratch/yjung/EnKF/ranpert',
+       mdeu = 0.0,
+       mdev = 0.0,
+       mdew = 0.0,
+       mdeptprt = 0.0,
+       mdepprt = 0.0,
+       mdeqv = 0.0,
+       mdeqc = 0.0,
+       mdeqr = 0.0,
+       mdeqi = 0.0,
+       mdeqs = 0.0,
+       mdeqg = 0.0,
+       mdeqh = 0.0,
+
+   relax_inflat = 0,
+   adapt_inflat = 0,
+     rlxf = 0.5,
+     taperf = 0.0,
+     lnsigcovinfcutoff = 6.,
+
+   infp = 0,
+
+   filter = 1,
+     r0hvr = 6000.0,
+     r0vvr = 6000.0,
+     r0hz = 6000.0,
+     r0vz = 6000.0,
+
+     covflgopt = 0,
+
+   Vr_updtime_uv = 0.0,
+   Vr_updtime_w = 0.0,
+   Vr_updtime_ptprt = 0.0,
+   Vr_updtime_pprt = 0.0,
+   Vr_updtime_qv = 0.0,
+   Vr_updtime_qcrish = 0.0,
+   Vr_updtime_ncrish = 0.0,
+
+   Z_updtime_uv = 0.0,
+   Z_updtime_w = 0.0,
+   Z_updtime_ptprt = 0.0,
+   Z_updtime_pprt = 0.0,
+   Z_updtime_qv = 0.0,
+   Z_updtime_qc = 0.0,
+   Z_updtime_qi = 0.0,
+   Z_updtime_qrsh = 0.0,
+   Z_updtime_ncrish = 0.0,
+
+   DP_delay_opt = 0,
+   DP_update_delay = 0.0,
+
+   vrqcopt = 0,
+     Vr_QC_delay = 0.,
+     Vr_factor = 5.,
+     Vr_err_fn = '/home/yjung/arps5.3/data/adas/vrerr.enkftab',
+
+   updt_hgt = 16000.0,
+
+   enforcebc = 0,
+
+   epsQ = 0.0,
+   epsN = 0.0,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  CONVENTIONAL DATA ASSIMILATION PARAMETERS (used by ARPSENKF and/or OSSEDATA)
+!  NOTE> To add Gaussian random error to simulated observations in OSSEDATA,
+!        set randomerr == 1 in ossedata_para block.
+!        'err_sfc_xxx', 'err_snd_xxx', 'err_pro_xxx' are used as
+!        the standard deviation of Gaussian error.
+!
+!  cvndatadir  The directory where the conventional data are
+!              Surface data  yyyymmddhhss.lso (sao and mesonet)
+!              Sounding data yyyymmddhhss.snd
+!              Profile data  yyyymmddhhss.pro
+!
+!  innovcvn    Option to output difference between observation and model
+!              = 0, no
+!              = 1, yes, dif*f(a).txt for before(after) enkf analysis
+!
+!  sfcassim    Option whether surface data are analyzed
+!              = 0, no
+!              = 1, yes
+!
+!    The following parameters will be in effect when sfcassim = 1
+!
+!    blackfile    Used to check surface observations
+!
+!    sfc_intopt   Option for surface data observation operator
+!                 = 0, interpolation (default)
+!                 = 1, Monin-Obhuhov (M-O) formula, when use this option,
+!                      please set use_sfc_t = 0/1 and use_sfc_td = 0/2
+!
+!    use_sfc_uv   = 0, no
+!                 = 1, yes
+!    use_sfc_t    = 0, no
+!                 = 1, use  t, work with err_sfc_t/dif_sfc_t
+!                 = 2, use pt, work with err_sfc_pt/dif_sfc_pt
+!    use_sfc_td   = 0, no
+!                 = 1, use td, work with err_sfc_td/dif_sfc_td
+!                 = 2, use qv, work with err_sfc_qv/dif_sfc_qv
+!                 = 3, use rh, work with err_sfc_rh/dif_sfc_rh
+!    use_sfc_p    = 0, no
+!                 = 1, yes
+!
+!    c.f. saoerr.adastab, mesoerr.adastab, raoberr.adastab, profilerr.adastab
+!    err_sfc_uv   Standard observation error for u/v (m/s)
+!    err_sfc_t    Standard observation error for t (C)
+!    err_sfc_t_meso    Standard observation error for mesonet t (C)
+!    err_sfc_td   Standard observation error for td (C)
+!    err_sfc_p    Standard observation error for p (hPa)
+!    err_sfc_pt   Standard observation error for pt (K)
+!    err_sfc_qv   Standard observation error for qv (kg/kg)
+!    err_sfc_rh   Standard observation error for rh
+!
+!    dif_sfc_uv   Difference threshold to discard surface u/v (m/s)
+!    dif_sfc_t    Difference threshold to discard surface t (C)
+!    dif_sfc_td   Difference threshold to discard surface td (C)
+!    dif_sfc_p    Difference threshold to discard surface p (hPa)
+!    dif_sfc_pt   Difference threshold to discard surface pt (K)
+!    dif_sfc_qv   Difference threshold to discard surface qv (kg/kg)
+!    dif_sfc_rh   Difference threshold to discard surface rh
+!
+!    sfcweight    Option to calculate distance-dependent weight in Kalman gain
+!                 = 1, horizontal filter weight  using sfcr0h
+!                 = 2, three-dimensional weight2 using sfcr0h/sfcr0v
+!    sfcr0h       Surface horizontal cutoff radius
+!    sfcr0h_meso  Surface horizontal cutoff radius for mesonet observations
+!    sfcr0v       Surface vertical cutoff radius
+!
+!  Similar parameters for sounding/profile data
+!
+!  (following 2 parameters are only used by OSSEDATA)
+!  cvn_iskip      Grid interval to create conventional data in x-direction
+!  cvn_jskip      Grid interval to create conventional data in y-direction
+!  cvn_var        Gaussian function shape factor for location sampling
+!                 Smaller number indicates narrower distribution
+!----------------------------------------------------------------------=*
+
+ &enkf_conventional
+   cvndatadir = './',
+   innovcvn = 1,
+
+   sfcassim = 0,
+     blackfile = 'blacklist.sfc',
+     sfc_intopt = 0,
+
+     use_sfc_uv = 1, err_sfc_uv =   1.5, dif_sfc_uv = 15.0,
+     use_sfc_t  = 2, err_sfc_t  =   1.5, dif_sfc_t  = 20.0, err_sfc_t_meso = 1.11,
+                     err_sfc_pt =   2.0, dif_sfc_pt = 20.0,
+     use_sfc_td = 1, err_sfc_td =   2.0, dif_sfc_td = 20.0,
+                     err_sfc_qv = 0.001, dif_sfc_qv = 0.01,
+                     err_sfc_rh =  0.05, dif_sfc_rh =  0.5,
+     use_sfc_p  = 1, err_sfc_p  =   2.0, dif_sfc_p  = 20.0,
+
+     sfcweight = 2,
+     sfcr0h      = 75000.0,
+     sfcr0h_meso = 50000.0,
+     sfcr0v      = 6000.0,
+
+     sfc_updt_u     = 1, sfc_updt_v  = 1, sfc_updt_w  = 1, sfc_updt_pprt = 0,
+     sfc_updt_ptprt = 1, sfc_updt_qv = 1, sfc_updt_qc = 1, sfc_updt_qr   = 1,
+     sfc_updt_qi    = 1, sfc_updt_qs = 1, sfc_updt_qh = 1,
+
+     sfc_updt_tsoil = 0, sfc_updt_qsoil = 0,
+
+   sndassim = 0,
+     use_snd_uv = 1, err_snd_uv =   2.5, dif_snd_uv = 25.0,
+     use_snd_t  = 2, err_snd_t  =   1.2, dif_snd_t  = 20.0,
+                     err_snd_pt =   2.0, dif_snd_pt = 20.0,
+     use_snd_td = 1, err_snd_td =   2.0, dif_snd_td = 20.0,
+                     err_snd_qv = 0.001, dif_snd_qv = 0.01,
+                     err_snd_rh =  0.08, dif_snd_rh =  0.5,
+     use_snd_p  = 1, err_snd_p  =   0.6, dif_snd_p  =  6.0,
+
+     sndweight = 2,
+     sndr0h = 150000.0,
+     sndr0v = 6000.0,
+
+     snd_updt_u     = 1, snd_updt_v  = 1, snd_updt_w  = 1, snd_updt_pprt = 1,
+     snd_updt_ptprt = 1, snd_updt_qv = 1, snd_updt_qc = 1, snd_updt_qr   = 1,
+     snd_updt_qi    = 1, snd_updt_qs = 1, snd_updt_qh = 1,
+
+   proassim = 0,
+     use_pro_uv = 1, err_pro_uv = 2.5, dif_pro_uv = 25.0,
+
+     proweight = 2,
+     pror0h = 150000.0,
+     pror0v = 6000.0,
+
+     pro_updt_u     = 1, pro_updt_v  = 1, pro_updt_w  = 1, pro_updt_pprt = 1,
+     pro_updt_ptprt = 1, pro_updt_qv = 1, pro_updt_qc = 1, pro_updt_qr   = 1,
+     pro_updt_qi    = 1, pro_updt_qs = 1, pro_updt_qh = 1,
+
+   cvn_iskip = 5,
+   cvn_jskip = 5,
+   cvn_var = 0.3,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  RADAR DATA COMMON PARAMETERS (used by ARPSENKF and/or OSSEDATA)
+!
+!  rdrdasrc  Radar data source
+!            = 1, simulated data
+!            = 2, real data
+!
+!  rdrfmver  Observation output format
+!            = 0, output grid is the same as the model grid
+!                 (observations at all grid points)
+!            = 1, observations only at non-missing points (column-tilt format)
+!
+!  (following 2 parameters are only used by ARPSENKF, not OSSEDATA)
+!
+!  vrupbd    The upper bound of abs(Vr). The data larger than vrupbd
+!            are discarded
+!  reflwbd   The reflectivity data smaller than reflwbd are assimilated
+!            with coarser resolution
+!
+!  (following parameters are used by both ARPSENKF and OSSEDATA)
+!
+!  ntiltmax    The maximun number of radar tilts among radar obs
+!  rdrobsdir   Directory that contains radar observation data
+!              (for OSSEDATA, this parameter is used when state2obsopt>=2,
+!               and in such case rdrdasrc=2 )
+!----------------------------------------------------------------------=*
+
+ &radarcom_para
+   rdrdasrc = 1,
+   rdrfmver = 0,
+   vrupbd = 85.0,
+   reflwbd = 5.0,
+
+   ntiltmax = 14,
+
+   rdrobsdir = '/home/yjung/simulation/may20',
+ /
+
+*-----------------------------------------------------------------------
+!  Parameters associated with radar observation operator
+!  (ARPSENKF and OSSEDATA)
+!
+!  vtopt     Option to include terminal velocity
+!            = 0, no
+!            = 1, yes
+!    <NOTE> Do not use vtopt = 1 when rfopt >= 1.
+!           It it complicated due to melting species.
+!
+!  zwopt     Option to apply reflectivity weight when calculate Vr
+!            = 0, no (default)
+!            = 1, yes
+!  <NOTE> Do not use zwopt = 1 when rfopt > 1 due to complication 
+!         associated with melting species.
+!
+!  rfopt     Option of reflectivity formula
+!            = 0, Ferrier JAS 1995, detailed in Tong and Xue MWR (2005)
+!              (Currently, works only for Lin's scheme)
+!            = 1, Jung, Zhang, and Xue, MWR (2008)
+!            = 2, Jung, Xue, and Zhang, JAMC (2010) using T-matrix table
+!            = 10, Tong, Xue, and Zhang, JR (2009) with attenation
+!      <NOTE> For multi-moment microphysics scheme, use rfopt >= 1.
+!      <*IMPORTANT*>
+!              For rfopt = 1, ONLY *exponentail* distribution is allowed
+!              in DA system for now.
+!
+!  rsadir     Directory path where the radar scattering amplitude tables
+!             are stored. (Table is produced by tmatrix.f90)
+!
+!  wavelen   Wavelengh of radar in mm (WSR-88D: 107, CASA: 31.9)
+!
+!  dsdparaopt Option to specify the value of DSD parameters in
+!             radar data observation operator (no effect in none parameter
+!             estimation case)
+!            = 0, use ARPS default values
+!            = 1, use the values stored in history data file (when parameters
+!                 are not perturbed. The parameter values are specified
+!                 in arps.input that is used to run forecast)
+!            = 2, use ensemble mean (when parameters are perturbed)
+!  (In programs ossedata.f90, corcoef.f90, endgns.f90, rms.f90,
+!   observation operator for reflectivity is used. This parameter need
+!   to be set carefully)
+!
+!  numvar     The total number of radar variables in radar data files. 
+!             Default is 2. (Vr, Zhh, Zvv, Zdr, Zdp, Kdp)
+!                ** Radar data type **
+!                Vr : Radial velocity
+!                Zhh: Horizontally polarized reflectivity
+!                Zvv: Vertically polarized reflectivity
+!                Zdr: Differential reflectivity
+!                Zdp: Reflectivity difference
+!                Kdp: Specific differential phase
+!                rhv: Cross-correlation coefficient
+!
+!  dualvarname   The list of radar variable names.
+!                ** DON'T CHANGE THE ORDER OF VARIABLES **
+!
+!  rdrstd    Standard deviation of Gaussian error
+!            (1)Vr  (2)Zhh  (3)Zvv  (4)Zdr  (5)Zdp  (6)Kdp
+!            **<NOTE>** rdrstd(2)   STD in log domain (dbZ)
+!  sigmaCO   Standard deviation of Gaussian error of correlated part of error
+!            which is proportional to Z (fractional error smaller than 1)
+!  sigmaUC   Standard deviation of Gaussian error of uncorrelated part of error
+!            which is proportional to in Z (fractional error smaller that 1)
+!
+!  attenopt  Option to account for attenuation
+!            = 0, no
+!            = 1, yes for rfopt = 10
+!            = 2, yes for rfopt = 2
+!  drinteg   Length of integration element (m)
+!
+!---------------------------------------------------------------------=*
+
+ &radarobs_operator
+   vtopt = 0,
+   zwopt = 0,
+   rfopt = 0,
+   rsadir = '/home/yjung/T-matrix/X-band'
+   wavelen = 107.,
+   dsdparaopt = 0,
+   numvar = 2,
+     dualvarname='vr_','zhh','zvv','zdr','zdp','kdp','rhv',
+
+     rdrstd_vr =   1.0,  1.0,  1.0,
+     rdrstd_zhh =  2.0,  2.0,  2.0,
+     rdrstd_zvv =  2.0,  2.0,  2.0,
+     rdrstd_zdr =  0.2,  0.2,  0.2,
+     rdrstd_zdp =  1.0,  1.0,  1.0,
+     rdrstd_kdp =  0.5,  0.5,  0.5,
+     rdrstd_rhv = 0.01, 0.01, 0.01,
+
+   sigmaCO= 0.40,
+   sigmaUC = 0.027,
+   attenopt = 0,
+     drinteg = 1500.,
+ /
+
+*-----------------------------------------------------------------------
+!
+! Microphysical DSD parameter retrieval/estimation options (See Tong and Xue MWR 2008a,b)
+!
+!  paraestopt Option to estimate DSD parameters using EnKF
+!             = 0, Do not perform parameter estimation
+!             = 1, Only consider error of DSD parameter in forecast model
+!             = 2, Consider error of DSD parameter in both forecast model
+!                  and observation operator
+!
+!  paranum    The maximum number of parameters to be estimated
+!
+!  n0west     Option to estimate N0r, 0 = no;  1 = yes
+!  n0sest     Option to estimate N0s, 0 = no;  1 = yes
+!  n0gest     Option to estimate N0g, 0 = no;  1 = yes
+!  roqsest    Option to estimate roqs, 0 = no;  1 = yes
+!  roqgest    Option to estimate roqg, 0 = no;  1 = yes
+!
+!  lgn0w      Option to use 10*log(x) as control variable for N0r
+!             = 0, no
+!             = 1, yes (prefered and used only when the parameter is estimated)
+!  lgn0s      Option to use 10*log(x) as control variable for N0s
+!             = 0, no
+!             = 1, yes (prefered and used only when the parameter is estimated)
+!  lgn0g      Option to use 10*log(x) as control variable for N0g
+!             = 0, no
+!             = 1, yes (prefered and used only when the parameter is estimated)
+!  lgroqs     Option to use 10*log(x) as control variable for roqs
+!             = 0, no
+!             = 1, yes (prefered and used only when the parameter is estimated)
+!  lgroqg     Option to use 10*log(x) as control variable for roqg
+!             = 0, no
+!             = 1, yes (prefered and used only when the parameter is estimated)
+!
+!  paestdata  Radar data used in DSD parameter estimation
+!          (1) = 1  use Vr    (rdrdaopt(1) > 0)
+!          (2) = 1  use Zhh   (rdrdaopt(2) > 0)
+!          (3) = 1  use Zvv   (rdrdaopt(3) > 0)
+!          (4) = 1  use Zdr   (rdrdaopt(4) > 0)
+!          (5) = 1  use Zdp   (rdrdaopt(5) > 0)
+!          (6) = 1  use Kdp   (rdrdaopt(6) > 0)
+!          (7) = 1  use rhv   (rdrdaopt(7) > 0)
+!
+!  paestthd   The lower bound of each radar parameter for the data to be
+!             considered for parameter estimation
+!
+!  updtpara_time  The update time for parameters (UPDATE ONLY BEYOND THIS TIME)
+!
+!  estsqnc    Option of estimation sequence
+!             = 1, estimate state and paramters simultaneously when a
+!                  particular observation is used. (state first, then dsd parameter)
+!             = 2, estimate parameters first using all possible data
+!                  before estimating model state
+!
+!  Parameters associated with observation operator when paraestopt=2:
+!
+!  painoprtr  Option to use individual member's or mean parameter value in
+!             observation operator
+!             = 1, use ensemble mean in H for all members
+!             = 2, use individual ensemble member's value in H for each member
+!
+!    n0wt     Assume true n0rain when paraestopt = 1
+!    n0st     Assume true n0snow when paraestopt = 1
+!    n0gt     Assume true n0hail when paraestopt = 1
+!    roqst    Assume true rhosnow when paraestopt = 1
+!    roqgt    Assume true rhohail when paraestopt = 1
+!
+!  Parameters associated with variance inflation:
+!
+!  parainflat Option to do variance inflation for parameters
+!             = 0, no inflation
+!             = 1, inflate by a factor of 'infxxx' (< 1) at the beginning of
+!                  each cycle, and inflate back to the minstd_xxx if spread
+!                  is smaller than minstd_xxx
+!             = 2, keeping the variance unchanged when retrieving parameter
+!             = 3, variance is based on the value of mean
+!             = 4, keep the variance within the cycle,
+!                  apply a deflation factor infxxx at the beginning
+!                  of each analysis
+!             = 5, inflate to infxxx of previous spread at each analysis
+!
+!    minstd_n0w    minimum stddev limit for N0r   (1.0 prefered)
+!    minstd_n0s    minimum stddev limit for N0s   (1.0 prefered)
+!    minstd_n0g    minimum stddev limit for N0h   (1.0 prefered)
+!    minstd_roqs   minimum stddev limit for roqs  (0.5 prefered)
+!    minstd_roqg   minimum stddev limit for roqh  (0.5 prefered)
+!
+!    infn0w        inflation coefficient for N0r
+!                  (0.0 is prefered when parainflat = 1, which are used in TX08,
+!                   if parainflat = 2, infn0w is the constant stddev of
+!                   parameter ensemble; if parainflat = 3, infn0w*mean value
+!                   is used as the stddev of the parameter ensemble)
+!    infn0s        inflation coefficient for N0s
+!    infn0g        inflation coefficient for N0h
+!    infroqs       inflation coefficient for roqs
+!    infroqg       inflation coefficient for roqh
+!
+!  corparaopt Option to calculate correlation coefficient between
+!             parameter and Vr/Z (corparaopt > 0, when corflgopt == 2)
+!             = 0, no
+!             = 1, yes, before analysis (used in Tong and Xue MWR 2008a,b)
+!             = 2, yes, in analysis
+!
+!  Parameters associated with data selection procedure:
+!
+!  corflgopt  Option to use the correlation coefficient information
+!             in parameter estimation
+!             = 0, all reflectivity data > 10dBZ will be used
+!             = 1, use data where correlation coefficient > cor0
+!             = 2, use a few data with the largest correlation coefficient
+!                  ! Need works for mpi mode
+!
+!  cor0       Correlation coefficient threshold for parameter retrieval
+!             (when corflgopt == 1)
+!
+!  cornum     The number of data used in parameter retrieval
+!             based on the absolute value of correlation coefficient
+!             (when corflgopt == 2, and corparaopt must be > 0)
+!
+!---------------------------------------------------------------------=*
+
+ &parartrvl
+   paraestopt = 0,
+   paranum = 5,
+
+   n0west = 0,
+   n0sest = 0,
+   n0gest = 0,
+   roqsest = 0,
+   roqgest = 0,
+
+   lgn0w = 0,
+   lgn0s = 0,
+   lgn0g = 0,
+   lgroqs = 0,
+   lgroqg = 0,
+
+   paestdata = 0, 0, 0, 0, 0, 0, 0,
+
+   paestthd = -999.0, 10.0, 10.0, 0.05, 10.0, 0.05, 0.6,
+
+   updtpara_time = 0.0,
+   estsqnc = 1,
+
+   painoprtr = 1,
+     n0wt = 8.0e6,
+     n0st = 3.0e6,
+     n0gt = 4.0e4,
+     roqst = 100.0,
+     roqgt = 913.0,
+
+   parainflat = 1,
+
+     minstd_n0w = 1.0,
+     minstd_n0s = 1.0,
+     minstd_n0g = 1.0,
+     minstd_roqs = 0.5,
+     minstd_roqg = 0.5,
+
+     infn0w = 0.0,
+     infn0s = 0.0,
+     infn0g = 0.0,
+     infroqs = 0.0,
+     infroqg = 0.0,
+
+   corparaopt = 1,
+
+   corflgopt = 2,
+     cor0 = 0.0,
+     cornum = 30,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  RADAR DATA ASSIMILATION PARAMETERS
+!  (ARPSENKF and OSSEDATA)
+!
+!  RADARDAOPT  Option to assimilate radar data
+!              = 0, no
+!              = 1, yes
+!
+!  exptype   Spatial distribution/layout of radar data
+!            = 1, data on model scalar points.
+!            = 2, data on elevation levels but on model columns.
+!            = 3, data in radar polar coordinates (not implemented in this version)
+!
+!  loc_rdrinfo  Location of "radarinfo.dat" file
+!               eg. "/home/yjung/arps5.3_EnKF/data/adas"
+!
+!  nrdrused    The number of radars that are assimilated.
+!              In OSSEDATA, it determines the number of radars,
+!              whose data are generated from truth simulation
+!
+!  radarname   Name of radar
+!
+!  ntwtype     Radar network type
+!              = 1  88D raw data
+!              = 2  88d level III data
+!              = 3  CASA data
+!              = 10  User defined radar
+!              NOTE: List ntwtype=10 radars first!
+!
+!  vcpmode     NEXRAD VCP number (i.e., 11,12,31 or 32)
+!              = 11, Storm mode  14 tilts 0.5-19.5 deg
+!              = 12, Storm mode   9 tilts 0.5-19.5 deg
+!              = 31, Clear-air    5 tilts 0.5- 4.5 deg
+!              = 32, Clear-air    5 tilts 0.5- 4.5 deg
+!
+!              USER defined mode
+!              = 0,  Use custom elevation angles as specified
+!                    (ntwtype = 10)
+!              = 1,  NEXRAD level III  4 tiles 0.5-1.75 deg
+!              = 10, CASA mode   8 tilets 1.0-14.0 deg
+!              = 40, KOUN Storm mode 14 tilts 0.5-19.5 deg
+!
+!    (following paramters are only for user defined radar (ntwtype = 10)
+!    U_nsweep    number of elevation level
+!    U_elvswp    list of elevation angles
+!    U_ngate     number of gates
+!    U_gatesp    gate spacing (m)
+!    U_beamwid   beamwidth (degree)
+!    U_delaz     azimuth sampling interval (degrees)
+!    U_sradmul   sradmul*beamwid is the radius of resolution volume
+!               in vertical direction
+!
+!  rdrlocopt   = 1 use radar lat,lon to get x,y (for real data and OSSE)
+!              = 2 use radar x,y to get lat,lon (for OSSE only)
+!
+!  (following 3 parameters are only used by OSSEDATA and
+!   only when state2obsopt == 1)
+!  xpos      x-coord of radar (m) for locopt = 2
+!  ypos      y-coord of radar (m) for locopt = 2
+!  hpos      altitude of radar (m)
+!
+!  z04vr      Assimilate Vr when Z > z04vr
+!
+!  Zupprlim   Assimilate Z when Z < Zupprlim
+!
+!  rdrcomopt  Data analysis option for radar Data
+!           = 0, Assimilate one radar after another.
+!           = 1, Assimilate composite radar data for maximum code efficiency
+!
+!    NOTE: If rdrcomopt = 0, all the following parameters are dimenioned by the
+!          number of actual radar used (nrdrused). Otherwise, they are dimensioned by
+!          the number virtual radars that is determined during run-time when
+!          the radar data is combining.
+!
+!  rdrfmt    Observation data format
+!            = 0, observation is on the same as the model grid
+!                 (observations at all grid points)
+!            = 1, observations only at non-missing points (column-tilt format)
+!  numrdra  If rdrfmt = 1, you can specify how many radar data to be
+!           analyzed at each overlaid grid point.
+!           If numrdra < the maximum number of radars overlaid,
+!           the radar data to be analyzed is the first numrdra radar observations
+!           and the radar priority is determined by the order in array "radarname".
+!
+!  ngrdx     Vr and Z(>= reflwbd) are assimilated every 'ngrdx' grid
+!            point in x direction
+!  ngrdy     Same as ngrdx but in y direction
+!  nzlwx      Z(< reflwbd) are assimilated every 'nzlwx' grid
+!            point in x direction
+!  nzlwy     Same as nzlwx but in y direction
+!
+!  rdrdaopt   Option to assimilate radar data
+!             (1)Vr  (2)Zhh  (3)Zvv (4)Zdr  (5)Zdp (6)Kdp (7)rhv
+!             = 0 No
+!             = 1 Yes
+!             = 2 No but being used for parameter retrieval
+!
+!  rdrthd     Assimilate radar obs. when obs. > rdrthd
+!             (1)Vr  (2)Zhh  (3)Zvv (4)Zdr  (5)Zdp (6)Kdp (7)rhv
+!             <NOTE> Vr is further limited by missvalue ( = -111.1).
+!
+!  paramest    Use 88D radar to estimate parameters
+!              = 0, no
+!              = 1, yes
+!---------------------------------------------------------------------=*
+
+ &radarda
+   radardaopt = 1,
+   exptype    = 2,
+
+   loc_rdrinfo = '/home/yjung/arps5.3_EnKF/data/adas',
+
+   nrdrused = 1,
+     radarname= 'KTLX','KCYR', 
+     ntwtype  =      1,     3,
+     vcpmode  =     11,    10,
+
+     rdrlocopt =     2,       2, 
+     xpos      =   0.0, 25000.0,    
+     ypos      =   0.0, 15000.0,
+     hpos      =  10.0,    10.0,
+
+     z04vr = 10.0,
+     Zupprlim = 100.0,
+
+   rdrcomopt = 1,
+   rdrfmt    = 1,
+     numrdra = 8,
+
+     ngridx=1, 1, 
+     ngridy=1, 1,
+     nzlwx =1, 1,
+     nzlwy =1, 1,
+
+     rdrdaopt1 = 1, 1,
+     rdrdaopt2 = 1, 1,
+     rdrdaopt3 = 0, 0,
+     rdrdaopt4 = 0, 0,
+     rdrdaopt5 = 0, 0,
+     rdrdaopt6 = 0, 0,
+     rdrdaopt7 = 0, 0,
+
+     rdrthd1= -990.0, -990.0, 
+     rdrthd2=  -90.0,  -99.0,
+     rdrthd3=   10.0,   10.0,
+     rdrthd4=    0.3,    0.3,
+     rdrthd5=    1.9,    1.9,
+     rdrthd6=    0.9,    0.9,
+     rdrthd7=   0.01,   0.01,
+
+     paramest=0, 0,
+ /
+
+*-----------------------------------------------------------------------
+!  Parameters associated with the calculation of innovaion statistics
+!  (for real case, when rdrdasrc=2)
+!
+!  innovsmth  Option to smooth both analysis and observation Vr before
+!             Calculate rms difference between backgroud/analysis and
+!             observations and innovation statistics
+!             = 0, No
+!             = 1, Yes
+!  smnum      The times observed Vr and Vr of ensemble mean
+!             background/analysis are smoothed
+!  innovenv   Option to calculate rms difference between environment
+!             state (without radar data assimilation) and observation
+!              = 0, No
+!              = 1, Yes
+!  sndsimnam   ARPS history data file with model state defined by
+!              single sounding or environment state obtained by using
+!              conventional data
+!
+!  innov_thd_Z Reflectivity threshold for innovation statistics.
+!              Statisctics are computed only where Zobs > innov_thd_Z
+!              or Zenmean > innov_thd_Z.
+!
+!---------------------------------------------------------------------=*
+
+ &innovation
+   innovsmth = 0,
+   smnum = 3,
+   innovenv = 0,
+     sndsimnam = './may29',
+
+   innov_thd_Z = 15.0,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  RMS error/Innovation calculation parameters:
+!
+!  trusimdir   Truth simulation directory
+!  trusimnam   File name header for truth simulation
+!              (do not including '.' at the end)
+!
+!  refthrsld  Reflectivity threshold for rms calculation (dBZ)
+!             Only grid points where truth reflectivity exceeds this
+!             threshold are included in the error calculation.
+!
+!  (This parameter is used in rms.f90 and postinnov.f90)
+!  rmsfcst  Options to compute rms errors/innovation statistics
+!           for forecast or analysis or both
+!          = 0, only for analysis
+!          = 1, only for forecast
+!          = 2, both
+!
+!  (Following parameters are used in rms.f90)
+!  rmsxbgn, rmsxend  Start and end i-index bounds for rms error averaging.
+!  rmsybgn, rmsyend  Start and end j-index bounds for rms error averaging.
+!  rmszbgn, rmszend  Start and end k-index bounds for rms error averaging.
+!
+!  wrtmeanopt  Option to create ensemble mean file
+!        = 0, no
+!        = 1, yes
+!
+!  Above Bounds are used by both regular domain RMS error and horizontal average RMS
+!
+!----------------------------------------------------------------------=*
+
+ &rmspara
+   trusimdir = '/home/yjung/simulation/may20',
+   trusimnam = 'may20',
+
+   refthrsld = 10.0,
+
+   rmsfcst = 2,
+
+   rmsxbgn = 2,
+   rmsxend = 33,
+   rmsybgn = 2,
+   rmsyend = 33,
+   rmszbgn = 2,
+   rmszend = 33,
+
+   wrtmeanopt = 0,
+ /
+
+*-----------------------------------------------------------------------
+!  Parameters controling output of statistics.
+!
+!  sprd3Ddmp    Option to dump 3D ensemble spread fields
+!               =0, no
+!               =1, yes
+!  sprd3Ddir   The directory to which the 3D ensemble spread fields
+!               are dumped
+!
+!  rmsesprddmp  Dump vertical profile of ensemble mean error and spread
+!               = 0, no (only dump 3D spatially averaged error and spread)
+!               = 1, yes (horizontal averaging also subject to earlier index bounds)
+!
+!  (The first 2 parameters are also used in ENDGNS)
+!----------------------------------------------------------------------=*
+
+ &datadump
+   sprd3Ddmp = 0,
+     sprd3Ddir = '/scratch/yjung/enspread/'
+   rmsesprddmp = 1,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  (Following parameters are used by OSSEDATA only)
+!
+!  hdmpdir      Directory containing the history files of truth simulation.
+!  hdmpfheader  History data file name header (not including '.' at the end),
+!               e.g., hdmpfheader='may20'.
+!
+!  randomerropt Adding random error to Vr and Z obs when state2obsopt = 1
+!               (when state2obsopt >= 2, no error is added)
+!               = 0, no
+!               = 1, yes, entire domain
+!               = 2, yes, but only around radar echo region
+!    seedobs    Seed used to generate random observation error
+!  nongaussopt = 1  Non-Gaussian Obs. error in reflectivity
+!              = 0  Gaussian Obs. error in reflectivity
+!
+!  state2obsopt Option to generate radar data from model state
+!               = 1, radar geometry is determined from input file
+!                 (this option is used for OSSE experiment, when
+!                  radar data are generated from truth simulation)
+!               = 2, radar geometry is determined by parameters saved in data.
+!                    This option is used when background/analysis
+!                    model state needs to be projected to the observation
+!                    space and innovation statistics can be calculated if
+!                    rmsdopt > 0
+!               = 3, same as 2, but radar data are read in only  (NOT USED NOW!)
+!                    at the first time (tbgn_dmpin) and innovation
+!                    statistics are not calculated
+!               (when state2obsopt >= 2, radar data directory and
+!               radar name need to be specified)
+!  crsbmvopt    Option to calculate cross-beam wind component
+!               = 0, no
+!               = 1, power-gain-based sampling
+!               = 2, simple interpolation
+!  rmsdopt      Option to calculate rms difference between
+!               background/analysis and observations (post processing
+!               for real case)
+!               = 0, no
+!               = 1, yes
+!               = 2, yes, and also calculate rms difference for cross-beam
+!                         wind component
+!               (state2obsopt = 2, when rmsdopt > 0)
+!  histsctr     Option to dump yo and ya for histogram and scatter plot
+!               = 0, no
+!               = 1, yes (state2obsopt = 2)
+!----------------------------------------------------------------------=*
+
+ &ossedata_para
+   hdmpdir = './',
+   hdmpfheader = 'may20',
+
+   randomerropt = 0,
+   seedobs = -100,
+   nongaussopt = 1,
+
+   state2obsopt = 1,
+   crsbmvopt = 0,
+   rmsdopt = 0,
+   histsctr = 0,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  Parameters used by programs OSSEDATA and POSTINNOV
+!
+!  enkfdtadir  Directory to save EnKF output data
+!
+!  tbgndmpin   Time at which input history data begins
+!  tenddmpin   Time at which input history data ends
+!  tintvdmpin  Time interval between history data dumps
+!
+!----------------------------------------------------------------------=*
+
+ &cycle_para
+   enkfdtadir = '/home/yjung/simulation/may20',
+
+   tbgn_dmpin  = 1500.0,
+   tend_dmpin  = 6000.0,
+   tintv_dmpin = 300.0,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  Parameters for EnKF diagnostic program ENDGNS
+!
+!  Calculate ensemble spread, covariances between model state variables
+!  and observed variables, and 3D divergence field
+!
+!  endtardopt  EnKF output data read in option
+!              = 1, read in ensemble members 'enfxxx.hdfenkfi'
+!              = 2, data file are explicitly listed, can be ensemble
+!                   mean forecast/analysis or certain ensemble members
+!    meandmp   Option to dump ensemble mean (when endtardopt = 1)
+!              = 0, no
+!              = 1, yes
+!    (following 3 parameters are for endtardopt=2)
+!    nenfile    The number of EnKF output data files to be read in
+!    engrdbasfn Name of base-state and grid data file
+!    endafile   Name of EnKF output data files
+!
+!  obsdtaopt    Observation data option (CORCOEF)
+!               = 0, no need to read observation data
+!               = 1, radar data
+!               = 2, surface data (not available now)
+!
+!  (when obsdtaopt=1)
+!  rdrnum      Number of radars
+!  rdrdanam    Option to specify radar data file name
+!              = 1, file header plus model time, model time is
+!                   read in from data of EnKF output
+!              = 2, explicitly listed
+!    rdrdaheader Radar data file name header including directory (rdrdanam=1)
+!    rdrdafile   Radar data file name (rdrdanam=2)
+!
+!  rdrdtaopt  The same as exptype above.
+!
+!  (following parameters are used in calculating covariance between
+!   radar observed variables and model state variables)
+!  covcoropt  Option to calcuate covariances
+!             = 0, no
+!             = 1, yes
+!  covvrnum   Number of Vr data points with respect to which
+!             covarainces are calculated
+!  dirnamevrc Output directory. './' for current directory
+!  ivr, jvr, kvr (i,j,k) of chosen Vr data point
+!  corvru, corvrv, corvrw, corvrptprt, corvrpprt, corvrqv, corvrqc
+!  corvrqr, corvrqi, corvrqs, corvrqg, corvrqh
+!  Option to calculate covariance between Vr and model state variables
+!         = 0, no
+!         = 1, yes, only dump correlation coefficient
+!         = 2, yes, dump both correlation coefficient and
+!              covariance
+!
+!  corvrvag  Option to calculate covariance between Vr and cross-beam
+!         wind component on scalar grid
+!  corvrvae  Option to calculate covariance between Vr and cross-beam
+!         wind component on data point
+!         = 0, no
+!         = 1, yes, only dump correlation coefficient
+!         = 2, yes, dump both correlation coefficient and
+!              covariance
+!
+!  covznum    Number of reflectivity data points with respect to which
+!             covaraince are calculated
+!  dirnamezc  Output directory. './' for current directory
+!  iz, jz, kz (i,j,k) of chosen reflectivity data point
+!  corzu, corzv, corzw, corzptprt, corzpprt, corzqv, corzqc
+!  corzqr, corzqi, corzqs, corzqh
+!  Option to calculate covariance between reflectivity and model
+!         state variables
+!         = 0, no
+!         = 1, yes, only dump correlation coefficient
+!         = 2, yes, dump both correlation coefficient and
+!              covariance
+!
+!  (following parameters are used for spread calculation)
+!  spreadopt Option to calculate ensemble spread
+!            = 0, no
+!            = 1, only model state variables
+!            = 2, model state variables plus observed variables (e.g.
+!                 Vr, Z, Va)
+!     JYS: NOTE>  =2 is not tested!!!  !
+!  sprdavg   Option to calculate spatial average of ensemble spread in
+!            domain specified by ni1s, ni2s, ...
+!            = 1, based on radar observed echo
+!            = 2, averaging domain is defined by following 6 parameters
+!
+!  mdivopt   Option to calculate sum of abslute values of momentum
+!            divergence in domain specified by following 6 parameters.
+!            = 0, no
+!            = 1, yes
+!
+!  ni1s    start grid in x direction
+!  ni2s    end grid in x direction
+!  nj1s    start grid in y direction
+!  nj2s    end grid in y direction
+!  nk1s    start grid in z direction
+!  nk2s    end grid in z direction
+!
+!  adjwopt Option to adjust w
+!          = 0, no adjustment
+!          = 1, w set using integrated divergence with OBrien
+!                    correction to satisfy top and bottom bc
+!----------------------------------------------------------------------=*
+
+ &endgns
+   endtardopt = 1,
+     enpostfix = 'enkfi',
+     meandmp = 0,
+     nenfile = 1,
+     engrdbasfn = 'enmean.hdfgrdbas',
+     endafile(1) = 'enmean.hdf003600',
+
+   obsdtaopt = 0,
+
+   rdrnum = 1,
+   rdrdanam = 1,
+     rdrdaheader(1)='./KTLX_may20_',
+     rdrdafile(1)='./KTLX.20040530.000000',
+   rdrdtaopt = 2,
+
+   covcoropt = 0,
+   covvrnum = 0,
+   dirnamevrc = '.',
+     ivr(1)=36, jvr(1)=2, kvr(1)=1,
+     corvru(1)=0, corvrv(1)=0, corvrw(1)=0, corvrptprt(1)=0,
+     corvrpprt(1)=0, corvrqv(1)=0, corvrqc(1)=0, corvrqr(1)=0,
+     corvrqi(1)=0, corvrqs(1)=0, corvrqg(1)=0, corvrqh(1)=0,
+     corvrvag(1)=0, corvrvae(1)=0,
+
+     ivr(2)=36, jvr(2)=2, kvr(2)=1,
+     corvru(2)=0, corvrv(2)=0, corvrw(2)=0, corvrptprt(2)=0,
+     corvrpprt(2)=0, corvrqv(2)=0, corvrqc(2)=0, corvrqr(2)=0,
+     corvrqi(2)=0, corvrqs(2)=0, corvrqg(2)=0, corvrqh(2)=0,
+     corvrvag(2)=0, corvrvae(2)=0,
+
+   covznum = 0,
+   dirnamezc = '.',
+     iz(1) = 36, jz(1) = 2, kz(1) = 1,
+     corzu(1)=0, corzv(1)=0, corzw(1)=0, corzptprt(1)=0,
+     corzpprt(1)=0, corzqv(1)=0, corzqc(1)=0, corzqr(1)=0,
+     corzqi(1)=0, corzqs(1)=0, corzqg(1)=0, corzqh(1)=0,
+
+     iz(2) = 36, jz(2) = 2, kz(2) = 1,
+     corzu(2)=0, corzv(2)=0, corzw(2)=0, corzptprt(2)=0,
+     corzpprt(2)=0, corzqv(2)=0, corzqc(2)=0, corzqr(2)=0,
+     corzqi(2)=0, corzqs(2)=0, corzqg(2)=0, corzqh(2)=0,
+
+   spreadopt = 1,
+   sprdavg = 2,
+
+   mdivopt = 0,
+
+   ni1s = 2,
+   ni2s = 32,
+   nj1s = 2,
+   nj2s = 32,
+   nk1s = 2,
+   nk2s = 32,
+
+   adjwopt = 0,
+ /
+
+*-----------------------------------------------------------------------
+!
+!  Parameters used by Sensitivity study (jfnvrz.f90)
+!
+!  sstvtopt     The option to calculate sensitiviy coefficient
+!             = 0, only calculate J response
+!             = 1, calculate sensitivity coefficient (for analysis)
+!  expn       The number of sensivity experiment
+!  acntl      The value of the parameter used in CNTL run
+!  apert      The value of the parameter used in perturbed run
+!  sstvtid    The name of sensivity experiment
+!  cntlfilnam Name of the data file of the control run
+!  pertfilnam Name of the data file of the perturbed run
+!  vrzwrtopt  The option to output calculated Vr and Z
+!----------------------------------------------------------------------=*
+
+ &postpara
+
+   sstvtopt = 0,
+     expn = 1,
+     acntl = 4.e4,
+     apert(1) = 4.e2,
+     sstvtid(1) = 'N0h42',
+     cntlfilnam  = '/home/yjung/simulation/may20_two/mphyopt09.hdf',
+     pertfilnam(1) = '/home/yjung/SENS/N0h42/N0h42.hdf',
+
+     vrzwrtopt = 0,
+ /
+
+!-----------------------------------------------------------------------
+!
+! End of input file
+!
+!-----------------------------------------------------------------------

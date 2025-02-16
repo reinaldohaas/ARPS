@@ -1,0 +1,209 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######       INPUT FILE FOR ENSSCORES IN NAMELIST FORMAT    ######
+!     ######                 ( Version ARPS5.3.x )                ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!  This namelist block sets the verification info
+!
+!  mode:           verification mode, 1 for grids to grids, 
+!                    2 for grids to stations
+!
+!  mn:             Number of ensemble members
+!
+!  mb:             Name list of ensemble members (forecasts). Also
+!                    serve as subdirectory names
+!
+!  varname:        Varialbe to be verified (must be 6 characters)
+!
+!  nbin:           Number of bins used in verification
+!
+!  bindv:          Values of the bins
+!
+!  nt:             Number of time levels in verification
+!
+!  timenm:         Time list in verification
+!
+!  kr:             Fussy radius of radar Data (0 - grid to grid)
+!
+!  sub-domain could be set by i1, i2, j1, j2. When all set to 0, the whole domain
+!  will be used.
+!
+!  i1:             The start x coordinate of the sub-domain. 
+!
+!  i2:             The end x coordinate of the sub-domain.
+!
+!  j1:             The start y coordinate of the sub-domain.
+!
+!  j2:             The end y coordinate of the sub-domain.
+!
+!------------------------------------------------------------------------
+
+&verification_setting
+  mode = 1,
+  mn = 1,
+  mb = 's4cn_arw', 's4m6_arw', 's4m7_arw', 's4m8_arw', 's4m9_arw', 's4m10_arw', 's4m11_arw',  \
+       's4m12_arw', 's4m13_arw', 's4m14_arw', 's4cn_nmm', 's4m3_nmm', 's4m4_nmm', 's4m5_nmm', \
+       's4cn_arps', 'mn', 'PM',
+  varname_fcst = 'accppt',
+  varname_obs  = 'hsr1hr',
+  nbin 	= 04,
+  bindv = 0.01, 0.1, 0.5, 1.0,
+  nt    = 36,          
+  timenm ='003600', '007200', '010800', '014400', '018000', '021600', '025200', 
+          '028800', '032400', '036000', '039600', '043200', '046800', '050400', '054000', 
+          '057600', '061200', '064800', '068400', '072000', '075600', '079200', '082800', 
+          '086400', '090000', '093600', '097200', '100800', '104400', '108000', 
+          '111600', '115200', '118800', '122400', '126000', '129600',
+  kr = 0,
+  i1=0,
+  j1=0,
+  i2=0,
+  j2=0,
+/
+
+
+!-----------------------------------------------------------------------
+!  This namelist block sets the paths of forecast, observation and output data
+!
+!  filedir:        The directory of fcst/obs data.
+!  
+!  finfmt:         The file format of fcst data.  1 for binary, 3 for hdf, 7 for netcdf.
+!
+!  ofinfmt:        The file format of obs  data.  1 for binary, 3 for hdf, 7 for netcdf.
+!
+!  nf:             The number of fcst/obs pairs.
+!
+!  fdir:           The sub-directory of the fcst data files.
+!
+!  filenm:         The filename suffix of the fcst data.
+!
+!  ofilenm:        The filename suffix of the obs data. 
+!
+!  output_dir:     Directory for verification output files.
+!------------------------------------------------------------------------
+
+&file_list
+  filedir = '/scratch/fkong/',
+  nf = 1,
+  finfmt = 3,
+  ofinfmt = 3,
+  fdir = 'spring-2010/data_2d/2d.20100429-acc/',
+         'spring-2010/data_2d/2d.20100430-acc/',
+         'spring-2010/data_2d/2d.20100503-acc/',
+         'spring-2010/data_2d/2d.20100504-acc/',
+         'spring-2010/data_2d/2d.20100505-acc/',
+         'spring-2010/data_2d/2d.20100506-acc/',
+         'spring-2010/data_2d/2d.20100507-acc/',
+         'spring-2010/data_2d/2d.20100510-acc/',
+         'spring-2010/data_2d/2d.20100511-acc/',
+         'spring-2010/data_2d/2d.20100512-acc/',
+         'spring-2010/data_2d/2d.20100513-acc/',
+         'spring-2010/data_2d/2d.20100514-acc/',
+         'spring-2010/data_2d/2d.20100517-acc/',
+         'spring-2010/data_2d/2d.20100518-acc/',
+         'spring-2010/data_2d/2d.20100519-acc/',
+         'spring-2010/data_2d/2d.20100520-acc/',
+         'spring-2010/data_2d/2d.20100521-acc/',
+         'spring-2010/data_2d/2d.20100524-acc/',
+         'spring-2010/data_2d/2d.20100525-acc/',
+         'spring-2010/data_2d/2d.20100526-acc/',
+         'spring-2010/data_2d/2d.20100527-acc/',
+         'spring-2010/data_2d/2d.20100528-acc/',
+         'spring-2010/data_2d/2d.20100531-acc/',
+         'spring-2010/data_2d/2d.20100601-acc/',
+         'spring-2010/data_2d/2d.20100602-acc/',
+         'spring-2010/data_2d/2d.20100603-acc/',
+         'spring-2010/data_2d/2d.20100604-acc/',
+         'spring-2010/data_2d/2d.20100607-acc/',
+         'spring-2010/data_2d/2d.20100609-acc/',
+         'spring-2010/data_2d/2d.20100610-acc/',
+         'spring-2010/data_2d/2d.20100611-acc/',
+         'spring-2010/data_2d/2d.20100614-acc/',
+         'spring-2010/data_2d/2d.20100615-acc/',
+         'spring-2010/data_2d/2d.20100616-acc/',
+         'spring-2010/data_2d/2d.20100617-acc/',
+         'spring-2010/data_2d/2d.20100618-acc/',
+  filenm = 'ar2010042900',
+           'ar2010043000',
+           'ar2010050300',
+           'ar2010050400',
+           'ar2010050500',
+           'ar2010050600',
+           'ar2010050700',
+           'ar2010051000',
+           'ar2010051100',
+           'ar2010051200',
+           'ar2010051300',
+           'ar2010051400',
+           'ar2010051700',
+           'ar2010051800',
+           'ar2010051900',
+           'ar2010052000',
+           'ar2010052100',
+           'ar2010052400',
+           'ar2010052500',
+           'ar2010052600',
+           'ar2010052700',
+           'ar2010052800',
+           'ar2010053100',
+           'ar2010060100',
+           'ar2010060200',
+           'ar2010060300',
+           'ar2010060400',
+           'ar2010060700',
+           'ar2010060900',
+           'ar2010061000',
+           'ar2010061100',
+           'ar2010061400',
+           'ar2010061500',
+           'ar2010061600',
+           'ar2010061700',
+           'ar2010061800',
+  ofilenm = 'radar-2010/20100429/ar2010042900',
+            'radar-2010/20100430/ar2010043000',
+            'radar-2010/20100503/ar2010050300',
+            'radar-2010/20100504/ar2010050400',
+            'radar-2010/20100505/ar2010050500',
+            'radar-2010/20100506/ar2010050600',
+            'radar-2010/20100507/ar2010050700',
+            'radar-2010/20100510/ar2010051000',
+            'radar-2010/20100511/ar2010051100',
+            'radar-2010/20100512/ar2010051200',
+            'radar-2010/20100513/ar2010051300',
+            'radar-2010/20100514/ar2010051400',
+            'radar-2010/20100517/ar2010051700',
+            'radar-2010/20100518/ar2010051800',
+            'radar-2010/20100519/ar2010051900',
+            'radar-2010/20100520/ar2010052000',
+            'radar-2010/20100521/ar2010052100',
+            'radar-2010/20100524/ar2010052400',
+            'radar-2010/20100525/ar2010052500',
+            'radar-2010/20100526/ar2010052600',
+            'radar-2010/20100527/ar2010052700',
+            'radar-2010/20100528/ar2010052800',
+            'radar-2010/20100531/ar2010053100',
+            'radar-2010/20100601/ar2010060100',
+            'radar-2010/20100602/ar2010060200',
+            'radar-2010/20100603/ar2010060300',
+            'radar-2010/20100604/ar2010060400',
+            'radar-2010/20100607/ar2010060700',
+            'radar-2010/20100609/ar2010060900',
+            'radar-2010/20100610/ar2010061000',
+            'radar-2010/20100611/ar2010061100',
+            'radar-2010/20100614/ar2010061400',
+            'radar-2010/20100615/ar2010061500',
+            'radar-2010/20100616/ar2010061600',
+            'radar-2010/20100617/ar2010061700',
+            'radar-2010/20100618/ar2010061800',
+  output_dir = './',
+/

@@ -1,0 +1,1034 @@
+[11/29/2005]> ls -lR arps5.2.4
+
+.:
+total 641
+-rw-r--r--    1 arps    caps     2314 Aug 30  2004 BUGS
+-rw-r--r--    1 arps    caps   234191 Nov 10 17:38 HISTORY
+-rw-r--r--    1 arps    caps    44288 Jun 26  2002 MANIFESTS
+-rw-r--r--    1 arps    caps   168547 Nov 21 10:34 Makefile
+-rw-r--r--    1 arps    caps    53078 May 28  2002 Makefile.wrkdir
+-rw-r--r--    1 arps    caps    21209 Jun 14 16:49 README
+-rw-r--r--    1 arps    caps    13372 Dec  9  2004 RELEASE.NOTES
+-rw-r--r--    1 arps    caps     3432 Oct 28  2003 TODO
+-rw-r--r--    1 arps    caps     3963 May 28  2002 UPDATE
+drwxr-sr-x    7 arps    caps      112 Nov 29 17:06 data/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 docs/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 include/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 input/
+-rwxr-xr-x    1 arps    caps    84232 Nov 17 14:21 makearps*
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 scripts/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 sounding/
+drwxr-sr-x   32 arps    caps     4096 Nov 29 17:07 src/
+
+./data:
+total 11
+-rw-r--r--    1 arps    caps      748 May 28  2002 README.data
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 adas/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 arpsplt/
+drwxr-sr-x    2 arps    caps       29 Nov 29 17:06 arpsverif/
+drwxr-sr-x    2 arps    caps       51 Nov 29 17:06 data.test/
+drwxr-sr-x    2 arps    caps       34 Nov 29 17:06 pltradcol/
+
+./data/adas:
+total 329
+-rw-r--r--    1 arps    caps       73 May 14  2003 armmnerr.adastab
+-rw-r--r--    1 arps    caps       87 May 14  2003 asoserr.adastab
+-rw-r--r--    1 arps    caps       78 May 14  2003 awoserr.adastab
+-rw-r--r--    1 arps    caps      162 Oct  9  2002 blacklist.sfc
+-rw-r--r--    1 arps    caps       78 May 14  2003 buoyerr.adastab
+-rw-r--r--    1 arps    caps       85 May 14  2003 coagmeterr.adastab
+-rw-r--r--    1 arps    caps      754 May 28  2002 fclasserr.adastab
+-rw-r--r--    1 arps    caps      252 May  1  2003 goes08ch4.adastab
+-rw-r--r--    1 arps    caps      237 May  1  2003 goes08vis.adastab
+-rw-r--r--    1 arps    caps      252 May  1  2003 goes09ch4.adastab
+-rw-r--r--    1 arps    caps      314 May  1  2003 goes09vis.adastab
+-rw-r--r--    1 arps    caps      252 May  1  2003 goes10ch4.adastab
+-rw-r--r--    1 arps    caps      237 May  1  2003 goes10vis.adastab
+-rw-r--r--    1 arps    caps      252 May  1  2003 goes11ch4.adastab
+-rw-r--r--    1 arps    caps      301 May  1  2003 goes11vis.adastab
+-rw-r--r--    1 arps    caps      252 May  1  2003 goes12ch4.adastab
+-rw-r--r--    1 arps    caps      295 May  1  2003 goes12vis.adastab
+-rw-r--r--    1 arps    caps       96 May 14  2003 hplainserr.adastab
+-rw-r--r--    1 arps    caps   299988 May 14  2003 ircalib.adastab
+-rw-r--r--    1 arps    caps       87 May 14  2003 iswserr.adastab
+-rw-r--r--    1 arps    caps      750 May 28  2002 mclasserr.adastab
+-rw-r--r--    1 arps    caps       96 May 14  2003 mdcrserr.adastab
+-rw-r--r--    1 arps    caps       80 May 13  2004 mesoerr.adastab
+-rw-r--r--    1 arps    caps       76 Sep 17  2004 mesowerr.adastab
+-rw-r--r--    1 arps    caps       83 May 28  2002 moblmerr.adastab
+-rw-r--r--    1 arps    caps      778 May 14  2003 profilerr.adastab
+-rw-r--r--    1 arps    caps       92 May 14  2003 rad88Derr.adastab
+-rw-r--r--    1 arps    caps    14966 May 28  2002 radarinfo.dat
+-rw-r--r--    1 arps    caps      101 May 28  2002 radnidserr.adastab
+-rw-r--r--    1 arps    caps      760 May 14  2003 raoberr.adastab
+-rw-r--r--    1 arps    caps      769 May 28  2002 ret88Derr.adastab
+-rw-r--r--    1 arps    caps      664 May 28  2002 ruc3herr.adastab
+-rw-r--r--    1 arps    caps       80 May 13  2004 saoerr.adastab
+-rw-r--r--    1 arps    caps       87 May 28  2002 shiperr.adastab
+-rw-r--r--    1 arps    caps       91 May 14  2003 synoperr.adastab
+-rw-r--r--    1 arps    caps      124 May 28  2002 testerr.adastab
+-rw-r--r--    1 arps    caps       83 May 13  2004 wtxmnerr.adastab
+
+./data/arpsplt:
+total 1158
+-rw-r--r--    1 arps    caps     1198 Mar  5  2003 aa-dfw.meta
+-rw-r--r--    1 arps    caps     5664 Sep 23 10:56 hubcaps5.pltcbar
+-rw-r--r--    1 arps    caps     1635 May 18  2005 skewt.pltcbar
+-rw-r--r--    1 arps    caps   147183 May 28  2002 us_spcounty.mapdata
+-rw-r--r--    1 arps    caps   192106 Jul  3  2003 us_state.mapdata
+-rw-r--r--    1 arps    caps      550 Sep 23 10:56 velocity_solo_real.table
+-rw-r--r--    1 arps    caps   147944 May 28  2002 world_coast.mapdata
+-rw-r--r--    1 arps    caps   250627 May 28  2002 world_country.mapdata
+-rw-r--r--    1 arps    caps   431599 May 28  2002 world_us_country.mapdata
+-rw-r--r--    1 arps    caps     4608 May 28  2002 zx_color.tbl
+
+./data/arpsverif:
+total 50
+-rw-r--r--    1 arps    caps    50183 May 28  2002 sfcstns.tbl
+
+./data/data.test:
+total 8
+-rw-r--r--    1 arps    caps     3238 May 18  2005 AMA16may9212z.txt
+-rw-r--r--    1 arps    caps     4039 May 18  2005 SHV.txt
+
+./data/pltradcol:
+total 190
+-rw-r--r--    1 arps    caps   193788 Jul 24  2003 spcounty.mapdata
+
+./docs:
+total 3759
+-rw-r--r--    1 arps    caps    41533 Jul  5 15:31 88d2arps50.pdf
+-rw-r--r--    1 arps    caps   325686 Jul  5 15:31 ADAS500.pdf
+-rw-r--r--    1 arps    caps    51932 Jul  5 15:31 ADASDataFormats.pdf
+-rw-r--r--    1 arps    caps    39013 Jul  5 15:31 ADASErrorFormats.pdf
+-rw-r--r--    1 arps    caps    91289 Jul  5 15:31 ADASNudging.pdf
+-rw-r--r--    1 arps    caps    86562 Jul  5 15:31 ADASPhaseAdjust.pdf
+-rw-r--r--    1 arps    caps   130411 Jul  5 15:31 ARPSNetCDF.pdf
+-rw-r--r--    1 arps    caps   799022 Jul  5 15:31 ARPSQuickGuide.pdf
+-rw-r--r--    1 arps    caps   118162 Jul  5 15:31 ARPSShading.pdf
+-rw-r--r--    1 arps    caps     1112 May 28  2002 README.GrADS
+-rw-r--r--    1 arps    caps     3236 Jul  5 15:32 README.docs
+-rw-r--r--    1 arps    caps     5862 May 28  2002 README.grib2arps
+-rw-r--r--    1 arps    caps     2943 Jun 13  2002 README.plscript
+-rw-r--r--    1 arps    caps    72324 Feb  4  2004 TerrainTerm.pdf
+-rw-r--r--    1 arps    caps    17651 Jul  5 15:31 a2io.txt
+-rw-r--r--    1 arps    caps     4953 May 28  2002 adas.tree
+-rw-r--r--    1 arps    caps    54798 May 28  2002 all.trees
+-rw-r--r--    1 arps    caps    54135 May 28  2002 arps.tree
+-rw-r--r--    1 arps    caps   426994 Nov  4 16:00 arps2wrf.pdf
+-rw-r--r--    1 arps    caps   172957 Jun  2 17:44 arps50.ch3.pdf
+-rw-r--r--    1 arps    caps   331302 Nov 18 11:17 arps50.ch4.pdf
+-rw-r--r--    1 arps    caps   600906 Nov 18 11:17 arps50.ch8.pdf
+-rw-r--r--    1 arps    caps   351749 Jul  5 15:31 arpsshift.pdf
+-rw-r--r--    1 arps    caps     8589 May 28  2002 ext2arps.tree
+-rw-r--r--    1 arps    caps    17380 Jul  5 15:31 mci2arps.pdf
+-rw-r--r--    1 arps    caps     1979 Oct 16  2003 newprogs.txt
+-rw-r--r--    1 arps    caps    29258 Jul  5 15:31 nids2arps.pdf
+
+./include:
+total 512
+-rw-r--r--    1 arps    caps       65 Jan 19  2005 3dvarcputime.inc
+-rw-r--r--    1 arps    caps    10689 May 28  2002 GEMPRM.AIX.inc
+-rw-r--r--    1 arps    caps    10747 May 28  2002 GEMPRM.HPUX.inc
+-rw-r--r--    1 arps    caps    10774 May 28  2002 GEMPRM.IRIX.inc
+-rw-r--r--    1 arps    caps    10776 May 28  2002 GEMPRM.LINUX.inc
+-rw-r--r--    1 arps    caps     9815 May 28  2002 GEMPRM.OSF1.inc
+-rw-r--r--    1 arps    caps    10775 May 28  2002 GEMPRM.SunOS.inc
+-rw-r--r--    1 arps    caps    10776 May 28  2002 GEMPRM.ULTRIX.inc
+-rw-r--r--    1 arps    caps     8568 Nov 15 23:05 adas.inc
+-rw-r--r--    1 arps    caps      890 May  1  2003 adassat.inc
+-rw-r--r--    1 arps    caps      307 May 28  2002 adjust.inc
+-rw-r--r--    1 arps    caps      518 May 28  2002 agrialloc.inc
+-rw-r--r--    1 arps    caps     1032 May 28  2002 agricpu.inc
+-rw-r--r--    1 arps    caps     3962 May 28  2002 agricst.inc
+-rw-r--r--    1 arps    caps    15318 May 28  2002 agrigrid.inc
+-rw-r--r--    1 arps    caps      802 May 28  2002 alarm.h
+-rw-r--r--    1 arps    caps     6688 Nov  8  2002 alloc.inc
+-rw-r--r--    1 arps    caps     1690 May 28  2002 arps2gem.inc
+-rw-r--r--    1 arps    caps      988 May 28  2002 arpsplt.inc
+-rw-r--r--    1 arps    caps     1437 Jul  7 18:30 arpssfc.inc
+-rw-r--r--    1 arps    caps     5401 Dec  6  2002 assim.inc
+-rw-r--r--    1 arps    caps     2829 May 28  2002 binio.h
+-rw-r--r--    1 arps    caps     3470 May 28  2002 bndry.inc
+-rw-r--r--    1 arps    caps    84827 May 28  2002 cfortran.h
+-rw-r--r--    1 arps    caps     3151 May 28  2002 cumucst.inc
+-rw-r--r--    1 arps    caps     4392 May 28  2002 enscv.inc
+-rw-r--r--    1 arps    caps     5176 May 28  2002 exbc.inc
+-rw-r--r--    1 arps    caps     4198 Apr  1  2005 ext2arps.inc
+-rw-r--r--    1 arps    caps     8347 May 28  2002 extsndinit.inc
+-rw-r--r--    1 arps    caps    59520 Nov  9 17:13 globcst.inc
+-rw-r--r--    1 arps    caps     4070 May 28  2002 grddsc.inc
+-rw-r--r--    1 arps    caps    33898 Nov  9 17:13 gribcst.inc
+-rw-r--r--    1 arps    caps     9534 May 28  2002 grid.inc
+-rw-r--r--    1 arps    caps     1332 May 28  2002 indtflg.inc
+-rw-r--r--    1 arps    caps     1021 May 28  2002 lapsparms.cmn
+-rw-r--r--    1 arps    caps      380 May 28  2002 manage.inc
+-rw-r--r--    1 arps    caps     8585 Aug 30  2004 mc_area.h
+-rw-r--r--    1 arps    caps     6632 May 28  2002 meraf.inc
+-rw-r--r--    1 arps    caps     3275 Dec  9  2004 mp.inc
+-rw-r--r--    1 arps    caps     2309 May 28  2002 nemcst.inc
+-rw-r--r--    1 arps    caps     1938 May 28  2002 nodal.inc
+-rw-r--r--    1 arps    caps     2296 Nov 17 14:21 nudging.inc
+-rw-r--r--    1 arps    caps     4545 Mar 24  2003 phycst.inc
+-rw-r--r--    1 arps    caps     8248 May 28  2002 radcst.inc
+-rw-r--r--    1 arps    caps      612 May 28  2002 remap.inc
+-rw-r--r--    1 arps    caps      201 May 28  2002 remapsum.inc
+-rw-r--r--    1 arps    caps     1572 May 28  2002 remaptab.inc
+-rw-r--r--    1 arps    caps     4293 Mar 24  2003 sfcphycst.inc
+-rw-r--r--    1 arps    caps     7796 Mar 24  2003 soilcst.inc
+-rw-r--r--    1 arps    caps     4292 May 18  2005 thermo.consts
+-rw-r--r--    1 arps    caps     4511 May 18  2005 thermo.stfunc
+-rw-r--r--    1 arps    caps      570 May 28  2002 timelvls.inc
+-rw-r--r--    1 arps    caps     2819 May 28  2002 udposix.h
+-rw-r--r--    1 arps    caps     3542 May 28  2002 ulog.h
+-rw-r--r--    1 arps    caps    12016 Feb 25  2005 v5d.h
+-rw-r--r--    1 arps    caps      708 Feb 25  2005 v5df.inc
+-rw-r--r--    1 arps    caps      696 Jan 19  2005 varpara.inc
+-rw-r--r--    1 arps    caps     6228 Nov 10 17:38 vericst.inc
+-rw-r--r--    1 arps    caps     2621 May 28  2002 vis5d.h
+-rw-r--r--    1 arps    caps    36753 May 28  2002 wxp.h
+-rw-r--r--    1 arps    caps     5116 May 28  2002 wxpgks.h
+-rw-r--r--    1 arps    caps    26849 May 28  2002 wxpresrc.h
+
+./input:
+total 414
+-rw-r--r--    1 arps    caps   120138 Nov 21 10:34 arps.input
+-rw-r--r--    1 arps    caps     4527 May 23  2003 arps2eta212.input
+-rw-r--r--    1 arps    caps     4575 May 28  2002 arps2gem.input
+-rw-r--r--    1 arps    caps     4825 Feb 25  2005 arps2ncdf.input
+-rw-r--r--    1 arps    caps     3377 Oct 16  2003 arps2rad.input
+-rw-r--r--    1 arps    caps    20666 Nov  4 16:00 arps2wrf.input
+-rw-r--r--    1 arps    caps     2879 May 28  2002 arpsassim.input
+-rw-r--r--    1 arps    caps    11162 Apr 18  2005 arpscvt.input
+-rw-r--r--    1 arps    caps     1770 Jul 19  2002 arpscvtobs.input
+-rw-r--r--    1 arps    caps     4392 Jul 17  2002 arpsdiff.input
+-rw-r--r--    1 arps    caps     1802 Dec  6  2002 arpsensbc.input
+-rw-r--r--    1 arps    caps     3275 May 28  2002 arpsenscv.input
+-rw-r--r--    1 arps    caps     2873 May 13  2003 arpsensic.input
+-rw-r--r--    1 arps    caps     3947 Apr  1  2005 arpsextsnd.input
+-rw-r--r--    1 arps    caps    25018 Jul 21  2003 arpsintrp.input
+-rw-r--r--    1 arps    caps    15020 May 28  2002 arpsintrp_ls.input
+-rw-r--r--    1 arps    caps    59549 Nov 17 14:22 arpsplt.input
+-rw-r--r--    1 arps    caps      476 May 28  2002 arpspltmax.input
+-rw-r--r--    1 arps    caps     5021 May 31  2002 arpsprt.input
+-rw-r--r--    1 arps    caps     2145 Jun  1  2002 arpsraindiff.input
+-rw-r--r--    1 arps    caps     3568 Dec 19  2003 arpsread.input
+-rw-r--r--    1 arps    caps    16591 Nov  9 17:13 arpssoil.input
+-rw-r--r--    1 arps    caps     9725 Oct 31 15:50 arpstern.input
+-rw-r--r--    1 arps    caps     8952 Mar 19  2003 arpstintrp.input
+-rw-r--r--    1 arps    caps     9480 Jun 17 16:10 arpstrn.input
+-rw-r--r--    1 arps    caps     8721 Nov 10 17:38 arpsverif.input
+-rw-r--r--    1 arps    caps     2150 May 28  2002 extract_avn.input
+-rw-r--r--    1 arps    caps     3302 May 28  2002 fakerad.input
+-rw-r--r--    1 arps    caps     3340 May 28  2002 mergetrn.input
+-rw-r--r--    1 arps    caps     5259 Apr 23  2003 nids2arps.input_incomplete
+-rw-r--r--    1 arps    caps     6673 Mar  5  2003 pltgrid.input
+-rw-r--r--    1 arps    caps     4649 Jan 21  2004 pltradcol.input
+-rw-r--r--    1 arps    caps     2300 May 28  2002 pltsatfld.input
+-rw-r--r--    1 arps    caps     7714 Jun 22 13:52 radarplt.input
+-rw-r--r--    1 arps    caps     3712 Dec 19  2003 radmosaic.input
+-rw-r--r--    1 arps    caps    20933 Nov 15 16:21 wrf2arps.input
+
+./scripts:
+total 306
+-rw-r--r--    1 arps    caps     5270 May 28  2002 README_plscripts
+-rwxr-xr-x    1 arps    caps    44044 Nov  7  2003 arps.gs*
+-rw-r--r--    1 arps    caps     2056 May 28  2002 beltrami_grads.r
+-rw-r--r--    1 arps    caps     1168 May 28  2002 density_grads.r
+-rwxr-xr-x    1 arps    caps     4216 Feb 18  2004 getdiff*
+-rw-r--r--    1 arps    caps     1640 May 28  2002 getincpar.pm
+-rw-r--r--    1 arps    caps     3026 Nov  7  2003 link_data
+-rwxr-xr-x    1 arps    caps     3066 May 28  2002 linkxlC*
+-rwxr-xr-x    1 arps    caps    15341 May 28  2002 mkarpswd*
+-rw-r--r--    1 arps    caps     2866 Jul  3  2002 mkinput.pm
+-rwxr-xr-x    1 arps    caps     2612 May 28  2002 nqs.arps*
+-rw-r--r--    1 arps    caps      274 May 28  2002 nqs.t3d
+-rw-r--r--    1 arps    caps      465 Nov  7  2003 openfn.gs
+-rw-r--r--    1 arps    caps      499 Nov  7  2003 openhdf.gs
+-rwxr-xr-x    1 arps    caps     2789 May 28  2002 runflint*
+-rwxr-xr-x    1 arps    caps    34127 May 28  2002 sfcflx.gs*
+-rw-r--r--    1 arps    caps      217 May 28  2002 surface_grads.r
+-rw-r--r--    1 arps    caps      611 Jul 28 16:52 template_sfcdata.ctl
+-rw-r--r--    1 arps    caps      506 Jul 28 16:52 template_soilvar.ctl
+-rw-r--r--    1 arps    caps      318 Jul 28 16:52 template_trndata.ctl
+-rwxr-xr-x    1 arps    caps    13136 Apr 18  2005 test_adas.pl*
+-rwxr-xr-x    1 arps    caps    12606 May 28  2002 test_agri.pl*
+-rwxr-xr-x    1 arps    caps    10793 Sep  9  2003 test_arps2wrf.pl*
+-rwxr-xr-x    1 arps    caps    12661 May 28  2002 test_arpsagr.pl*
+-rwxr-xr-x    1 arps    caps     4643 May 31  2002 test_arpsintrp.pl*
+-rwxr-xr-x    1 arps    caps    12227 Nov 17 14:22 test_arpsmpi.pl*
+-rwxr-xr-x    1 arps    caps     5701 Nov 15 16:21 test_arpssfc.pl*
+-rwxr-xr-x    1 arps    caps     4204 May 28  2002 test_arpstern.pl*
+-rwxr-xr-x    1 arps    caps     4748 Sep 17  2004 test_arpstrn.pl*
+-rwxr-xr-x    1 arps    caps     3272 May 28  2002 test_beltrami.pl*
+-rwxr-xr-x    1 arps    caps     3503 May 28  2002 test_density.pl*
+-rwxr-xr-x    1 arps    caps     9713 Sep 17  2004 test_ext2arps.pl*
+-rwxr-xr-x    1 arps    caps     6729 Jun 27  2002 test_intrp.pl*
+-rwxr-xr-x    1 arps    caps     4003 May 28  2002 test_may20delcitystorm.pl*
+-rwxr-xr-x    1 arps    caps     3802 May 28  2002 test_mci2arps.pl*
+-rwxr-xr-x    1 arps    caps     9049 Aug 13  2002 test_nids2arps.pl*
+-rwxr-xr-x    1 arps    caps    13215 Sep 17  2004 test_realcase.pl*
+-rwxr-xr-x    1 arps    caps     6112 May 28  2002 test_restart.pl*
+-rwxr-xr-x    1 arps    caps     4761 May 28  2002 test_surface.pl*
+-rwxr-xr-x    1 arps    caps     3010 May 28  2002 test_symmetry.pl*
+-rwxr-xr-x    1 arps    caps     3257 May 28  2002 test_warmbubble.pl*
+-rwxr-xr-x    1 arps    caps    11629 Aug 12  2002 testarps.pl*
+-rwxr-xr-x    1 arps    caps     5661 May 28  2002 testmkarps*
+-rwxr-xr-x    1 arps    caps     6642 May 28  2002 update_arps*
+-rwxr-xr-x    1 arps    caps     2175 Nov  7  2003 useg*
+
+./sounding:
+total 15
+-rw-r--r--    1 arps    caps     4807 May 28  2002 fife.snd
+-rw-r--r--    1 arps    caps     1483 May 28  2002 july21_ice.snd
+-rw-r--r--    1 arps    caps     2660 May 28  2002 may20.snd
+-rw-r--r--    1 arps    caps     2620 May 28  2002 may20_calm.snd
+-rw-r--r--    1 arps    caps      346 May 28  2002 neutral.snd
+-rw-r--r--    1 arps    caps      346 May 28  2002 stable.snd
+-rw-r--r--    1 arps    caps     1293 May 28  2002 wangara.snd
+
+./src:
+total 75
+drwxr-sr-x    3 arps    caps     4096 Nov 29 17:06 88d2arps/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 adas/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 arps/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 arps2wrf/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 arps3dvar/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 arps_mp/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 arpsagr/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 arpsassim/
+drwxr-sr-x    2 arps    caps      135 Nov 29 17:07 arpscvt/
+drwxr-sr-x    2 arps    caps      125 Nov 29 17:07 arpscvtobs/
+drwxr-sr-x    2 arps    caps       96 Nov 29 17:07 arpsdiff/
+drwxr-sr-x    2 arps    caps      115 Nov 29 17:07 arpsens/
+drwxr-sr-x    2 arps    caps       75 Nov 29 17:07 arpsextsnd/
+drwxr-sr-x    2 arps    caps      140 Nov 29 17:07 arpsintrp/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 arpsplt/
+drwxr-sr-x    2 arps    caps      113 Nov 29 17:07 arpsprt/
+drwxr-sr-x    2 arps    caps      115 Nov 29 17:07 arpssfc/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 arpssoil/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 arpstern/
+drwxr-sr-x    2 arps    caps       94 Nov 29 17:07 arpstintrp/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 arpstrn/
+drwxr-sr-x    3 arps    caps     4096 Nov 29 17:07 arpsverif/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 ext2arps/
+drwxr-sr-x    5 arps    caps       53 Nov 29 17:07 external/
+drwxr-sr-x    2 arps    caps      106 Nov 29 17:07 f77tof90/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 mci2arps/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 skewt/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 wrf2arps/
+drwxr-sr-x    2 arps    caps       92 Nov 29 17:07 wtretcol/
+drwxr-sr-x    2 arps    caps      131 Nov 29 17:07 zxplot/
+
+./src/88d2arps:
+total 663
+-rw-r--r--    1 arps    caps    68088 Apr 12  2005 88d2arps.c
+-rw-r--r--    1 arps    caps    11567 Jun 13 11:18 Makefile
+-rw-r--r--    1 arps    caps      284 May 28  2002 README.88d2arps
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:06 a2io/
+-rw-r--r--    1 arps    caps    23047 May 28  2002 adjustreflib.f90
+-rw-r--r--    1 arps    caps    23556 Jul  9  2003 apdetect.f90
+-rw-r--r--    1 arps    caps    28675 Nov 17 14:22 arps2rad.f90
+-rw-r--r--    1 arps    caps    10663 Dec 17  2003 fakeio.c
+-rw-r--r--    1 arps    caps    27328 Nov 17 14:22 fakerad.f90
+-rw-r--r--    1 arps    caps     6978 May 28  2002 module_n2aconst.f90
+-rw-r--r--    1 arps    caps    50306 Nov 17 14:22 nids2arps.f90
+-rw-r--r--    1 arps    caps    58999 May  1  2003 nidsdecoders.f90
+-rw-r--r--    1 arps    caps    48421 Aug 25 12:21 pltradarscan.f90
+-rw-r--r--    1 arps    caps    24836 Nov 17 14:22 pltradcol.f90
+-rw-r--r--    1 arps    caps     4241 May 28  2002 radarinfo.c
+-rw-r--r--    1 arps    caps    57928 Jul 26  2002 rasterlib.f90
+-rw-r--r--    1 arps    caps     5637 Feb 28  2003 remapdummy.f90
+-rw-r--r--    1 arps    caps    29974 Nov 17 14:22 remaplib.f90
+-rw-r--r--    1 arps    caps    95897 Jan 16  2004 remaptilt.f90
+-rw-r--r--    1 arps    caps    60828 Nov 17 14:22 unfldlib.f90
+-rw-r--r--    1 arps    caps    28057 May  1  2003 unfold.f90
+-rw-r--r--    1 arps    caps     3156 Apr 12  2005 wrttilts.f90
+
+./src/88d2arps/a2io:
+total 280
+-rw-r--r--    1 arps    caps     5321 Feb 18  2004 Makefile
+-rw-r--r--    1 arps    caps     2934 Jan 21  2004 a2defs.h
+-rw-r--r--    1 arps    caps     5275 Mar 22  2004 a2io.c
+-rw-r--r--    1 arps    caps     4555 Oct 18 10:58 a2io.h
+-rw-r--r--    1 arps    caps     9345 Mar 14  2003 compress.c
+-rw-r--r--    1 arps    caps     3425 Mar 22  2004 config.h
+-rw-r--r--    1 arps    caps      894 Mar 14  2003 const.h
+-rw-r--r--    1 arps    caps     5290 Oct 18 10:58 decode_data.c
+-rw-r--r--    1 arps    caps     7951 Oct 18 10:58 endian.c
+-rw-r--r--    1 arps    caps     4900 Aug 30  2004 extern.h
+-rw-r--r--    1 arps    caps     2367 Mar 14  2003 extern_funct.h
+-rw-r--r--    1 arps    caps     2365 Mar 14  2003 find_key.c
+-rw-r--r--    1 arps    caps     2000 Mar 14  2003 funct_init.c
+-rw-r--r--    1 arps    caps     1868 Mar 14  2003 funct_init.h
+-rw-r--r--    1 arps    caps     4426 Mar 14  2003 get_data.c
+-rw-r--r--    1 arps    caps    11664 Oct 18 10:58 get_data_a2io.c
+-rw-r--r--    1 arps    caps    14754 Mar 14  2003 get_data_tdwr.c
+-rw-r--r--    1 arps    caps     5659 Mar 14  2003 get_record.c
+-rw-r--r--    1 arps    caps      123 Mar 14  2003 mem.h
+-rw-r--r--    1 arps    caps      630 Mar 14  2003 mem_hook.h
+-rw-r--r--    1 arps    caps      867 Mar 14  2003 ncdc.h
+-rw-r--r--    1 arps    caps      232 Mar 14  2003 proto_bzip2.h
+-rw-r--r--    1 arps    caps      629 Mar 14  2003 proto_compress.h
+-rw-r--r--    1 arps    caps      545 Mar 14  2003 proto_endian.h
+-rw-r--r--    1 arps    caps      333 Mar 14  2003 proto_file.h
+-rw-r--r--    1 arps    caps      226 Mar 14  2003 proto_gzip.h
+-rw-r--r--    1 arps    caps      220 Mar 14  2003 proto_ldm.h
+-rw-r--r--    1 arps    caps      303 Mar 14  2003 proto_live.h
+-rw-r--r--    1 arps    caps      700 Mar 14  2003 proto_mem.h
+-rw-r--r--    1 arps    caps      275 Mar 14  2003 proto_mmap.h
+-rw-r--r--    1 arps    caps     1842 Mar 14  2003 proto_radar.h
+-rw-r--r--    1 arps    caps      348 Mar 14  2003 proto_tape.h
+-rw-r--r--    1 arps    caps      220 Mar 14  2003 proto_tar.h
+-rw-r--r--    1 arps    caps      325 Mar 14  2003 proto_tdwr.h
+-rw-r--r--    1 arps    caps     1934 Mar 14  2003 proto_user.h
+-rw-r--r--    1 arps    caps     8190 Mar 14  2003 radar.c
+-rw-r--r--    1 arps    caps     3608 Mar 14  2003 radar_a2io.c
+-rw-r--r--    1 arps    caps     3309 Mar 14  2003 radar_tdwr.c
+-rw-r--r--    1 arps    caps      461 Mar 14  2003 radardefs.h
+-rw-r--r--    1 arps    caps     5804 Mar 14  2003 radarinfo.c
+-rw-r--r--    1 arps    caps      818 Mar 14  2003 read_radial.c
+-rw-r--r--    1 arps    caps    11220 Aug 30  2004 read_record.c
+-rw-r--r--    1 arps    caps     4883 Aug 30  2004 read_record.h
+-rw-r--r--    1 arps    caps     3984 Mar 14  2003 read_record_live.c
+-rw-r--r--    1 arps    caps     9352 Mar 14  2003 read_record_rads.c
+-rw-r--r--    1 arps    caps      829 Mar 14  2003 read_record_raw.c
+-rw-r--r--    1 arps    caps     2278 Mar 14  2003 read_record_raw_disk.c
+-rw-r--r--    1 arps    caps     5623 Jan 21  2004 read_record_raw_disk_bzip2.c
+-rw-r--r--    1 arps    caps     4830 Jan 21  2004 read_record_raw_disk_compress.c
+-rw-r--r--    1 arps    caps     9603 Mar 22  2004 read_record_raw_disk_dir.c
+-rw-r--r--    1 arps    caps    10711 Jan 21  2004 read_record_raw_disk_file.c
+-rw-r--r--    1 arps    caps     4937 Mar 14  2003 read_record_raw_disk_gzip.c
+-rw-r--r--    1 arps    caps     4861 May 13  2004 read_record_raw_disk_ldm.c
+-rw-r--r--    1 arps    caps     2424 Mar 14  2003 read_record_raw_disk_mmap.c
+-rw-r--r--    1 arps    caps     3954 Mar 14  2003 read_record_raw_disk_tar.c
+-rw-r--r--    1 arps    caps     3965 Mar 14  2003 read_record_raw_live.c
+-rw-r--r--    1 arps    caps     6201 Mar 14  2003 read_record_raw_mem.c
+-rw-r--r--    1 arps    caps    18856 Mar 14  2003 read_record_raw_rads.c
+-rw-r--r--    1 arps    caps     5343 Mar 14  2003 read_record_raw_tape.c
+-rw-r--r--    1 arps    caps    11091 Mar 14  2003 read_record_tape.c
+-rw-r--r--    1 arps    caps      452 Mar 14  2003 tdwr_extern.h
+-rw-r--r--    1 arps    caps      604 Mar 14  2003 tdwr_nyq.h
+-rw-r--r--    1 arps    caps      418 Mar 14  2003 tdwr_struct.h
+-rw-r--r--    1 arps    caps      832 Mar 14  2003 tdwrdefs.h
+-rw-r--r--    1 arps    caps     3567 Mar 14  2003 tdwrio.h
+-rw-r--r--    1 arps    caps     7136 Mar 14  2003 user.c
+-rw-r--r--    1 arps    caps     4509 Mar 14  2003 vcp.h
+-rw-r--r--    1 arps    caps     2143 Mar 14  2003 y2klib.c
+
+./src/adas:
+total 1464
+-rw-r--r--    1 arps    caps    11318 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      179 May 28  2002 README.adas
+-rw-r--r--    1 arps    caps   109289 Nov 17 14:22 adas.f90
+-rw-r--r--    1 arps    caps     7477 May  2  2005 adjtsfc.f90
+-rw-r--r--    1 arps    caps    19778 Apr 23  2005 adjuvw3d.f90
+-rw-r--r--    1 arps    caps   190768 Jul 14  2004 anxiter.f90
+-rw-r--r--    1 arps    caps    27510 May 28  2002 anxlib3d.f90
+-rw-r--r--    1 arps    caps   135798 May  1  2003 cldinsert.f90
+-rw-r--r--    1 arps    caps    58573 May  1  2003 cloud_cv.f90
+-rw-r--r--    1 arps    caps    97917 May  1  2003 cloud_lwc.f90
+-rw-r--r--    1 arps    caps    49634 Apr 18  2005 cmpclddrv.f90
+-rw-r--r--    1 arps    caps    93500 Feb 18  2004 cmpcldlib.f90
+-rw-r--r--    1 arps    caps    80692 Oct 16  2003 difobs.f90
+-rw-r--r--    1 arps    caps    34856 Oct 16  2003 difstats.f90
+-rw-r--r--    1 arps    caps     5689 May 28  2002 dummyadas.f90
+-rw-r--r--    1 arps    caps     5974 Oct 16  2003 dummydifobs.f90
+-rw-r--r--    1 arps    caps     5979 Oct 16  2003 dummyradmos.f90
+-rw-r--r--    1 arps    caps    52439 Feb 25  2004 grd2obsth.f90
+-rw-r--r--    1 arps    caps    17760 Nov 17 14:22 incrdump.f90
+-rw-r--r--    1 arps    caps     9772 Nov 15 23:05 initadas.f90
+-rw-r--r--    1 arps    caps    37349 Sep  9  2003 intfield.f90
+-rw-r--r--    1 arps    caps    70707 Apr 27  2005 intrpsoil3d.f90
+-rw-r--r--    1 arps    caps    45476 May 28  2002 mthermo.f90
+-rw-r--r--    1 arps    caps     5893 Oct 16  2003 pltradlib.f90
+-rw-r--r--    1 arps    caps    52676 Feb 25  2004 prepradar.f90
+-rw-r--r--    1 arps    caps     9570 May 28  2002 prepretr.f90
+-rw-r--r--    1 arps    caps    44701 May 17  2005 prepsfc.f90
+-rw-r--r--    1 arps    caps    18873 May 17  2005 prepsng.f90
+-rw-r--r--    1 arps    caps     7078 May  2  2003 prepua.f90
+-rw-r--r--    1 arps    caps    33780 May  5  2003 radarlib3d.f90
+-rw-r--r--    1 arps    caps     7916 May 16  2005 radmosaic.f90
+-rw-r--r--    1 arps    caps     2446 May 28  2002 rdacars.f90
+-rw-r--r--    1 arps    caps    15162 Feb 25  2004 rdprofiles.f90
+-rw-r--r--    1 arps    caps    20580 Nov  4 16:00 rdradcol.f90
+-rw-r--r--    1 arps    caps     5019 May 28  2002 rdrdapstern.f90
+-rw-r--r--    1 arps    caps     9284 May 28  2002 rdretcol.f90
+-rw-r--r--    1 arps    caps     4168 May 28  2002 rdructern.f90
+-rw-r--r--    1 arps    caps     9410 Dec 19  2003 rdsatfld.f90
+-rw-r--r--    1 arps    caps    15927 Feb  4  2004 rdsfcobs.f90
+-rw-r--r--    1 arps    caps     6083 May 28  2002 sunfuncs.f90
+-rw-r--r--    1 arps    caps    51521 Feb 25  2004 thermo3d.f90
+
+./src/arps:
+total 6762
+-rw-r--r--    1 arps    caps    25709 Jun 16 11:53 Makefile
+-rw-r--r--    1 arps    caps       61 May 28  2002 README.arps
+-rw-r--r--    1 arps    caps    93252 Dec 19  2003 advct3d.f90
+-rw-r--r--    1 arps    caps    60094 Dec 19  2003 advfct3d.f90
+-rw-r--r--    1 arps    caps    22369 Sep 17  2004 alloclib.f90
+-rw-r--r--    1 arps    caps    53430 Oct 16  2003 arps.f90
+-rw-r--r--    1 arps    caps   130290 Nov 17 14:22 arpsio3d.f90
+-rw-r--r--    1 arps    caps    86481 Oct 13 10:18 arpslib3d.f90
+-rw-r--r--    1 arps    caps    11706 Dec 19  2003 arpsread.f90
+-rw-r--r--    1 arps    caps    55645 Feb 17  2005 ascio3d.f90
+-rw-r--r--    1 arps    caps    15731 Oct 14  2002 assimdummy.f90
+-rw-r--r--    1 arps    caps   196866 Apr 18  2005 bc3d.f90
+-rw-r--r--    1 arps    caps    54673 May 28  2002 bcdif3d.f90
+-rw-r--r--    1 arps    caps    18465 Feb  9  2005 binio.c
+-rw-r--r--    1 arps    caps   210055 Apr 29  2005 binio3d.f90
+-rw-r--r--    1 arps    caps    67504 May 28  2002 celtrk3d.f90
+-rw-r--r--    1 arps    caps    49261 May 28  2002 chksym3d.f90
+-rw-r--r--    1 arps    caps    66462 Nov 26  2003 cmix3d.f90
+-rw-r--r--    1 arps    caps    24207 May  8  2003 craylib3d.f90
+-rw-r--r--    1 arps    caps    63897 Jul  7 18:26 cumulus3d.f90
+-rw-r--r--    1 arps    caps    15791 May 28  2002 energy3d.f90
+-rw-r--r--    1 arps    caps    83033 Nov  9 17:11 exbc3d.f90
+-rw-r--r--    1 arps    caps   115143 Nov 17 14:22 exbcio3d.f90
+-rw-r--r--    1 arps    caps    33248 May 28  2002 fft99f.f90
+-rw-r--r--    1 arps    caps   102609 Dec 19  2003 force3d.f90
+-rw-r--r--    1 arps    caps    36127 May  8  2003 genlib3d.f90
+-rw-r--r--    1 arps    caps   127626 Nov 17 14:22 gradsio3d.f90
+-rw-r--r--    1 arps    caps    43059 Nov 26  2003 grdtrns3d.f90
+-rw-r--r--    1 arps    caps    37590 May  8  2003 gribdec3d.f90
+-rw-r--r--    1 arps    caps    47374 May 11  2005 gribenc3d.f90
+-rw-r--r--    1 arps    caps   135573 May 11  2005 gribio3d.f90
+-rw-r--r--    1 arps    caps   259768 Nov  9 17:11 hdfio3d.f90
+-rw-r--r--    1 arps    caps    35780 May  8  2003 htchlib3d.f90
+-rw-r--r--    1 arps    caps    36669 Jul  7 18:26 ibmlib3d.f90
+-rw-r--r--    1 arps    caps    34150 Feb 24  2003 img3d.f90
+-rw-r--r--    1 arps    caps    62172 Jul 27 11:36 inibase3d.f90
+-rw-r--r--    1 arps    caps   210486 Nov  9 17:11 init3d.f90
+-rw-r--r--    1 arps    caps   154729 Nov 21 10:34 initpara3d.f90
+-rw-r--r--    1 arps    caps    18431 May 28  2002 interface_wrf_bmj.f90
+-rw-r--r--    1 arps    caps    15722 Jun 22 13:52 interface_wrf_kfeta.f90
+-rw-r--r--    1 arps    caps   282099 Nov 17 14:22 iolib3d.f90
+-rw-r--r--    1 arps    caps    36059 May  8  2003 irixlib3d.f90
+-rw-r--r--    1 arps    caps    59676 Jan 23  2004 irrad3d.f90
+-rw-r--r--    1 arps    caps    15957 May 28  2002 kfinterfc.f90
+-rw-r--r--    1 arps    caps    77576 Oct 16  2002 kfpara.f90
+-rw-r--r--    1 arps    caps    39521 Nov  4 16:57 lnxlib3d.F90
+-rw-r--r--    1 arps    caps    81803 Nov  9 17:11 maproj3d.f90
+-rw-r--r--    1 arps    caps    58712 Jan 23  2004 micro3d.f90
+-rw-r--r--    1 arps    caps    66948 Jan  5  2005 micro_ice3d.f90
+-rw-r--r--    1 arps    caps    73893 Nov 17 14:22 micro_lfo_ice.f90
+-rw-r--r--    1 arps    caps    40888 Jan 23  2004 micro_nem3d.f90
+-rw-r--r--    1 arps    caps    23021 Oct 14 16:18 module_arps_netio_metadata.f90
+-rw-r--r--    1 arps    caps    78763 May 28  2002 module_cu_bmj.f90
+-rw-r--r--    1 arps    caps    94141 Oct 14  2002 module_cu_kfeta.f90
+-rw-r--r--    1 arps    caps   155814 Apr 18  2005 mpisubs.f90
+-rw-r--r--    1 arps    caps    14730 Jul  6 16:39 ncarg3d.f90
+-rw-r--r--    1 arps    caps   259003 Nov 17 14:22 netio3d.f90
+-rw-r--r--    1 arps    caps     3142 Jun 14 16:49 nohdfio3d.f90
+-rw-r--r--    1 arps    caps     7011 May 12  2005 nompsubs.f90
+-rw-r--r--    1 arps    caps     7725 May 28  2002 noncarg3d.f90
+-rw-r--r--    1 arps    caps     9745 Aug 25 12:21 nonetio3d.f90
+-rw-r--r--    1 arps    caps      954 May 28  2002 nopakio3d.f90
+-rw-r--r--    1 arps    caps    16544 Jul  9  2002 nosviio3d.f90
+-rw-r--r--    1 arps    caps     1070 May 28  2002 nov5dio3d.f90
+-rw-r--r--    1 arps    caps    48978 Nov 17 14:22 nudge.f90
+-rw-r--r--    1 arps    caps    65535 Apr 18  2005 operat3d.f90
+-rw-r--r--    1 arps    caps   153820 Nov  9 17:11 out3d.f90
+-rw-r--r--    1 arps    caps   133463 Nov 17 14:22 outlib3d.f90
+-rw-r--r--    1 arps    caps     3455 May 28  2002 pakio3d.f90
+-rw-r--r--    1 arps    caps   206056 May 28  2002 raddata3d.f90
+-rw-r--r--    1 arps    caps    58902 May  6  2004 radfrc3d.f90
+-rw-r--r--    1 arps    caps    26976 Nov 17 14:22 radlib3d.f90
+-rw-r--r--    1 arps    caps    84897 Jan  5  2005 radtrns3d.f90
+-rw-r--r--    1 arps    caps    19189 Dec 19  2003 raydmp3d.f90
+-rw-r--r--    1 arps    caps    10839 Nov 18 11:17 readarps.c
+-rw-r--r--    1 arps    caps   131898 Nov  9 17:11 rst3d.f90
+-rw-r--r--    1 arps    caps    24918 May 28  2002 setbdt3d.f90
+-rw-r--r--    1 arps    caps   100309 Nov  9 17:11 sfcphy3d.f90
+-rw-r--r--    1 arps    caps    23905 Apr 18  2005 smooth3d.f90
+-rw-r--r--    1 arps    caps    56792 May 25  2005 soildiag3d.f90
+-rw-r--r--    1 arps    caps   166428 May  3  2004 soilebm3d.f90
+-rw-r--r--    1 arps    caps   212747 Nov  9 17:11 solve3d.f90
+-rw-r--r--    1 arps    caps    69074 Jan 23  2004 sorad3d.f90
+-rw-r--r--    1 arps    caps    36055 May  8  2003 sunlib3d.f90
+-rw-r--r--    1 arps    caps    47924 Jul  9  2002 sviio3d.f90
+-rw-r--r--    1 arps    caps    23981 May  8  2003 t3dlib3d.f90
+-rw-r--r--    1 arps    caps    52119 Apr  5  2004 thermolib3d.f90
+-rw-r--r--    1 arps    caps     9407 Jul 26  2002 timelib3d.f90
+-rw-r--r--    1 arps    caps   185503 Nov  4 16:56 tinteg3d.f90
+-rw-r--r--    1 arps    caps    37403 Dec 19  2003 tke3d.f90
+-rw-r--r--    1 arps    caps   257856 Dec 19  2003 tmix3d.f90
+-rw-r--r--    1 arps    caps    36104 May  8  2003 tru64lib3d.f90
+-rw-r--r--    1 arps    caps    85698 Feb  8  2005 v5d.c
+-rw-r--r--    1 arps    caps    41857 Nov 17 14:22 v5dio3d.f90
+-rw-r--r--    1 arps    caps    60533 May 28  2002 vfftpack.f90
+-rw-r--r--    1 arps    caps    13283 Feb 15  2004 wwcont3d.f90
+
+./src/arps2wrf:
+total 899
+-rw-r--r--    1 arps    caps     7459 Oct 10 14:36 Makefile
+-rw-r--r--    1 arps    caps    87930 Nov 17 14:22 arps2wrf.f90
+-rw-r--r--    1 arps    caps    15230 Oct 10 14:36 dump_wrf_bdy.f90
+-rw-r--r--    1 arps    caps   167176 Oct 10 14:36 dump_wrf_input.f90
+-rw-r--r--    1 arps    caps    28233 Oct 10 14:36 dump_wrf_static.f90
+-rw-r--r--    1 arps    caps   111676 Nov 17 14:22 interplib.f90
+-rw-r--r--    1 arps    caps     4765 Sep 16 17:46 module_wrf_metadata.f90
+-rw-r--r--    1 arps    caps    28520 Nov 17 14:22 readnamelist.f90
+-rw-r--r--    1 arps    caps    94150 Oct 14 16:18 wrf_iolib.f90
+-rw-r--r--    1 arps    caps    43252 Nov 17 14:22 wrf_ioncd.f90
+-rw-r--r--    1 arps    caps     4631 Sep 16 17:46 wrf_ionophdf5.f90
+-rw-r--r--    1 arps    caps     9108 Sep 16 17:46 wrf_iophdf5.f90
+-rw-r--r--    1 arps    caps    99807 Dec  6  2004 wrf_mpsubs.f90
+-rw-r--r--    1 arps    caps    50968 Nov  2  2004 wrf_nompsubs.f90
+-rw-r--r--    1 arps    caps     5372 Sep 16 17:46 wrf_subs.F90
+-rw-r--r--    1 arps    caps     2839 Sep 16 17:46 wrfsi_cio.c
+-rw-r--r--    1 arps    caps    86449 Sep 16 17:46 wrfsi_subs.f
+-rw-r--r--    1 arps    caps    31024 Nov 17 14:22 wrfstatic.f90
+-rw-r--r--    1 arps    caps    37445 Oct 10 14:36 wrfstaticlib.f90
+
+./src/arps3dvar:
+total 467
+-rw-r--r--    1 arps    caps     9520 Jun  8 11:05 Makefile
+-rw-r--r--    1 arps    caps      434 Jan 19  2005 README.3dvar
+-rw-r--r--    1 arps    caps      359 Jan 19  2005 README.history
+-rw-r--r--    1 arps    caps    63976 Jan 19  2005 Ugrd2obsth.f90
+-rw-r--r--    1 arps    caps    54758 Jan 19  2005 Uprepradar.f90
+-rw-r--r--    1 arps    caps    20552 Jan 19  2005 Urdradcol.f90
+-rw-r--r--    1 arps    caps     1763 Jan 19  2005 Vbck_scale.f90
+-rw-r--r--    1 arps    caps    35679 Jan 19  2005 Vcostf3d.f90
+-rw-r--r--    1 arps    caps     1763 Jan 19  2005 Vctr_to_vbl.f90
+-rw-r--r--    1 arps    caps     2195 Jan 19  2005 Vderac_scale.f90
+-rw-r--r--    1 arps    caps    28333 Jan 19  2005 Vgradc3d.f90
+-rw-r--r--    1 arps    caps     3488 Jan 19  2005 Vinit3dvar.f90
+-rw-r--r--    1 arps    caps     5965 Jan 19  2005 Vlinear_int2d.f90
+-rw-r--r--    1 arps    caps     5520 Jan 19  2005 Vlinear_int3d.f90
+-rw-r--r--    1 arps    caps    39263 Jan 19  2005 Vminim_sub.f90
+-rw-r--r--    1 arps    caps    55462 Feb 25  2005 Vminimization.f90
+-rw-r--r--    1 arps    caps      211 Jan 19  2005 Vmodule_grd.f90
+-rw-r--r--    1 arps    caps     4851 Jan 19  2005 Vrecur_filt1d.f90
+-rw-r--r--    1 arps    caps     3135 Jan 19  2005 Vrecur_filt2d.f90
+-rw-r--r--    1 arps    caps     8522 Jan 19  2005 Vrecur_filt3d.f90
+-rw-r--r--    1 arps    caps     1679 Jan 19  2005 Vrecur_filt3d_scale.f90
+-rw-r--r--    1 arps    caps    11248 Jan 19  2005 Vtrans.f90
+-rw-r--r--    1 arps    caps     1835 Jan 19  2005 Vvbl_to_ctr.f90
+-rw-r--r--    1 arps    caps   111874 Nov 15 23:05 arps3dvar.f90
+
+./src/arps_mp:
+total 204
+-rw-r--r--    1 arps    caps     8133 Dec 19  2003 Makefile
+-rw-r--r--    1 arps    caps      301 May 28  2002 README.arps_mp
+-rw-r--r--    1 arps    caps    33529 Nov  9 17:10 fjoin_hdf.f90
+-rw-r--r--    1 arps    caps    30360 Nov  9 17:10 fjoinbin2hdf.f90
+-rw-r--r--    1 arps    caps    15748 Nov  9 17:10 fjoindumps.f90
+-rw-r--r--    1 arps    caps    20269 Nov  9 17:10 fsplit_hdf.f90
+-rw-r--r--    1 arps    caps    14881 Nov  9 17:10 fsplitdump.f90
+-rw-r--r--    1 arps    caps     6736 Nov  9 17:10 fsplitexbc.f90
+-rw-r--r--    1 arps    caps    24317 Nov  9 17:10 fsplitrestart.f90
+-rw-r--r--    1 arps    caps     8921 Nov  9 17:10 fsplitsoil.f90
+-rw-r--r--    1 arps    caps     8691 Nov  9 17:10 fsplitsoilini.f90
+-rw-r--r--    1 arps    caps     5357 Nov  9 17:10 fsplitterrain.f90
+-rw-r--r--    1 arps    caps     3069 Jul 18  2002 joinbin2hdf.f90
+-rw-r--r--    1 arps    caps     1582 May 28  2002 joinfile.f90
+-rw-r--r--    1 arps    caps     6694 Dec 19  2003 joinfiles.f90
+-rw-r--r--    1 arps    caps     3366 Jul 17  2003 joinhdf.f90
+-rw-r--r--    1 arps    caps      123 Jul 16  2003 nohdf.f90
+-rw-r--r--    1 arps    caps     9528 Dec 19  2003 splitfiles.f90
+-rw-r--r--    1 arps    caps     2250 Dec 19  2003 splithdf.f90
+
+./src/arpsagr:
+total 475
+-rw-r--r--    1 arps    caps    12075 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      617 May 28  2002 README.arpsagr
+-rw-r--r--    1 arps    caps    32936 May 28  2002 arpsagr.f90
+-rw-r--r--    1 arps    caps    32959 May 28  2002 arpscnst.f90
+-rw-r--r--    1 arps    caps    46472 May 28  2002 arpsinit.f90
+-rw-r--r--    1 arps    caps    18806 May 28  2002 arpsolve.f90
+-rw-r--r--    1 arps    caps    16705 May 28  2002 arpsout.f90
+-rw-r--r--    1 arps    caps    24716 May 28  2002 arpsplot.f90
+-rw-r--r--    1 arps    caps    16997 May 28  2002 arpstgrid.f90
+-rw-r--r--    1 arps    caps     5495 May 28  2002 change_cnst.f90
+-rw-r--r--    1 arps    caps      965 May 28  2002 cpucray.f90
+-rw-r--r--    1 arps    caps      966 May 28  2002 cpugen.f90
+-rw-r--r--    1 arps    caps      965 May 28  2002 cpuibm.f90
+-rw-r--r--    1 arps    caps      965 May 28  2002 cpusun.f90
+-rw-r--r--    1 arps    caps     7299 May 28  2002 filgrd.f90
+-rw-r--r--    1 arps    caps     1632 May 28  2002 fill.f90
+-rw-r--r--    1 arps    caps     2478 May 28  2002 initcgrd.f90
+-rw-r--r--    1 arps    caps    18387 May 28  2002 inivar.f90
+-rw-r--r--    1 arps    caps     8043 May 28  2002 manage.f90
+-rw-r--r--    1 arps    caps    21248 May 28  2002 packcray.f90
+-rw-r--r--    1 arps    caps      782 May 28  2002 packgen.f90
+-rw-r--r--    1 arps    caps    29741 May 28  2002 pointf.f90
+-rw-r--r--    1 arps    caps    12660 May 28  2002 regrid.f90
+-rw-r--r--    1 arps    caps     6369 May 28  2002 setstr.f90
+-rw-r--r--    1 arps    caps    11056 May 28  2002 tick.f90
+-rw-r--r--    1 arps    caps    60731 May 28  2002 updbc.f90
+-rw-r--r--    1 arps    caps    14996 May 28  2002 updexbc.f90
+-rw-r--r--    1 arps    caps    35102 May 28  2002 updgrd.f90
+-rw-r--r--    1 arps    caps     1351 May 28  2002 usrout.f90
+-rw-r--r--    1 arps    caps    35703 May 28  2002 util1.f90
+
+./src/arpsassim:
+total 452
+-rw-r--r--    1 arps    caps     8144 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      232 May 28  2002 README.assim
+-rw-r--r--    1 arps    caps    50117 Jul  9  2002 arpsassim.f90
+-rw-r--r--    1 arps    caps    13414 May 31  2002 assimadasread.f90
+-rw-r--r--    1 arps    caps     5347 May 28  2002 assimblnd.f90
+-rw-r--r--    1 arps    caps     4831 May 28  2002 assimchk.f90
+-rw-r--r--    1 arps    caps    24416 May 28  2002 assimcon.f90
+-rw-r--r--    1 arps    caps    32431 Aug  9  2003 assimdriv.f90
+-rw-r--r--    1 arps    caps    14980 May 28  2002 assimfil.f90
+-rw-r--r--    1 arps    caps     5529 May 28  2002 assimfz.f90
+-rw-r--r--    1 arps    caps    19270 May 28  2002 assimout.f90
+-rw-r--r--    1 arps    caps    12404 May 28  2002 assimpois.f90
+-rw-r--r--    1 arps    caps    14447 May 28  2002 assimpsolver.f90
+-rw-r--r--    1 arps    caps    42565 Jul  9  2002 assimptpr.f90
+-rw-r--r--    1 arps    caps    10138 May 28  2002 assimradread.f90
+-rw-r--r--    1 arps    caps    38548 May 31  2002 assimrd.f90
+-rw-r--r--    1 arps    caps    31333 May 28  2002 assimthermo.f90
+-rw-r--r--    1 arps    caps    20172 May 28  2002 assimtinpl.f90
+-rw-r--r--    1 arps    caps    46389 Jul  9  2002 assimvel.f90
+-rw-r--r--    1 arps    caps     9161 May 28  2002 assimvrfil.f90
+-rw-r--r--    1 arps    caps    19293 May 28  2002 head3d.f90
+-rw-r--r--    1 arps    caps    33894 May 28  2002 initassim.f90
+
+./src/arpscvt:
+total 111
+-rw-r--r--    1 arps    caps     4943 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      190 May 28  2002 README.arpscvt
+-rw-r--r--    1 arps    caps    39615 Nov 17 14:22 arpscvt.f90
+-rw-r--r--    1 arps    caps    51828 Oct 14 16:18 cvtiolib3d.f90
+-rw-r--r--    1 arps    caps     1432 May 28  2002 dummycvt.f90
+-rw-r--r--    1 arps    caps    14176 Aug 30  2004 hdf2grads.f90
+
+./src/arpscvtobs:
+total 70
+-rw-r--r--    1 arps    caps     4480 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps        0 Jul 19  2002 README.arpscvtobs
+-rw-r--r--    1 arps    caps    26378 Jul 14  2004 arpscvtobs.f90
+-rw-r--r--    1 arps    caps     2445 Jul 19  2002 module_verifhdf.f90
+-rw-r--r--    1 arps    caps    37786 Jul 14  2004 wrtlsohdf.f90
+
+./src/arpsdiff:
+total 132
+-rw-r--r--    1 arps    caps     5223 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      377 May 28  2002 README.arpsdiff
+-rw-r--r--    1 arps    caps   114324 Nov  4  2002 arpsdiff.f90
+-rw-r--r--    1 arps    caps    14080 Jun  1  2002 arpsraindiff.f90
+
+./src/arpsens:
+total 276
+-rw-r--r--    1 arps    caps     6070 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      141 May 28  2002 README.arpsens
+-rw-r--r--    1 arps    caps    32562 Mar 11  2003 arpsensbc.f90
+-rw-r--r--    1 arps    caps   174726 Nov  9 17:13 arpsenscv.f90
+-rw-r--r--    1 arps    caps    67101 May 13  2003 arpsensic.f90
+
+./src/arpsextsnd:
+total 69
+-rw-r--r--    1 arps    caps     5159 Jun  3 12:09 Makefile
+-rw-r--r--    1 arps    caps      217 May 28  2002 README.arpsextsnd
+-rw-r--r--    1 arps    caps    63813 Apr 26  2005 arpsextsnd.f90
+
+./src/arpsintrp:
+total 275
+-rw-r--r--    1 arps    caps     5874 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      389 May 28  2002 README.intrp
+-rw-r--r--    1 arps    caps   160666 Apr 29  2005 arpsintrp.f90
+-rw-r--r--    1 arps    caps   110745 Apr 24  2004 arpsintrp_ls.f90
+-rw-r--r--    1 arps    caps     1416 Nov 13  2003 check_file.f90
+-rw-r--r--    1 arps    caps     1306 May 28  2002 dummyintrp.f90
+
+./src/arpsplt:
+total 809
+-rw-r--r--    1 arps    caps    10194 Feb  3  2003 HISTORY
+-rw-r--r--    1 arps    caps    10346 Jun 15 10:48 Makefile
+-rw-r--r--    1 arps    caps      260 May 28  2002 README.arpsplt
+-rw-r--r--    1 arps    caps   258482 Nov 17 14:22 arpsplt.f90
+-rw-r--r--    1 arps    caps     3434 May 28  2002 arpsplt_cpu.f90
+-rw-r--r--    1 arps    caps   111071 Apr 18  2005 arpspltderive.f90
+-rw-r--r--    1 arps    caps   361249 Nov 17 14:22 arpspltlib.f90
+-rw-r--r--    1 arps    caps    21687 May 28  2002 arpspltmax.f90
+-rw-r--r--    1 arps    caps     1436 May 28  2002 dummyplt.f90
+-rw-r--r--    1 arps    caps     7253 Apr 23  2005 mpisubs.f90
+-rw-r--r--    1 arps    caps      732 Apr 18  2005 nompisubs.f90
+-rw-r--r--    1 arps    caps     7534 May 28  2002 plot_coltab.f90
+-rw-r--r--    1 arps    caps    15499 Apr  5  2004 pltgrid.f90
+-rw-r--r--    1 arps    caps     9697 Jul 26  2002 read_surface_obs.f90
+-rw-r--r--    1 arps    caps     4729 Apr 18  2005 wirfrm.f90
+-rw-r--r--    1 arps    caps     1421 May 28  2002 wirfrmstub.f90
+
+./src/arpsprt:
+total 46
+-rw-r--r--    1 arps    caps     4405 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      223 May 28  2002 README.arpsprt
+-rw-r--r--    1 arps    caps    30632 May 31  2002 arpsprt.f90
+-rw-r--r--    1 arps    caps     9225 May 31  2002 arpsprtlib.f90
+-rw-r--r--    1 arps    caps     1432 May 28  2002 dummyprt.f90
+
+./src/arpssfc:
+total 157
+-rw-r--r--    1 arps    caps     4672 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      271 May 28  2002 README.arpssfc
+-rw-r--r--    1 arps    caps    38037 Oct 31 15:50 arpssfc.f90
+-rw-r--r--    1 arps    caps   115210 Nov  9 17:09 arpssfclib.f90
+-rw-r--r--    1 arps    caps      806 May 28  2002 sfc_winter.tbl
+
+./src/arpssoil:
+total 160
+-rw-r--r--    1 arps    caps     4965 Nov  9 17:07 Makefile
+-rw-r--r--    1 arps    caps      283 May 28  2002 README.arpssoil
+-rw-r--r--    1 arps    caps    40155 Nov  9 17:07 arpssoil.f90
+-rw-r--r--    1 arps    caps    17239 May 28  2002 barnes3d.f90
+-rw-r--r--    1 arps    caps     1432 May 28  2002 dummysoil.f90
+-rw-r--r--    1 arps    caps    79488 Nov  9 17:07 mksoilvar.f90
+-rw-r--r--    1 arps    caps    14308 May 28  2002 mnet2arps.f90
+-rw-r--r--    1 arps    caps     3834 May 28  2002 read_obs.f90
+
+./src/arpstern:
+total 160
+-rw-r--r--    1 arps    caps     5344 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      266 May 28  2002 README.terrain
+-rw-r--r--    1 arps    caps   115430 Oct 31 15:50 arpstern.f90
+-rw-r--r--    1 arps    caps    13402 May 28  2002 dir1deg.f90
+-rw-r--r--    1 arps    caps     9014 May 28  2002 dir30sec.f90
+-rw-r--r--    1 arps    caps    14281 May 28  2002 dir5min.f90
+-rw-r--r--    1 arps    caps     2166 May 28  2002 dummymtrn.f90
+-rw-r--r--    1 arps    caps       40 May 28  2002 load1deg.file
+-rw-r--r--    1 arps    caps       42 May 28  2002 load30sec.file
+-rw-r--r--    1 arps    caps       78 May 28  2002 load5min.file
+
+./src/arpstintrp:
+total 45
+-rw-r--r--    1 arps    caps     4872 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      317 May 28  2002 README.tintrp
+-rw-r--r--    1 arps    caps    38645 Dec 19  2003 arpstintrp.f90
+-rw-r--r--    1 arps    caps     1306 May 28  2002 dummyintrp.f90
+
+./src/arpstrn:
+total 180
+-rw-r--r--    1 arps    caps     5300 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      202 May 28  2002 README.arpstrn
+-rw-r--r--    1 arps    caps    62988 Nov  9 17:10 arpstrn.f90
+-rw-r--r--    1 arps    caps      402 Jun 17 16:10 europe_dem.index
+-rw-r--r--    1 arps    caps    23365 May 28  2002 mergetrn.f90
+-rw-r--r--    1 arps    caps     1332 Aug  1  2002 nozxplot.f90
+-rw-r--r--    1 arps    caps    88699 May 25  2005 usgs_dem.index
+
+./src/arpsverif:
+total 653
+-rw-r--r--    1 arps    caps     9142 Nov 10 17:38 Makefile
+-rw-r--r--    1 arps    caps       68 May 28  2002 README.arpsverif
+-rw-r--r--    1 arps    caps     5463 May 28  2002 arps_nn.c
+-rw-r--r--    1 arps    caps   191013 Nov 10 17:38 arpshis2ver.f90
+-rw-r--r--    1 arps    caps    26180 Nov 10 17:38 arpsverif.f90
+-rw-r--r--    1 arps    caps    17807 May 28  2002 avgverifgrid.f90
+-rw-r--r--    1 arps    caps    30928 May 28  2002 cvt2verif.f90
+-rw-r--r--    1 arps    caps     4780 May 28  2002 extdims2.f90
+-rw-r--r--    1 arps    caps    35343 May 28  2002 getgrib.f90
+-rw-r--r--    1 arps    caps    24056 May 28  2002 gribcst2.f90
+-rw-r--r--    1 arps    caps     1239 May 28  2002 indtflg.f90
+-rw-r--r--    1 arps    caps    11356 May 28  2002 intfield2.f90
+-rw-r--r--    1 arps    caps    18069 May 28  2002 intqpf.f90
+-rw-r--r--    1 arps    caps     4017 May 28  2002 intverifh.f90
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 iplib/
+-rw-r--r--    1 arps    caps     1661 May 28  2002 module_verif.f90
+-rw-r--r--    1 arps    caps      952 May 28  2002 module_verifhdf.f90
+-rw-r--r--    1 arps    caps     7164 May 28  2002 qpfmask.f90
+-rw-r--r--    1 arps    caps    28460 May 28  2002 qpfstats.f90
+-rw-r--r--    1 arps    caps    16545 Jun  1  2002 rdarpsqpf.f90
+-rw-r--r--    1 arps    caps    18552 May 28  2002 rdnmcgrb3d2.f90
+-rw-r--r--    1 arps    caps    18736 May 28  2002 rdverifstats.f90
+-rw-r--r--    1 arps    caps     5185 May 28  2002 setijloc2.f90
+-rw-r--r--    1 arps    caps    74388 Nov 10 17:38 verif_hdf.f90
+-rw-r--r--    1 arps    caps     5021 Nov 10 17:38 verif_mpsubs.f90
+-rw-r--r--    1 arps    caps     1657 Nov 10 17:38 verif_nompsubs.f90
+-rw-r--r--    1 arps    caps     3550 Nov 10 17:38 verif_sort.f90
+-rw-r--r--    1 arps    caps    29428 May 28  2002 verifgrid.f90
+-rw-r--r--    1 arps    caps     5538 May 28  2002 veriflib.f90
+-rw-r--r--    1 arps    caps    57745 Nov 10 17:38 verifstatslib.f90
+-rw-r--r--    1 arps    caps     2498 May 28  2002 vgridconst.f90
+
+./src/arpsverif/iplib:
+total 856
+-rw-r--r--    1 arps    caps     5428 Nov 10 17:38 Makefile
+-rw-r--r--    1 arps    caps   142483 Aug  1  2002 decode.f
+-rw-r--r--    1 arps    caps   141192 May 28  2002 encode.f
+-rw-r--r--    1 arps    caps     3094 May 28  2002 gausslat.f
+-rw-r--r--    1 arps    caps     1222 May 28  2002 gcdist.f
+-rw-r--r--    1 arps    caps     1800 May 28  2002 gdsawt.f
+-rw-r--r--    1 arps    caps     5310 May 28  2002 gdswiz00.f
+-rw-r--r--    1 arps    caps     5578 May 28  2002 gdswiz01.f
+-rw-r--r--    1 arps    caps     7015 May 28  2002 gdswiz03.f
+-rw-r--r--    1 arps    caps     6278 May 28  2002 gdswiz04.f
+-rw-r--r--    1 arps    caps     6319 May 28  2002 gdswiz05.f
+-rw-r--r--    1 arps    caps     9465 May 28  2002 gdswizc9.f
+-rw-r--r--    1 arps    caps     8681 May 28  2002 gdswizca.f
+-rw-r--r--    1 arps    caps     8886 May 28  2002 gdswzd.f
+-rw-r--r--    1 arps    caps     7102 May 28  2002 gdswzd00.f
+-rw-r--r--    1 arps    caps     6889 May 28  2002 gdswzd01.f
+-rw-r--r--    1 arps    caps     9079 May 28  2002 gdswzd03.f
+-rw-r--r--    1 arps    caps     7794 May 28  2002 gdswzd04.f
+-rw-r--r--    1 arps    caps     8673 May 28  2002 gdswzd05.f
+-rw-r--r--    1 arps    caps    11868 May 28  2002 gdswzdc9.f
+-rw-r--r--    1 arps    caps    10784 May 28  2002 gdswzdca.f
+-rw-r--r--    1 arps    caps     3718 May 28  2002 ijkgds.f
+-rw-r--r--    1 arps    caps     8696 May 28  2002 ipolates.f
+-rw-r--r--    1 arps    caps    10743 May 28  2002 ipolatev.f
+-rw-r--r--    1 arps    caps     5879 May 28  2002 ipxetas.f
+-rw-r--r--    1 arps    caps     6740 May 28  2002 ipxwafs.f
+-rw-r--r--    1 arps    caps     7960 May 28  2002 ipxwafs2.f
+-rw-r--r--    1 arps    caps     7342 May 28  2002 makgds.f
+-rw-r--r--    1 arps    caps     2856 May 28  2002 movect.f
+-rw-r--r--    1 arps    caps     7800 May 28  2002 polateg0.f
+-rw-r--r--    1 arps    caps    20269 May 28  2002 polateg1.f
+-rw-r--r--    1 arps    caps     9368 May 28  2002 polateg4.f
+-rw-r--r--    1 arps    caps     6904 May 28  2002 polates0.f
+-rw-r--r--    1 arps    caps    11395 May 28  2002 polates1.f
+-rw-r--r--    1 arps    caps     5541 May 28  2002 polates2.f
+-rw-r--r--    1 arps    caps     9018 May 28  2002 polates3.f
+-rw-r--r--    1 arps    caps    10950 May 28  2002 polates4.f
+-rw-r--r--    1 arps    caps    13170 May 28  2002 polates5.f
+-rw-r--r--    1 arps    caps     7618 May 28  2002 polates6.f
+-rw-r--r--    1 arps    caps    10516 May 28  2002 polatev0.f
+-rw-r--r--    1 arps    caps    18810 May 28  2002 polatev1.f
+-rw-r--r--    1 arps    caps     7484 May 28  2002 polatev2.f
+-rw-r--r--    1 arps    caps    12260 May 28  2002 polatev3.f
+-rw-r--r--    1 arps    caps    12937 May 28  2002 polatev4.f
+-rw-r--r--    1 arps    caps     9130 May 28  2002 polatev6.f
+-rw-r--r--    1 arps    caps     2680 May 28  2002 polfixs.f
+-rw-r--r--    1 arps    caps     3497 May 28  2002 polfixv.f
+-rw-r--r--    1 arps    caps     5512 May 28  2002 r63w72.f
+-rw-r--r--    1 arps    caps   156748 May 28  2002 w3fi63.f
+-rw-r--r--    1 arps    caps     6689 May 28  2002 w3fi68.f
+-rw-r--r--    1 arps    caps    33897 May 28  2002 w3fi71.f
+-rw-r--r--    1 arps    caps    12265 May 28  2002 w3fi74.f
+
+./src/ext2arps:
+total 1315
+-rw-r--r--    1 arps    caps    11188 May 20  2005 Makefile
+-rw-r--r--    1 arps    caps      451 May 28  2002 README.ext2arps
+-rw-r--r--    1 arps    caps    91885 Jun 20  2003 arps2eta212.f90
+-rw-r--r--    1 arps    caps    61719 Jul 20 13:42 arps2gem.f90
+-rw-r--r--    1 arps    caps    94793 Nov  9 17:05 arps2ncdf.f90
+-rw-r--r--    1 arps    caps     6972 Apr 29  2005 dummye2a.f90
+-rw-r--r--    1 arps    caps   173314 Nov 17 14:22 ext2arps.f90
+-rw-r--r--    1 arps    caps    50861 Apr 29  2005 extlib.f90
+-rw-r--r--    1 arps    caps    48207 Jul 26  2002 extract_avn.f90
+-rw-r--r--    1 arps    caps    10019 May 28  2002 getcoamps.f90
+-rw-r--r--    1 arps    caps   303810 Nov 21 10:34 getextd3d.f90
+-rw-r--r--    1 arps    caps   104215 May 28  2002 getgempak3d.f90
+-rw-r--r--    1 arps    caps    22047 May 28  2002 getlaps3d.f90
+-rw-r--r--    1 arps    caps    13497 Aug 30  2004 gribio_c.c
+-rw-r--r--    1 arps    caps   169865 Aug 15 21:48 griblib3d.f90
+-rw-r--r--    1 arps    caps   126324 Jun 28 20:41 nmcdecode.f90
+-rw-r--r--    1 arps    caps     5698 May 28  2002 nogempak3d.f90
+-rw-r--r--    1 arps    caps     1430 May 28  2002 nolaps3d.f90
+-rw-r--r--    1 arps    caps    40095 Nov 10 17:27 rdnmcgrb3d.f90
+-rw-r--r--    1 arps    caps     4286 Nov  9 17:05 v2dint.f90
+
+./src/external:
+total 5
+drwxr-sr-x    2 arps    caps       95 Nov 29 17:07 inc/
+drwxr-sr-x    2 arps    caps      123 Nov 29 17:07 io_int/
+drwxr-sr-x    2 arps    caps     4096 Nov 29 17:07 io_phdf5/
+
+./src/external/inc:
+total 12
+-rw-r--r--    1 arps    caps       71 Jan 20  2005 README
+-rw-r--r--    1 arps    caps     1897 Jan 20  2005 intio_tags.h
+-rw-r--r--    1 arps    caps      780 Jan 20  2005 wrf_io_flags.h
+-rw-r--r--    1 arps    caps     8360 Jan 20  2005 wrf_status_codes.h
+
+./src/external/io_int:
+total 100
+-rw-r--r--    1 arps    caps     1638 Sep 16 17:46 Makefile
+-rwxr-xr-x    1 arps    caps     1019 Jan 20  2005 README.int*
+-rw-r--r--    1 arps    caps    54322 Jan 20  2005 io_int.F90
+-rw-r--r--    1 arps    caps    40649 Nov  4 16:00 module_internal_header_util.F
+-rw-r--r--    1 arps    caps     2584 Jan 20  2005 pack_utils.c
+
+./src/external/io_phdf5:
+total 336
+-rwxr-xr-x    1 arps    caps    48851 Dec  7  2004 INSTALL.htm*
+-rw-r--r--    1 arps    caps     1923 Sep 16 17:46 Makefile
+-rwxr-xr-x    1 arps    caps     2237 Dec  7  2004 README.phdf5*
+-rw-r--r--    1 arps    caps   183548 Mar 15  2005 wrf-phdf5.F90
+-rw-r--r--    1 arps    caps    33493 Dec 21  2004 wrf-phdf5attr.F90
+-rw-r--r--    1 arps    caps    27200 Feb  4  2005 wrf-phdf5bdy.F90
+-rw-r--r--    1 arps    caps    44831 Dec  7  2004 wrf-phdf5support.F90
+
+./src/f77tof90:
+total 196
+-rw-r--r--    1 arps    caps    67423 May 28  2002 F90ARPS.html
+-rw-r--r--    1 arps    caps     2653 May 28  2002 NOTES
+-rw-r--r--    1 arps    caps    58727 May 28  2002 convert_inc_to_mod.f90
+-rw-r--r--    1 arps    caps    71080 May 28  2002 convert_src_to_f90.f90
+
+./src/mci2arps:
+total 224
+-rw-r--r--    1 arps    caps     7185 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      253 May 28  2002 README.mci2arps
+-rw-r--r--    1 arps    caps    14120 Nov 18 10:07 calib.c
+-rw-r--r--    1 arps    caps     2378 Nov 18 10:07 gldtonat.c
+-rw-r--r--    1 arps    caps     5990 Apr 18  2005 inisatarps.f90
+-rw-r--r--    1 arps    caps    14969 Nov 18 10:07 maptran.c
+-rw-r--r--    1 arps    caps    30124 Nov 18 10:07 mci2arps.c
+-rw-r--r--    1 arps    caps    12301 Nov 18 10:07 mergesat.c
+-rw-r--r--    1 arps    caps     1063 May 28  2002 palgrey.hdf
+-rw-r--r--    1 arps    caps     1143 Feb 21  2003 pltmap.f90
+-rw-r--r--    1 arps    caps     8488 May 28  2002 pltsatfld.f90
+-rw-r--r--    1 arps    caps    24524 Nov 18 10:07 sat2arps.c
+-rw-r--r--    1 arps    caps    14931 Nov 18 10:07 sat_read.c
+-rw-r--r--    1 arps    caps    66700 Nov 18 10:07 sat_tran.c
+-rw-r--r--    1 arps    caps     6371 May 28  2002 solcor.f90
+-rw-r--r--    1 arps    caps     6083 May 28  2002 sunfuncs.f90
+-rw-r--r--    1 arps    caps     7795 Apr 18  2005 wtsatfld.f90
+
+./src/skewt:
+total 292
+-rw-r--r--    1 arps    caps     5285 Jun  3 12:42 Makefile
+-rw-r--r--    1 arps    caps     1684 Jun  3 12:09 README.skewt
+-rw-r--r--    1 arps    caps     3212 Oct 31 15:50 barb.f
+-rw-r--r--    1 arps    caps    32034 Jun  3 12:09 c.miscsubs2.f
+-rw-r--r--    1 arps    caps     7449 Jun  3 12:09 denmwind.f
+-rw-r--r--    1 arps    caps     5077 Jun  3 12:09 helcont.f
+-rw-r--r--    1 arps    caps     9146 Jun  3 12:09 hodograph.f
+-rw-r--r--    1 arps    caps    45233 Jun  3 12:09 indices.f
+-rw-r--r--    1 arps    caps     5292 Jun  3 12:09 misc_kb.f
+-rw-r--r--    1 arps    caps    15750 Jun  3 12:09 myzxsubs.f
+-rw-r--r--    1 arps    caps    11818 Jun 28 20:41 parseinput.f90
+-rw-r--r--    1 arps    caps    29115 Jun  3 12:09 preciptype.f
+-rw-r--r--    1 arps    caps    26075 Jun  3 12:09 readsound.f
+-rw-r--r--    1 arps    caps     6881 Jun  3 12:09 sfcupd.f
+-rw-r--r--    1 arps    caps    68886 Jun 28 20:41 skewt.F90
+-rw-r--r--    1 arps    caps    22084 Jun  3 12:09 thermosubs.f
+
+./src/wrf2arps:
+total 470
+-rw-r--r--    1 arps    caps     6526 May 20  2005 Makefile
+-rw-r--r--    1 arps    caps     6972 Apr 23  2005 dummye2a.f90
+-rw-r--r--    1 arps    caps    53011 May 20  2005 get_wrf_multi_files.f90
+-rw-r--r--    1 arps    caps    44254 May 20  2005 get_wrf_one_file.f90
+-rw-r--r--    1 arps    caps    94145 May 20  2005 getwrfd3d.f90
+-rw-r--r--    1 arps    caps   145458 Nov 17 14:22 wrf2arps.f90
+-rw-r--r--    1 arps    caps    28848 Jan 26  2005 wrf_ioncd.f90
+-rw-r--r--    1 arps    caps     3669 Apr 23  2005 wrf_ionophdf5.f90
+-rw-r--r--    1 arps    caps     5023 Feb 17  2005 wrf_iophdf5.f90
+-rw-r--r--    1 arps    caps    53846 Apr 23  2005 wrf_mpsubs.f90
+-rw-r--r--    1 arps    caps    13308 Apr 23  2005 wrf_nompsubs.f90
+-rw-r--r--    1 arps    caps     1746 Feb 17  2005 wrf_subs.F90
+-rw-r--r--    1 arps    caps    21390 Apr 18  2005 wrfintrplib.f90
+
+./src/wtretcol:
+total 34
+-rw-r--r--    1 arps    caps     4592 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps        0 May 28  2002 README.wtretcol
+-rw-r--r--    1 arps    caps     1432 May 28  2002 dummywtr.f90
+-rw-r--r--    1 arps    caps    28092 Nov 17 14:22 wtretcol.f90
+
+./src/zxplot:
+total 441
+-rw-r--r--    1 arps    caps     4620 Dec 17  2003 Makefile
+-rw-r--r--    1 arps    caps      471 Nov 17  2003 README
+-rw-r--r--    1 arps    caps    37745 Nov 17  2003 xncar3.f
+-rw-r--r--    1 arps    caps    21558 May 16  2005 xpost3.f
+-rw-r--r--    1 arps    caps     9620 Nov 17  2003 zxnglib3.f
+-rw-r--r--    1 arps    caps   363797 Jun  2 12:24 zxplot3.f
+-rw-r--r--    1 arps    caps    12202 Nov 17  2003 zxpslib3.f

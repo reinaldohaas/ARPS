@@ -1,0 +1,5 @@
+
+This directory contains source code for ARPSCVT, a program for converting
+among ARPS history dump formats.
+
+Doing 'makearps arpscvt' in arps root directory compiles and links this package.

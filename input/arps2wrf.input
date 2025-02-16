@@ -1,0 +1,688 @@
+!
+!     ##################################################################
+!     ##################################################################
+!     ######                                                      ######
+!     ######      INPUT FILE FOR ARPS2WRF IN NAMELIST FORMAT      ######
+!     ######                 ( Version ARPS5.3.2 )                ######
+!     ######                                                      ######
+!     ######                     Developed by                     ######
+!     ######     Center for Analysis and Prediction of Storms     ######
+!     ######                University of Oklahoma                ######
+!     ######                                                      ######
+!     ##################################################################
+!     ##################################################################
+!
+!-----------------------------------------------------------------------
+!
+!   AUTHOR:
+!
+!   Yunheng Wang, CAPS
+!   6/29/03
+!
+!-----------------------------------------------------------------------
+!
+!   MODIFICATION HISTORY
+!
+!   03/10/2004 Yunheng Wang
+!   To support WRF version 1.4 or pre-release of version 2.0.
+!
+!   07/28/2004 Yunheng Wang
+!   Upgraded WRF v1.4 support to WRF V2.0 support.
+!
+!   11/20/2004 Yunheng Wang
+!   Upgraded to support WRF V2.0.3 only and Added support for PHDF5
+!   format.
+!
+!   09/16/2005 Yunheng Wang
+!   Upgraded to support WRF V2.1 only and added support for WRFSTATIC.
+!
+!   01/10/2007 Yunheng Wang
+!   Upgraded to WRFV2.2 and WPS and added nesting capability for WRF.
+!
+!-----------------------------------------------------------------------
+!
+!-----------------------------------------------------------------------
+!
+!  Message passing namelist
+!
+!  nproc_x     : processor number in X direction
+!  nproc_y     : processor number in Y direction
+!
+!  readsplit_in : flag indicates whether the program needs to split the
+!                 data files.
+!                = 1, Data for all processors is in one joined file, such
+!                     as the data dumped from joinfiles, or specifing
+!                     dmp_out_joined = 1 while run ARPS.
+!                = 0, Data are all split, needs to specify the following
+!                     two parameters.
+!
+!    nprocx_in : Valid only when readsplit = 0. processor number when
+!                the data to be read was dumped.
+!                It must be a multiple of nproc_x.
+!    nprocy_in : Same as nprocx_in but in Y direction. It must be
+!                a multiple of nproc_y
+!
+!  NOTE:  At present, arps2wrf_mpi only supported for the case when
+!         WRF horizontal grid matches with ARPS horizontal grid.
+!         i.e. use_arps_grid = 1.
+!
+!---------------------------------------------------------------------
+
+ &message_passing
+   nproc_x = 1,
+   nproc_y = 1,
+
+   readsplit_in = 1,
+     nprocx_in = 1,
+     nprocy_in = 1,
+ /
+
+!-----------------------------------------------------------------------
+!
+! domains     Instruct arps2wrf to generate wrfinput_dxx for multiple
+!             nested domains.
+!
+! max_dom     The number of nested domains to be precessed. You can specify
+!             up to 100 domains.
+!
+! parent_id   The parent grid identity. Specify 1 for the very first domains.
+!             Specify the parent id for all other domains in order. Note
+!             that any parent must precede all of its child grids. For example
+!             if we have 3 domains while the first domain is the parent of the
+!             other two grids and the other two grids are siblings. You should
+!             spcify,
+!                max_dom   = 3,
+!                parent_id = 1, 1, 1,
+!
+! input_from_file  Specify whether ARPS input file will be provided for each
+!             domain. If the value is .FALSE. for a nesting domain, the
+!             program is used to generate file namelist.input only. The
+!             first value must be .TRUE..
+!
+! NOTE: When input_from_file = .TRUE. and use_arps_grid = 1, the nesting position
+!       will be determined from central lat/lon in the data file. Parameter
+!       i_parent_start/j_parent_start is ignored. Otherwise, parameters
+!       i_parent_start/j_parent_start in this file is significant.
+!
+!       When input_from_file = .False., it implies use_arps_grid = 0 for
+!       that domain. So parameters nx_wrf, ny_wrf, dx_wrf, dy_wrf,
+!       i_parent_start, j_parent_start below should be set accordingly.
+!
+!-----------------------------------------------------------------------
+
+ &domains
+   max_dom   = 1,
+   parent_id = 1, 1,
+   input_from_file = .TRUE., .TRUE.,
+ /
+
+!-----------------------------------------------------------------------
+!
+!  history_data   specify files for WRF input data. It can be either ADAS
+!                 analysis, or ARPS history dumps or EXT2ARPS outputs.
+!
+!  hinfmt  input data format option. The available options are:
+!     = 1, unformatted binary data dump
+!     = 3, HDF format
+!     = 7, NetCDF format
+!
+!  adasbasfn  Base-state and grid data file name.
+!  adashisfn  History data files to be converted.
+!
+!  Note: Domain dimensions nx, ny and nz are obtained from file grdbasfn.
+!
+!-----------------------------------------------------------------------
+!
+ &history_data
+   hinfmt     = 3,                        3,
+   adasbasfn  = 'adas25may1998.hdfgrdbas','eta25may1998.hdfgrdbas',
+   adashisfn  = 'adas25may1998.hdf000000','eta25may1998.hdf000000',
+ /
+
+!----------------------------------------------------------------------
+!
+!  sfcinitopt  Option to initialize surface characteristics
+!              (Vegetation type, Soil type, land mask etc.)
+!            =  'WRFSI' read from static file - specified by "sfcdtfn" blow -
+!                       which was created by gridgen_model.exe
+!                       from WRFSI package. Must be at the same WRF
+!                       grid as that defined below.
+!            =  'ARPS'  read from sfcdtfn specified below which was
+!                       dumped by ARPSSFC from ARPS package. Must be at
+!                       the same grid as that in the ARPS history data
+!                       specified above.
+!            =  'WRF'   read WRF static file, generated by WRFSTATIC or
+!                       program staticpost in WRFSI package.
+!            =  'GEOGRID'   read WRF static file, generated by program
+!                           geogrid from the WPS package since WRFV2.2.
+!
+!  wrftrnopt   Option for WRF terrain data
+!            = 0, read in from ADAS data file,
+!            = 1, read in form WRF static file (sfcinitopt == 'WRF'/'WRFSI')
+!
+!  sfcdtfn   Data file containing the surface characteristics
+!            (soil and vegetation type, leaf area index and surface roughness).
+!
+!  sfcfmt    Format of data file containing surface characteristics.
+!            Only for ARPS surface data. WRFSI static file must be always
+!            in NetCDF format.
+!          = 1, Fortran unformatted;
+!          = 3, HDF format
+!          = 7, NetCDF 3.0 format.
+!
+!  geogdir    Outside static data set directory. Used only by WRFSTATIC.
+!             Must first download WRFSI static data sets from
+!             http://www.mmm.ucar.edu/wrf/users/download/get_source2.html
+!
+!  silavwt_parm_wrf   0,1,2,3, see WRFSI, src/grid/README_toptwvl_silavwt.
+!  toptwvl_parm_wrf   specifying the wavelength, in grid-cell size units, of
+!                     the smallest horizontal modes of terrain height data
+!
+!  start_date Used only for WRFSTATIC and if use_arps_grid = 0
+!
+!---------------------------------------------------------------------
+
+ &sfcdt
+   sfcinitopt = 'WRF',          'WRF',
+   wrftrnopt  =    0 ,             0 ,
+   sfcdtfn    = 'wrfstatic_d01','wrfstatic_d02',
+     sfcfmt   = 7,
+
+     geogdir   = '/home/ywang/data/GEOG/',
+     silavwt_parm_wrf = 0.0,
+     toptwvl_parm_wrf = 2.0,
+     start_date = '1998-05-25_00:00:00', '1998-05-26_00:00:00',
+ /
+
+!--------------------------------------------------------------------
+!
+! Specify whether to create lateral boundary file for WRF
+!
+!   create_bdy = 0,  Do not create WRF boundary file
+!              = 1,  The program will also create WRF boundary file.
+!                    The time interval in the WRF boundary file is
+!                    the same as those specified by tbgn_bdyin, tintv_bdyin,
+!                    & tend_bydin. Note that the WRF model requires
+!                    evenly distributed boundary data. If data at
+!                    any time level is missed, the program will do time
+!                    interpolation automatically. For the best results,
+!                    please make sure the missing data files are not too many.
+!              = 2,  The time interval in the WRF boundary file will be
+!                    specified by parameter tintv_bdywrf. Note that
+!                    this option handles the case when the desired
+!                    time interval is different from that available
+!                    in the ARPS data files. The actual WRF boundary
+!                    data is interpolated from those availabe ARPS data.
+!                    The last valid boundary date and time will be
+!                    determined automatically based on tintv_bdywrf & tend_bdyin.
+!
+!   tintv_bdywrf    WRF boundary time interval in seconds. Used only when
+!                   create_bdy = 2.
+!
+!   bdyfheader  External boundary file name header (not including '.'
+!                at the end), corresponding to runname plus directory name.
+!                e.g., hdmpfheader='./eta25may1998'.
+!
+!   tbgn_bdyin  Time at which input boundary data begins (in seconds).
+!   tintv_bdyin Time interval between boundary data dumps.
+!   tend_bdyin  Time at which input boundary data ends.
+!
+!   NOTE: The above "time" represents forecast time in seconds from the
+!         initial ADAS analysis date and time (retrived from the file
+!         specified above "hisfile(1)"). "tbgn_bdyin" must be initial
+!         analysis time + tinv_bdyin.
+!
+!         The boundary file name is constructed as
+!              Perturbation file = "bdyfheader.XXXtttttt"
+!              Base file         = "bdyfheader.XXXgrdbas.??"
+!
+!          Where "XXX" represents the file format, like "bin" for binary
+!          which is specified by "hinfmt" above.
+!
+!          "tttttt" represents the forecast time from the initial time
+!          (ADAS analysis file specified above) which is computed
+!          from tbgn_bdyin + n*tintv_bdyin, n changes from 0 to
+!
+!               tend_bdyin - tbgn_bdyin
+!              -------------------------
+!                    tintv_bdyin
+!
+!          "??" is a serial number for the boundary files.
+!
+!          Examples:
+!              ./eta25may1998.bin010800    ./eta25may1998.bingrdbas.01
+!              ./eta25may1998.bin021600    ./eta25may1998.bingrdbas.02
+!              etc.
+!
+!          Those files are created by EXT2ARPS and they must be at the
+!          same grid as that specified by "hisfile(1)" above and they
+!          are in the same format specified by "hinfmt".
+!
+!  mgrdbas      Grid base file option for the above files
+!              = 0 share the same grid base file as "grdbasfn" (default);
+!              = 1 All of the files share one grid base file but it
+!                  is not grdbasfn, the file name will be
+!                  "bdyfheader.bingrdbas". Those files are usually
+!                  generated by ARPS;
+!              = 2 Each file has one corresponding grid base file.
+!                  Those files are generated by EXT2ARPS.
+!
+!--------------------------------------------------------------------
+
+ &bdyspc
+   create_bdy = 1,
+     tintv_bdywrf = 10800,
+
+     bdyfheader  = './eta25may1998',
+     tbgn_bdyin  = 10800,
+     tintv_bdyin = 10800,
+     tend_bdyin  = 21600,
+     mgrdbas     = 0,
+ /
+
+!--------------------------------------------------------------------
+!
+!  WRF grid definitions  (similar to those for WRFSI)
+!
+!    use_arps_grid:    Specify whether ARPS grid and WRF grid are the same.
+!              = 1, horizontal interplation will be unncessary
+!              = 0, need to do both horizontal and vertical interpolations.
+!
+!      NOTE: ARPS grid has two fake points at both end of each diretion
+!            X, Y and Z. So nx_wrf = nx_arps - 2, ny_wrf = ny_arps - 2.
+!
+!    The following speficicaitons are only used when use_arps_gird = 0, otherwise
+!    those information will be extracted from ARPS data.
+!
+!      nx_wrf:       Dimension size of WRF grid in X direction
+!      ny_wrf:       Dimension size of WRF grid in Y direction
+!
+!      mapproj_wrf:    Map projection option.
+!                    = 0, no map projection;
+!                    = 1, polar projection;   (-1 south polar projection)
+!                    = 2, Lambert projection; (-2 sothern hemisphere)
+!                    = 3, Mercator projection.
+!      trulat1_wrf:  1st true latitude of map projection.
+!      trulat2_wrf:  2nd true latitude of map projection (used only
+!                    by mapproj = 2).
+!      trulon_wrf:   True longitude of map projection.
+!      sclfct_wrf:   Map scale factor (default is 1.0).
+!      ctrlat_wrf:   Latitude of the model physical domain center (deg. N).
+!      ctrlon_wrf:   Longitude of the model physical domain center (deg. E).
+!
+!      dx_wrf:       Grid spacing in x-direction (meter).
+!      dy_wrf:       Grid spacing in y-direction (meter).
+!
+!    ptop:             Pressure in Pascal of the model top.
+!    vertgrd_opt:      Flag about how to generate sigma (WRF Eta) levels
+!                    = 0, sigma levels are specified by zlevels_wrf or nz_wrf
+!                         below. See notes with zlevels_wrf for details;
+!                    = 1, calculate linear levels in sigma;
+!                    = 2, calculate square root levels in sigma;
+!                    = 3, calculate the top 1/3 of the requested levels
+!                         in linear and the lower 2/3 of the requested
+!                         levels in square root in sigma.
+!
+!    nz_wrf            Number of vertical grid (used only when
+!                      vertgrd_opt > 0, Otherwise, it will be determined
+!                      by the actual elements specified in zlevels_wrf below)
+!
+!    pbot              Representative surface pressure (in Pascal, used
+!                      only by vertgrd_opt = 3)
+!
+!          NOTE: When vertgrd_opt = 3, the linear scheme and the
+!                square root scheme overlap each other, the value
+!                for number of elements in the array is usually
+!                larger than nz_wrf requested by the user.
+!
+!    zlevels_wrf:      List of vertical levels (used only when vertgrd_opt = 0),
+!                      sorted from bottom of the atmosphere to the top.
+!                      For the WRF mass coordinates, the first value must
+!                      be 1.0 (surface) and decrease to 0.0 (corresponds
+!                      to top of the atmosphere). The levels specified here
+!                      are "full" levels. All variables except w are on
+!                      the half levels.
+!
+!    NOTE: Users may explicitly define full eta levels.  Given are distributions
+!          for 28, 35, 31, and 53 levels.  The number of levels must agree with the
+!          number of WRF vertical dimension (nz_wrf). Otherwise, the program will
+!          reset nz_wrf to match with the actual levels in zlevels_wrf. Users may
+!          alternatively request only the number of levels (with nz_wrf and
+!          zlevels_wrf = -1), and the program will compute values.  The computation
+!          assumes a known first several layers, then generates equi-height spaced
+!          levels up to the top of the model.
+!
+!          Example 1: 28 vertical levels
+!                     zlevels_wrf     = 1.000, 0.990, 0.978, 0.964, 0.946,
+!                                       0.922, 0.894, 0.860, 0.817, 0.766,
+!                                       0.707, 0.644, 0.576, 0.507, 0.444,
+!                                       0.380, 0.324, 0.273, 0.228, 0.188,
+!                                       0.152, 0.121, 0.093, 0.069, 0.048,
+!                                       0.029, 0.014, 0.000,
+!          Example 2: 31 vertical levels
+!                   zlevels_wrf = 1.000, 0.993, 0.980, 0.966, 0.950, 0.933,
+!                                 0.913, 0.892, 0.869, 0.844, 0.816, 0.786,
+!                                 0.753, 0.718, 0.680, 0.639, 0.596, 0.550,
+!                                 0.501, 0.451, 0.398, 0.345, 0.290, 0.236,
+!                                 0.188, 0.145, 0.108, 0.075, 0.046, 0.021,
+!                                 0.000,
+!
+!          Example 3: 35 vertical levels
+!                     zlevels_wrf    =  1.000, 0.993, 0.983, 0.970, 0.954,
+!                                       0.934, 0.909, 0.880, 0.845, 0.807,
+!                                       0.765, 0.719, 0.672, 0.622, 0.571,
+!                                       0.520, 0.468, 0.420, 0.376, 0.335,
+!                                       0.298, 0.263, 0.231, 0.202, 0.175,
+!                                       0.150, 0.127, 0.106, 0.088, 0.070,
+!                                       0.055, 0.040, 0.026, 0.013, 0.000
+!
+!
+!          Example 4: 51 vertical levels
+!                   zlevels_wrf = 1.00000,0.99381,0.98643,0.97786,0.96815,
+!         0.95731,0.94538,0.93122,0.91490,0.89653,0.87621,0.85405,0.82911,
+!         0.80160,0.77175,0.73981,0.70509,0.66798,0.62889,0.58823,0.54957,
+!         0.51281,0.47788,0.44471,0.41323,0.38336,0.35503,0.32819,0.30276,
+!         0.27869,0.25592,0.23439,0.21405,0.19484,0.17672,0.15963,0.14352,
+!         0.12836,0.11410,0.10070,0.08811,0.07630,0.06523,0.05487,0.04517,
+!         0.03611,0.02765,0.01977,0.01243,0.00560,0.00000
+!
+!---------------------------------------------------------------------
+
+ &wrf_grid
+
+   use_arps_grid   =    1,    1,
+     nx_wrf      =     65,   65,
+     ny_wrf      =     65,   65,
+     mapproj_wrf =      2,
+     sclfct_wrf  =    1.0,
+     trulat1_wrf =   30.0,
+     trulat2_wrf =   60.0,
+     trulon_wrf  = -100.0,
+     ctrlat_wrf  =   38.0,
+     ctrlon_wrf  =  -98.0,
+     dx_wrf      = 30000.,  16000.,
+     dy_wrf      = 30000.,  16000.,
+
+     i_parent_start = 1,  17,
+     j_parent_start = 1,  17,
+
+   ptop        = 5000,      5000,
+   vertgrd_opt = 0,
+     nz_wrf    = 31,
+     pbot      = 101300,
+
+     zlevels_wrf = 1.000, 0.993, 0.980, 0.966, 0.950, 0.933,
+                   0.913, 0.892, 0.869, 0.844, 0.816, 0.786,
+                   0.753, 0.718, 0.680, 0.639, 0.596, 0.550,
+                   0.501, 0.451, 0.398, 0.345, 0.290, 0.236,
+                   0.188, 0.145, 0.108, 0.075, 0.046, 0.021,
+                   0.000,
+/
+
+!-------------------------------------------------------------------
+!
+!  wrf_opts:  These are WRF options which should be identical to
+!             the WRF namelist file, namelist.input.  The only exception
+!             is "rsl_lite".
+!
+!  NOTE: they are listed here just because the NetCDF file needs them
+!        as global attributes.
+!
+!    WRF namelist_01 (&dynamics for V2.0)
+!
+!    diff_opt (default to 1)
+!             turbulence and mixing  option:
+!          0 = no turbulence or explicit spatial numerical filters
+!              (km_opt IS IGNORED).
+!          1 = old diffusion scheme, evaluates 2nd order diffusion
+!              term on coordinate surfaces. uses kvdif for vertical
+!              diffusion, unless PBL option is used. may be used
+!              with km_opt = 1 and 4.
+!          2 = new diffusion scheme, evaluates mixing terms in
+!              physical space (stress form) (x,y,z). turbulence
+!              parameterization is chosen by specifying km_opt.
+!    km_opt (default to 1)
+!           eddy coefficient option
+!          1 = constant (uses khdif, kvdif which are defined in namelist_03)
+!            Different from diff_opt=1 because its horizontal diffusion
+!            is not along model zeta-surfaces. Same only in the case of
+!            no terrain.
+!          2 = 1.5 order TKE closure
+!          3 = Smagorinsky first order closure
+!          4 = horizontal Smagorinsky first order closure (may be used when dx >> dz)
+!
+!    WRF NAMELIST_03 (&dynamics)
+!
+!    khdif (default value is 0)
+!          This parameter specifies the horizontal diffusion constant (m^2/s),
+!          and it is used with diff_opt = 1 option or km_opt = 1 option.
+!
+!    kvdif (default value is 0)
+!          This parameter specifies the vertical diffusion constant (m^2/s),
+!          and it is used with diff_opt = 1 option or km_opt = 1 option.
+!
+!    WRF NAMELIST_04 (&physics)
+!
+!    mp_physics (default value is 0)  -- MUST be specified the same as later WRF run.
+!               This parameter specifies microphysics option. Currently the
+!               following are available:
+!             = 0, no microphysics
+!             = 1, Kessler scheme (warm rain)
+!             = 2, Lin et al. scheme (vapor, rain, snow, cloud water, ice, graupel)
+!             = 3, WSM 3-class simple ice scheme (vapor, cloud/ice and rain/snow)
+!             = 4, WSM 5-class scheme (vapor, rain, snow, cloud water, ice)
+!             = 5, Ferrier 2-class scheme (vapor, cloud water)
+!             = 6, WSM 6-class graupel scheme
+!             = 8, Thompson et al. graupel scheme
+!
+!    ra_lw_physics (default value is 0)
+!               This parameter specifies longwave radiation option. Options available:
+!             = 0, no longwave radiation
+!             = 1, rrtm scheme
+!
+!    ra_sw_physics (default value is 0)
+!               This parameter specifies shortwave radiation option. Options available:
+!             = 0, no shortwave radiation
+!             = 1, Dudhia scheme
+!             = 2, Goddard short wave
+!
+!    sf_sfclay_physics (default value is 0)
+!               This parameter specifies surface-layer option. Options available:
+!             = 0, no surface-layer
+!             = 1, Monin-Obukhov scheme
+!             = 2, MYJ Monin-Obukhov scheme (works only with MYJ PBL)
+!
+!    sf_surface_physics (default value is 0)   -- MUST be specified.
+!               This parameter specifies land-surface option. Options available:
+!             = 0, no land-surface
+!             = 1, thermal diffusion scheme
+!             = 2, OSU/MM5 land-surface model  (WRFV1.3)
+!                  Noah land-surface model     (WRFV2.0, sfcinitopt = "WRF" or
+!                                               "WRFSI" is recommended)
+!             = 3, RUC land-surface model
+!
+!    bl_pbl_physics (default value is 0)
+!               This parameter specifies boundary-layer option. Options available:
+!             = 0, no boundary-layer
+!             = 1, MRF scheme
+!             = 2, Eta Mellor-Yamada-Janjic TKE scheme
+!
+!    cu_physics (default value is 0)
+!               This parameter specifies cumulus option. Options available:
+!             = 0, no cumulus
+!             = 1, Eta Kain-Fritsch scheme with shallow convection
+!             = 2, Betts-Miller-Janjic scheme
+!             = 3, Grell-deveny ensemble scheme
+!             = 99, Kain-Fritsch scheme
+!
+!    dt   (unit in seconds, default is 2 sec)  (time_step in &domain)
+!               This parameter specifies the time step for advection or
+!               large time step. Typically, dt can be 5 - 7 times dx (in km).
+!               For example, if the grid size is 10 km, one may use dt = 60 sec.
+!
+!    base_temp  Base sea-level temp (K), used to generate base atmospheric states
+!
+!    spec_bdy_width (default value is 5)      (&bdy_control)
+!               This parameter specifies the number of rows for specified boundary
+!               value nudging.
+!
+! Parameters to be passed through to WRF namelist.input. These parameters have
+! no affects on ARPS2WRF behavior.
+!
+!
+!    nprocx_wrf (default value is -1)         (&domains variable 'nproc_x')
+!               Process number in X direction for WRF run.
+!
+!    nprocy_wrf (default value is -1)         (&domains variable 'nproc_y')
+!               Process number in Y direction for WRF run.
+!
+!    NOTES: nprocx_wrf/nprocy_wrf are used instead of nproc_x/nproc_y, as
+!           those names are already used.  Arps2wrf will use the correct
+!           names in the "namelist.input" file. They are included only for
+!           writing WRF namelist file and will not affect ARPS2WRF run
+!           in any way.
+!
+!           It is *unknown* if nprocx_wrf/nprocy_wrf will work for a
+!           non-RSL_LITE run, so don't change them!
+!
+!           If "wrf2arps" is to be run, then the RSL_LITE version is required!
+!           For that case, nprocx_wrf/nprocy_wrf *MUST* be set.  See the file
+!           "wrf2arps.input" for details including *REQUIRED* WRF code changes.
+!
+!   frames_per_outfile (1) : output times per history output file.
+!
+!   restart_interval  (60) : restart output file interval in minutes
+!   radt              (30) : minutes between radiation physics calls
+!                            recommend 1 min per km of dx (e.g. 10 for 10 km)
+!   cudt               (0) : minutes between cumulus physics calls
+!
+!   ifsnow             (0) : snow-cover effects
+!                            (only works for sf_surface_physics = 1)
+!                           1 = with    snow-cover effect
+!                           0 = without snow-cover effect
+!
+!   w_damping          (0) : vertical velocity damping flag (for operational use)
+!                           0 = without damping
+!                           1 = with    damping
+!
+!   io_form_history     (2):
+!   io_form_restart     (2):
+!   moist_adv_opt          : Original pd_moist, changed to integer
+!                          1: positive definite advection of moisture, 2: monotomic option
+!
+!   indir  = './',          ! used for LEAD project only
+!   outdir = './',          ! for LEAD only
+!   static = './',          ! for LEAD only
+!
+!-------------------------------------------------------------------
+
+&wrf_opts
+  diff_opt = 0,
+  km_opt   = 1,
+  khdif    = 0.0,                0.0,
+  kvdif    = 0.0,                0.0,
+  mp_physics    = 4,               4,
+  ra_lw_physics = 1,               1,
+  ra_sw_physics = 1,               1,
+  sf_sfclay_physics  = 1,          1,
+  sf_surface_physics = 2,          2,
+  bl_pbl_physics     = 1,          1,
+  cu_physics         = 1,          1,
+
+  base_temp          = 290.,
+
+  dt             = 40,
+  spec_bdy_width = 5,
+
+  nprocx_wrf = -1,
+  nprocy_wrf = -1,
+  frames_per_outfile     = 1,     1,
+  parent_time_step_ratio = 1,     2,
+  restart_interval       = 60,
+  radt                   = 30,   30,
+  cudt                   = 0,
+  ifsnow                 = 0,
+  w_damping              = 0,
+  dampcoef               = 0,
+
+  io_form_history        = 2,
+  io_form_restart        = 2,
+  history_interval       = 60,   30,
+  output_interval_2d     = 0,
+  output_dir_2d          = './',
+  moist_adv_opt          = 0,
+
+  indir                  = './',
+  outdir                 = './',
+  staticdir              = './',
+/
+
+!--------------------------------------------------------------------
+!
+!  iorder:      Order of horizontal interpolation
+!             1 = Bi-linear
+!             2 = Bi-quadratic
+!
+!  korder       Order of vertical interpolation
+!             1 = Linear
+!             2 = Quadratic (recommended)
+!
+!---------------------------------------------------------------------
+
+ &interp_options
+   iorder = 2,
+   korder = 2,
+/
+
+
+!-----------------------------------------------------------------------
+!
+!  Data output control parameters.
+!
+!  wrfversion WRF version supported
+!          = 2.2 WRF version 2.2
+!          = 3.0 WRF version 3.0 or later
+!          = 3.1 WRF version 3.1 or later
+!            NOTE: only WPS static file generated by GEOGRID provides
+!            the new data for gravity drag option of WRFV3.1.
+!
+!  dirname   Name of directory into which output files are written.
+!
+!  readyfl   Flag to writing a _ready file after output file is writen
+!          = 0, no _ready file
+!          = 1, write _ready file
+!
+!  io_form   Output WRF file format,
+!          = 1,  WRF internal binary format
+!          = 7,  NetCDF format (Default - 64bit file offset),
+!          = 97, Large NetCDF file support (64-bit file offset, CDF2)
+!                Requires NetCDF 3.6.0 and later
+!          = 107, netCDF 32-bit file offset (obsolete)
+!          = 5,  PHDF5 format, for MPI mode only.
+!
+!  qx_zero_out   Flag to zero-out hydrometeor variables, such as
+!                QR,QI,QS,QG,QH etc.
+!
+!  create_namelist  Indicates whether to dumps a WRF namelist file
+!                   according to the arguments specified above.
+!                  = 0 or 1
+!  wrfnamelist      String specifiy the WRF namelist file name when
+!                   create_namelist = 1.
+!
+!----------------------------------------------------------------------
+
+ &output
+   wrfversion  = 3.1,
+   dirname     = './',
+   readyfl     = 0,
+   io_form     = 7,
+   qx_zero_out = 0,
+   create_namelist = 1,
+     wrfnamelist   = 'namelist.input',
+/
+
+!---------------------------------------------------------------------
+!
+! END of Input file
+!
+!----------------------------------------------------------------------

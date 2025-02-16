@@ -1,0 +1,92 @@
+#############################################################################
+#
+# This README is for the perl test scripts included in scripts/
+#
+# Author: Yunheng Wang  (06/13/2002)
+#
+#############################################################################
+
+Steps to run these scripts:
+
+I.   Copy an ARPS version from paige:/work/official/ to a directory named as 
+     "arpsxxxx", where "xxxx" is the version number of arps, like, 
+     "5.0.0Beta8", "IHOP_2" etc.
+
+     For ARPS version information, read paige:/work/official/README_version
+
+II.  If you are not working on paige or cirrus, copy data on paige to a directory 
+     on your local machine. These date are: 
+
+       paige:/work/official/arpssfc.data
+       paige:/work/official/arpstern.data
+       paige:/work/official/data.25may1998
+
+     NOTE: These data are large. You had better maitain only one copy on each machine. 
+
+II.  change work directory to "arpsxxxx", i.e,
+       $ cd arpsxxx
+
+III. run the following command:
+       $ source scripts/link_data [/data]
+
+     This command supposes that you are using c shell or tcshell. "/data" is 
+     the directory where you have copied the data to. You can replace "/data" with 
+     any directory it is. If you are doing tests on paige or cirrus, you do not 
+     need to specify this parameter and the code will link them directly from 
+     /work/official.
+    
+IV. run ARPS standard tests, which are described on ARPS User's Guide.
+      $ scripts/test_xxxx.pl
+
+    where "xxxx" is one of the 7 independent tests and they are:
+    ==========================================================================     
+
+    7 independent tests:
+     
+    1.  test_warmbubble.pl            (A simple warmbubble test)
+    2.  test_may20delcitystorm.pl     (Same as 1 except for another restart run)
+    3.  test_restart.pl               (Same as 2 except for another restart mpi run)
+    4.  test_beltrami.pl
+    5.  test_density.pl
+    6.  test_symmetry.pl
+    7.  test_surface.pl
+ 
+V.  run a real case test based on data from May 25, 1998.
+    
+    1. Prepare tern data for the real case (either one will work, arpstrn is prefered):
+
+       $ scripts/test_arpstrn.pl      
+
+       OR
+
+       $ scripts/test_arpstern.pl
+
+    2. Prepare surface data for the test
+
+       $ scripts/test_arpssfc.pl
+ 
+    3. Prepare external boundary conditions
+
+       $ scripts/test_ext2arps.pl
+ 
+    4. Run ADAS (for initial conditions):
+ 
+       $ scripts/test_adas.pl
+ 
+    5. Run the real case:
+
+       $ scripts/test_realcase.pl
+
+    6. Run mpi test of this real case
+
+       $ scripts/test_arpsmpi.pl -real
+
+    ==============================================================================        
+
+    Do all of the above in one command line:
+
+       $ scripts/testarps.pl -arpstrn -arpstern -arpssfc -ext2arps -adas -realcase
+
+
+NOTE: Run "source scripts/link_data [/data]" again whenever your shell environment 
+      has been changed.
