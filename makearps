@@ -256,7 +256,7 @@ set lib_hdf               # default include HDF library
 if ($?HDF_GOOD_WITH_NET ) set hdfnet
 
 if ($mach == linux) then       # set default for Linux
-  set fort_cmp = ifort
+  set fort_cmp = ifx
   if ( $?F90 ) then
     set fort_cmp = "$F90"
   endif
@@ -269,7 +269,7 @@ else if ($mach == mac) then    # set default for Mac OS X
   set fort_cmp = xlf90
   #unset lib_hdf
 else if ($mach == intel-mac) then # set default for Intel Mac OS X (at least for 10.6)
-  set fort_cmp = ifort
+  set fort_cmp = ifx
 endif
 
 #}
@@ -559,7 +559,7 @@ while ($#argv)
       set proc_type = $argv[1]
       switch("$fort_cmp")
         case ifc*:
-        case ifort:
+        case ifx:
         case pgf90:
           breaksw
         default:
@@ -1401,10 +1401,15 @@ if ($?lib_net) then
   set DUMP_str = "$DUMP_str '$NET_str'"
 
   switch ("$HOST")
+  echo "$HOST"
 
   case s10c2b*: IU Big Red
     set INC_NET = "/N/u/tg-drlead/BigRed/libs/netcdf-4.0/include"
     set LIB_NET = "-L/N/u/tg-drlead/BigRed/libs/netcdf-4.0/lib -lnetcdf"
+    breaksw
+  case codespaces*:
+    set INC_NET = "-I/usr/include"
+    set LIB_NET =  "-L/usr/lib/x86_64-linux-gnu/ -lnetcdf -lnetcdff" 
     breaksw
 
   case modi*: # On  NCSA SGI O2K cluster
@@ -1530,8 +1535,9 @@ endif
 #-----------------------------------------------------------------------
 #
 
-set LIB_HDF =
+set LIB_HDF = 
 set INC_HDF = ./
+
 
 if ($?lib_hdf) then
   echo Support for HDF I/O.
@@ -1577,6 +1583,10 @@ if ($?lib_hdf) then
     set INC_HDF = "/usr/ncsa/include"
     breaksw
 
+  case codespaces*:
+    set INC_HDF = "/usr/include/hdf/"
+    set LIB_HDF =  "-L/usr/lib/ -lmfhdf -ldf -L/usr/lib -ljpeg -lz" 
+    breaksw
   case tun*:        # Tungsten on NCSA
     set LIB_HDF = "-L/usr/apps/hdf/lib -lmfhdf -ldf -lz -L/u/ncsa/slu/HDF/jpeg_lib/lib -ljpeg -L/u/ncsa/slu/HDF/szip_lib/lib -lsz"
     set INC_HDF = "/usr/apps/hdf/include"
@@ -1677,7 +1687,7 @@ if ($?lib_hdf5) then
   case vortex.caps.ou.edu:
   case thunder.caps.ou.edu:
     switch ("$fort_cmp")
-    case ifort:
+    case ifx:
       set MPI_COMPILER=intel
       breaksw
     case pgf90:
@@ -2027,7 +2037,7 @@ if ($?lib_lapack) then
       breaksw
     default
       #set LAPACK = "/usr"
-      if ( "$fort_cmp" == "ifort" ) then
+      if ( "$fort_cmp" == "ifx" ) then
         set LIBS = "$LIBS -mkl"
       else
         set LIBS = "$LIBS -llapack -lblas"
@@ -2335,7 +2345,7 @@ if ($mach == linux && (! $?proc_type)) then
 
 else if ($mach == "mac" || $mach == "intel-mac") then
   # Mac with Intel compiler is treated the same as Linux platform
-  if ($fort_cmp == "ifort") then
+  if ($fort_cmp == "ifx") then
     set mach = linux
     set proc_type = "-WI,-stack_size -WI,0x40000000"
   endif
@@ -2345,7 +2355,7 @@ endif
 if ($HOST == dawson.local) then
   set c_cmp = /usr/bin/gcc-4.2
   set CFLAGS0 = "-m64"
-  if ($fort_cmp == "ifort") then
+  if ($fort_cmp == "ifx") then
     set FFLAGS0 = "-m64 -xS -heap-arrays $FFLAGS0"
     set LDFLAGS = "-m64 -xS $LDFLAGS"
   else
@@ -3058,8 +3068,8 @@ else if ($mach == linux) then
     echo "WARNING"
     echo
     sleep 2
-    case ifort:
-    case *ifort*:
+    case ifx:
+    case *ifx*:
     case tau_f90.sh:
       if ("$proc_type" == "core2") set proc_type = "-march=core2 -mtune=core2 -shared-intel"
       setenv MPI_COMPILER  intel
@@ -3342,7 +3352,7 @@ else if ($mach == linux) then
       set DBG_str = "-g -Mbounds -traceback"
       #set DBG_str = "-g -Mbounds -Ktrap=fp,denorm"
       set CFLAGS0 = "-g $CFLAGS0"
-    else if ("$fort_cmp" == "ifort") then
+    else if ("$fort_cmp" == "ifx") then
       set DBG_str = "-g -fpe0 -check bounds -traceback"
       #set DBG_str = "-g -check bounds"
       set CFLAGS0 = "$CFLAGS0 -g"
@@ -3380,7 +3390,7 @@ else if ($mach == linux) then
     set LIBS = "$LIBS -Mconcur"
     #set LINUX_PAR_LIBS = "/usr/pgi/linux86-64/5.2/lib/libpgmp.a /usr/pgi/linux86-64/5.2/lib/libpgthread.a"
     #set LIBS = "$LIBS $LINUX_PAR_LIBS"
-  else if($?par && "$fort_cmp" == "ifort") then       # parallel
+  else if($?par && "$fort_cmp" == "ifx") then       # parallel
                # set OMP_NUM_THREADS or use default - all available processors
     if ($opt >= 2) then
       set FFLAGS0 = "$FFLAGS0 -parallel"
@@ -3394,7 +3404,7 @@ else if ($mach == linux) then
  if ( $CMD == mci2arps || $CMD == mergesat  || $CMD == sat2arps ) then
     if ("$fort_cmp" == "pgf90" || "$fort_cmp" == "ftn") then
       set LDFLAGS = "-Mnomain $LDFLAGS"
-    else if ("$fort_cmp" == "ifort") then
+    else if ("$fort_cmp" == "ifx") then
       set LDFLAGS = "-nofor_main $LDFLAGS"
     endif
   else if ($CMD =~ "arpsenkf*" && $?inline) then
