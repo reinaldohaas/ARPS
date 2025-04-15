@@ -1628,6 +1628,11 @@ if ($?lib_hdf) then
     set LIB_HDF = "-L/usr/lib -lmfhdf -ldf -lz -ljpeg"
     set INC_HDF = "/usr/include/hdf"
     breaksw
+  
+ case codespaces*:         # gordon.sdsc.edu
+    set LIB_HDF = "-L/usr/lib -lmfhdf -ldf -lz -ljpeg"
+    set INC_HDF = "/usr/include/hdf"
+    breaksw
 
   case origin:          # NSSL machine used by Jidong
     set LIB_HDF = "-L/home/Jidong.Gao/tools/HDF4.2r4/lib -lmfhdf -ldf -lz -ljpeg"
@@ -3461,9 +3466,9 @@ else if ($mach == linux) then
         breaksw
 
       default:
-        set LDR_str = "'ARPS_LD = mpif90'"
-        set FTN_str = "$FTN_str 'FTNMP = mpif90'"
-        set C_str = "$C_str 'CCMP = mpicc'"
+        set LDR_str = "'ARPS_LD = mpiifx'"
+        set FTN_str = "$FTN_str 'FTNMP = mpiifx'"
+        set C_str = "$C_str 'CCMP = mpiicc'"
       endsw
 
       if ("$fort_cmp" == "efc" ) then
